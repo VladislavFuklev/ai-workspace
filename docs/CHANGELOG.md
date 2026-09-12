@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+### Tooling — context economy (2026-09-12, not a roadmap task)
+
+**Added**
+- `scripts/ctx.sh` — session-start context digest: HEAD commit, tree state, current
+  phase and task, blockers, next action, the current phase's roadmap items, ADR
+  titles and available task specs. ~35 lines in place of ~470 lines of documents.
+- `.claude/skills/token-economy/SKILL.md` — when to read which document, and the
+  `rtk` equivalent for each noisy command in this stack.
+
+**Changed**
+- `CLAUDE.md` — added a "Context economy" section pointing at both.
+
+**Why**
+- `rtk discover` measured 1.8% RTK adoption in a real session here: the global
+  rewrite hook does not fire on compound commands, heredocs or pipelines, which is
+  most of what this project runs. Calling `rtk` explicitly is the fix.
+
 ### 0.2 — Monorepo setup (2026-09-12)
 
 **Added**

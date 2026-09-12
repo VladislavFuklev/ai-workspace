@@ -13,6 +13,19 @@ Read `docs/PROJECT_STATE.md`, `docs/ROADMAP.md`, `docs/ARCHITECTURE.md`, `docs/D
 - Changelog: `docs/CHANGELOG.md`
 - Task specs: `docs/tasks/`
 
+## Context economy
+
+Start a session with `./scripts/ctx.sh` — a ~35 line digest of state, roadmap
+position, blockers and ADR titles. Open the full documents only when the work
+needs them.
+
+Prefer `rtk <command>` over the raw command in Bash (`rtk pnpm`, `rtk next`,
+`rtk tsc`, `rtk uv`, `rtk git`, `rtk grep`, `rtk read`, `rtk docker`, `rtk psql`,
+`rtk err`). The global rewrite hook does not fire on compound commands, heredocs
+or pipelines, which is most of what this project runs.
+
+See the `token-economy` skill for the full list and rationale.
+
 ## Operating mode
 
 Work on one task at a time.
