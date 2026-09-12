@@ -102,15 +102,25 @@ class ScratchBase(DeclarativeBase):
 
 
 @contextlib.asynccontextmanager
-async def running_app(app: FastAPI) -> AsyncIterator[httpx.AsyncClient]:
+async def running_app(
+    app: FastAPI, *, raise_app_exceptions: bool = True
+) -> AsyncIterator[httpx.AsyncClient]:
     """A client talking to an app whose lifespan has actually run.
 
     `httpx.ASGITransport` does **not** run the lifespan — it dispatches requests
     only. Anything the lifespan puts on `app.state`, such as the session factory,
     is therefore missing unless the lifespan is entered explicitly.
+
+    `raise_app_exceptions` stays on by default so an unexpected failure in a test
+    is loud. Pass False to see what a real client sees: Starlette builds the 500
+    response and then re-raises so the server can log it, and only a transport
+    that swallows the re-raise shows the response body.
     """
     async with (
         app.router.lifespan_context(app),
-        httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client,
+        httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app, raise_app_exceptions=raise_app_exceptions),
+            base_url="http://test",
+        ) as client,
     ):
         yield client

@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+### 2.8 — Exception handling (2026-09-13)
+
+- Domain exceptions with stable machine-readable codes; nothing in the domain
+  raises `HTTPException`.
+- One error envelope — `code`, `message`, `detail`, `request_id` — matching what
+  the web client has parsed since 1.7, including FastAPI's own 422.
+- An unhandled error logs its traceback and returns a generic sentence plus a
+  reference. Verified to leak no credential, host, exception type or traceback.
+- `RequestContextMiddleware` rewritten as pure ASGI: `BaseHTTPMiddleware` changes
+  how exceptions surface and buffers streaming responses.
+- Warnings now fail the test suite.
+
 ### 2.7 — Structured logging (2026-09-13)
 
 - structlog: JSON outside local, console locally, with the standard library and

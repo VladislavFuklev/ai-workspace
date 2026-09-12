@@ -86,7 +86,7 @@ pretty = true
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
-addopts = "-q --strict-markers --strict-config -m 'not integration'"
+addopts = "-q --strict-markers --strict-config -W error -m 'not integration'"
 # Every async test is a coroutine; marking each one adds nothing.
 asyncio_mode = "auto"
 markers = [

@@ -14,6 +14,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from ai_workspace_api import __version__
+from ai_workspace_api.api.exception_handlers import register_exception_handlers
 from ai_workspace_api.api.middleware import RequestContextMiddleware
 from ai_workspace_api.api.routes import health
 from ai_workspace_api.core.database import create_engine, create_session_factory
@@ -67,6 +68,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     # Outermost, so every request — including one rejected by CORS — gets an id
     # and a log line.
     app.add_middleware(RequestContextMiddleware)
+
+    register_exception_handlers(app)
 
     if resolved.cors_origins:
         app.add_middleware(

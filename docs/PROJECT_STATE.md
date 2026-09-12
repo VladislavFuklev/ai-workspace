@@ -11,21 +11,19 @@ Phase 2 — Backend foundation
 None in progress.
 
 ## Last completed task
-2.7 — Structured logging (2026-09-13)
+2.8 — Exception handling (2026-09-13)
 
 ## Last session
 
-2.7 only. See `docs/tasks/2.7-logging.md`.
+2.8 only. See `docs/tasks/2.8-errors.md`.
 
-Beyond that file: the request-id bug was invisible to the tests as written and
-only showed when the server was run and its output read. Worth doing that after
-anything that touches middleware or logging.
+Beyond that file: `BaseHTTPMiddleware` changes how exceptions surface and buffers
+streaming responses. The request middleware is now pure ASGI; keep it that way,
+especially before phase 7's streaming.
 
 ## Next action
-Execute task **2.8 — Exception handling**; write `docs/tasks/2.8-errors.md`
-first. The error envelope must match what the web client already parses in
-`apps/web/src/lib/api/errors.ts`: `code`, `message`, and a `detail` array of
-`{field, message}` for a 422.
+Execute task **2.9 — API versioning**; write `docs/tasks/2.9-versioning.md`
+first. `settings.api_prefix` exists and is unused; health endpoints stay off it.
 
 ## Known blockers
 None.
