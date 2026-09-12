@@ -1,29 +1,32 @@
 # Project State
 
 ## Status
-Phase 1 in progress. Phase 0 complete: both workspaces, Docker services, quality gate, CI, docs system, design tokens. Both workspaces install cleanly, the local backing services
+**Phases 0 and 1 complete.** Phase 0 complete: both workspaces, Docker services, quality gate, CI, docs system, design tokens. Both workspaces install cleanly, the local backing services
 run in Docker, and a quality gate covers both languages. No product features.
 
 ## Current phase
-Phase 1 — Frontend foundation
+Phase 2 — Backend foundation
 
 ## Current task
 None in progress.
 
 ## Last completed task
-1.9 — Forms and validation (2026-09-13)
+1.10 — Reusable UI surface (2026-09-13)
 
 ## Last session
 
-1.9 only. See `docs/tasks/1.9-forms.md`.
+1.5 through 1.10 in one session, at the user's request — phase 1 complete. See the
+individual task files.
 
-Beyond that file: 1.7's `errorFromResponse` parsed the server's `detail` and threw
-it away, which only surfaced when something needed it. Worth checking other
-"parsed but unused" values.
+Carried forward: there is still no web test runner, so 1.7, 1.8 and 1.9 were each
+verified once through a throwaway route handler rather than a suite. Task 12.1
+should port those assertions; they are listed in the task outcomes.
 
 ## Next action
-Execute task **1.10 — Reusable UI surface**; write `docs/tasks/1.10-ui-surface.md`
-first. Last task of phase 1.
+Phase 2. Execute task **2.1 — FastAPI application structure**; write
+`docs/tasks/2.1-fastapi-application-structure.md` first. The API has
+dependencies, configuration, tooling and a container image but no ASGI app —
+`scripts/dev-api.sh` still reports that.
 
 ## Known blockers
 None.
@@ -43,7 +46,10 @@ None.
 - CI's first real run was red; both causes fixed and `scripts/check-ci.sh` added
   to catch that class before pushing. Needs one green run to confirm.
 - No browser automation until 12.8, so UI review is limited to markup and
-  generated CSS. `/design` and the error boundary deserve a human look.
+  generated CSS. The `(dev)` pages deserve a human look.
+- No web test runner (12.1): the API client, retry policy and form wiring were
+  each verified once, not continuously.
+- `(dev)` is reachable in production builds; gating belongs with deployment.
 - No theme switcher yet (1.5); `data-theme` must be set by hand.
 - `ci.yml` duplicates the commands in `scripts/check.sh`; both must be updated
   together.

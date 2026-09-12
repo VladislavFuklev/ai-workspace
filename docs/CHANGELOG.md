@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### 1.10 — Reusable UI surface (2026-09-13)
+
+- `(dev)` becomes a navigable reference: Tokens, Components, Forms, with an
+  "internal" marker and the same active-state mechanism as the product nav.
+- `(dev)/components` shows every shared component in the states it ships in,
+  leading with empty, error and long content rather than the happy path.
+- A page rather than Storybook: the app's own build, tokens and theme, with no
+  second dependency tree to keep in step.
+
 ### 1.9 — Forms and validation (2026-09-13)
 
 - `Field` (render prop, full ARIA wiring), `Input`, `Textarea`, `SubmitButton`,

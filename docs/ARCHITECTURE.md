@@ -95,7 +95,7 @@ Route groups (no URL segment of their own):
 | --- | --- | --- |
 | `(marketing)` | `/` | the public surface; landing page is task 14.1 |
 | `(app)` | `/workspace`, `/documents`, `/assistant`, `/usage`, `/settings` | header, sidebar/drawer, `<main>`, skip link |
-| `(dev)` | `/design` | internal reference surfaces, not product |
+| `(dev)` | `/design`, `/components`, `/forms` | internal reference surfaces, not product |
 
 Top-level `error.tsx`, `global-error.tsx` and `not-found.tsx` cover every route.
 Next 16 passes `retry` to an error boundary, not `reset`, and generates
@@ -103,6 +103,11 @@ Next 16 passes `retry` to an error boundary, not `reset`, and generates
 
 Dependency direction: `app → features → components → lib`.
 A feature may not import another feature's internals; shared code moves down a layer.
+
+As of phase 1, `lib/` holds the environment (`env.ts`), the API client (`api/`) and
+the query layer (`query/`); `components/` holds the shell (`layout/`), shared state
+components (`ui/`) and form primitives (`form/`). `features/` is still empty — the
+first feature arrives with documents in phase 5.
 
 ### API internals — `apps/api`
 

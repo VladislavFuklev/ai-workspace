@@ -22,7 +22,7 @@ See `MASTER_PROMPT.md` for the complete product specification.
 - [x] 1.7 API client
 - [x] 1.8 Query/cache architecture
 - [x] 1.9 Forms and validation
-- [ ] 1.10 Reusable UI surface
+- [x] 1.10 Reusable UI surface
 
 ## Phase 2
 - [ ] 2.1 FastAPI application structure
