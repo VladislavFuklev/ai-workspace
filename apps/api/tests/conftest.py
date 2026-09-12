@@ -64,3 +64,19 @@ def settings_from(monkeypatch: pytest.MonkeyPatch) -> BuildSettings:
 def settings(valid_env: dict[str, str], settings_from: BuildSettings) -> Settings:
     """A complete Settings object for tests that need one rather than build one."""
     return settings_from(valid_env)
+
+
+@pytest.fixture(scope="session")
+def database_url() -> str:
+    """The real database, from the environment the developer already has.
+
+    Integration tests use the compose stack rather than a substitute: SQLite is a
+    different database, and a query using pgvector or a Postgres-specific
+    constraint proves nothing there.
+    """
+    import os
+
+    url = os.environ.get("DATABASE_URL")
+    if not url:
+        pytest.skip("DATABASE_URL is not set; run scripts/dev-up.sh and copy .env")
+    return url

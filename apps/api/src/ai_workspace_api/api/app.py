@@ -15,6 +15,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from ai_workspace_api import __version__
+from ai_workspace_api.core.database import create_engine, create_session_factory
 from ai_workspace_api.core.settings import Settings, get_settings
 
 logger = logging.getLogger(__name__)
@@ -30,8 +31,17 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     """
     settings: Settings = app.state.settings
     logger.info("starting api", extra={"environment": settings.environment.value})
-    yield
-    logger.info("stopping api")
+
+    engine = create_engine(settings)
+    app.state.engine = engine
+    app.state.session_factory = create_session_factory(engine)
+    try:
+        yield
+    finally:
+        # Dispose even if startup of a later resource failed, or the pool keeps
+        # its connections until the process dies.
+        await engine.dispose()
+        logger.info("stopping api")
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:

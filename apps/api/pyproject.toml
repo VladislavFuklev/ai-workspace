@@ -5,7 +5,9 @@ description = "AI Workspace API — multi-tenant AI document intelligence backen
 requires-python = ">=3.13"
 dependencies = [
     "fastapi>=0.141.1",
+    "psycopg[binary,pool]==3.3.5",
     "pydantic-settings==2.15.0",
+    "sqlalchemy[asyncio]==2.0.52",
     "uvicorn[standard]>=0.52.4",
 ]
 
@@ -28,7 +30,7 @@ dev = [
 [tool.ruff]
 target-version = "py313"
 line-length = 100
-src = ["src", "tests"]
+src = ["src", "tests", "scripts"]
 
 [tool.ruff.lint]
 # Rule sets are enabled deliberately rather than with ALL, so every warning the
@@ -67,7 +69,7 @@ docstring-code-format = true
 
 [tool.mypy]
 python_version = "3.13"
-files = ["src", "tests"]
+files = ["src", "tests", "scripts"]
 strict = true
 # Fail loudly on the two things that silently erode a strict codebase.
 warn_unreachable = true
@@ -80,6 +82,11 @@ pretty = true
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
-addopts = "-q --strict-markers --strict-config"
+addopts = "-q --strict-markers --strict-config -m 'not integration'"
 # Every async test is a coroutine; marking each one adds nothing.
 asyncio_mode = "auto"
+markers = [
+    "integration: needs the compose stack (scripts/dev-up.sh). Excluded by default.",
+]
+# Integration tests are opt-in so a machine without the stack still gets a green
+# unit run — but scripts/check.sh runs them too, and says so when it cannot.

@@ -107,6 +107,11 @@ class Settings(BaseSettings):
     ]
     redis_url: RedisDsn
 
+    # Pool sizing is per process. The ceiling that matters is Postgres's
+    # max_connections divided by the number of API processes.
+    database_pool_size: Annotated[int, Field(ge=1, le=50)] = 5
+    database_max_overflow: Annotated[int, Field(ge=0, le=50)] = 5
+
     s3_endpoint_url: AnyHttpUrl
     s3_bucket: Annotated[str, Field(min_length=3, max_length=63)]
     s3_access_key: SecretStr

@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### 2.3 — Database connection (2026-09-13)
+
+- `core/database.py`: one async engine per process opened in the lifespan and
+  disposed on shutdown, one session per request from `SessionDep`.
+- `session_scope` guarantees rollback and close; committing stays with the caller,
+  which is the only place that knows where a unit of work ends.
+- Integration tests against the real Postgres, marked and excluded from the
+  default run, executed by `scripts/check.sh` with an explicit skip when the stack
+  is down. CI gains a Postgres 18 + pgvector service.
+
 ### 2.2 — Configuration (2026-09-13)
 
 - `service_name`, `api_prefix`, `cors_origins`, `max_request_body_bytes`; CORS

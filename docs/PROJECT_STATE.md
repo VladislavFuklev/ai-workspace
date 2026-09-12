@@ -11,18 +11,21 @@ Phase 2 — Backend foundation
 None in progress.
 
 ## Last completed task
-2.2 — Configuration (2026-09-13)
+2.3 — Database connection (2026-09-13)
 
 ## Last session
 
-2.2 only. See `docs/tasks/2.2-configuration.md`.
+2.3 only. See `docs/tasks/2.3-database-connection.md`.
 
-Beyond that file: pydantic-settings JSON-decodes list fields in the env source
-before validators run, so a comma-separated value needs `NoDecode` on the field.
+Beyond that file: the test suite now has two halves. `pytest` runs units only;
+integration tests are marked and run by `scripts/check.sh` when the stack is up,
+with an explicit skipped line when it is not. CI has its own Postgres service.
 
 ## Next action
-Execute task **2.3 — Database connection**; write
-`docs/tasks/2.3-database-connection.md` first.
+Execute task **2.4 — SQLAlchemy models**; write `docs/tasks/2.4-models.md` first.
+Base class, id and timestamp mixins, and a constraint naming convention — Alembic
+autogenerate produces unnamed constraints without one, and they cannot be dropped
+in a later migration.
 
 ## Known blockers
 None.

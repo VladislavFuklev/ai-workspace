@@ -59,9 +59,21 @@ jobs:
     defaults:
       run:
         working-directory: apps/api
+    services:
+      # Integration tests run against a real Postgres with pgvector. SQLite is a
+      # different database; a query using pgvector proves nothing there.
+      postgres:
+        image: pgvector/pgvector:pg18
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ci -d ci"
+          --health-interval 5s --health-timeout 5s --health-retries 12
     env:
-      # The settings object requires these; no .env exists in CI. Values are
-      # syntactically valid but point nowhere — nothing here opens a connection.
       ENVIRONMENT: test
       DATABASE_URL: postgresql+psycopg://ci:ci@localhost:5432/ci
       REDIS_URL: redis://localhost:6379/0
@@ -86,3 +98,8 @@ jobs:
       - run: uv run ruff check .
       - run: uv run mypy
       - run: uv run pytest
+      - name: Enable pgvector
+        # The compose stack does this with an init script; a service container
+        # has no init hook.
+        run: uv run python scripts/enable_pgvector.py
+      - run: uv run pytest -m integration

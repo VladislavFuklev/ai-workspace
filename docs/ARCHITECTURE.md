@@ -207,7 +207,7 @@ file, runs every check even after one fails, and exits non-zero if any did.
 | format | `prettier --check` | `ruff format --check` |
 | lint | `eslint` | `ruff check` |
 | types | `next typegen && tsc --noEmit` | `mypy --strict` |
-| tests | phase 12 | `pytest` |
+| tests | phase 12 | `pytest` (units) + `pytest -m integration` (real Postgres) |
 
 Plus `scripts/check.sh docs`: documentation consistency (`scripts/check-docs.sh`),
 and `scripts/check-contrast.mjs`: WCAG AA for every token pairing in both themes.

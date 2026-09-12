@@ -16,6 +16,7 @@ cd "$repo_root"
 
 target="${1:-all}"
 failed=()
+skipped=()
 
 run() {
   local label="$1"; shift
@@ -48,9 +49,22 @@ if [ "$target" = "all" ] || [ "$target" = "api" ]; then
   run "api · lint"      api ruff check .
   run "api · types"     api mypy
   run "api · tests"     api pytest
+
+  # Integration tests need the compose stack. Skipping is reported, not silent:
+  # a suite that quietly runs nothing is worse than one that fails.
+  if [ -f .env ] && (set -a; . ./.env; set +a; nc -z localhost "${POSTGRES_PORT:-5433}" 2>/dev/null); then
+    run "api · integration" bash -c 'set -a; . ./.env; set +a; cd apps/api && uv run pytest -m integration'
+  else
+    printf '\n\033[1m==> api · integration\033[0m\n'
+    printf '    \033[33mskipped\033[0m — database unreachable; run scripts/dev-up.sh\n'
+    skipped+=("api · integration")
+  fi
 fi
 
 echo
+if [ ${#skipped[@]} -gt 0 ]; then
+  printf '\033[33m%d check(s) skipped:\033[0m %s\n' "${#skipped[@]}" "${skipped[*]}"
+fi
 if [ ${#failed[@]} -eq 0 ]; then
   printf '\033[32mAll checks passed.\033[0m\n'
   exit 0
