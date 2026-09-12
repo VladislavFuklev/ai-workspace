@@ -11,14 +11,19 @@ Phase 1 — Frontend foundation
 None in progress.
 
 ## Last completed task
-1.8 — Query and cache architecture (2026-09-12)
+1.9 — Forms and validation (2026-09-13)
 
 ## Last session
 
-1.8 only. See `docs/tasks/1.8-query-cache.md`.
+1.9 only. See `docs/tasks/1.9-forms.md`.
+
+Beyond that file: 1.7's `errorFromResponse` parsed the server's `detail` and threw
+it away, which only surfaced when something needed it. Worth checking other
+"parsed but unused" values.
 
 ## Next action
-Execute task **1.9 — Forms and validation**; write `docs/tasks/1.9-forms.md` first.
+Execute task **1.10 — Reusable UI surface**; write `docs/tasks/1.10-ui-surface.md`
+first. Last task of phase 1.
 
 ## Known blockers
 None.

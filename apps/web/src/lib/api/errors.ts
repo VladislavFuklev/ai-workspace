@@ -28,6 +28,8 @@ export class ApiError extends Error {
   /** Machine-readable code from the server, for branching in a caller. */
   readonly code?: string;
   readonly requestId?: string;
+  /** The server's structured detail, kept so a 422 can be mapped back onto fields. */
+  readonly detail?: unknown;
 
   constructor(init: {
     kind: ApiErrorKind;
@@ -35,6 +37,7 @@ export class ApiError extends Error {
     status?: number;
     code?: string;
     requestId?: string;
+    detail?: unknown;
     cause?: unknown;
   }) {
     super(init.message, { cause: init.cause });
@@ -43,6 +46,7 @@ export class ApiError extends Error {
     this.status = init.status;
     this.code = init.code;
     this.requestId = init.requestId;
+    this.detail = init.detail;
   }
 
   /** Retrying a 4xx just fails again; a timeout or a 5xx might not. */
@@ -56,11 +60,13 @@ export class ApiError extends Error {
 export async function errorFromResponse(response: Response): Promise<ApiError> {
   let code: string | undefined;
   let message: string | undefined;
+  let detail: unknown;
   try {
     const parsed = apiErrorBody.safeParse(await response.json());
     if (parsed.success) {
       code = parsed.data.code;
       message = parsed.data.message;
+      detail = parsed.data.detail;
     }
   } catch {
     // A failure response with no JSON body is normal — a proxy timeout, an
@@ -70,6 +76,7 @@ export async function errorFromResponse(response: Response): Promise<ApiError> {
     kind: "http",
     status: response.status,
     code,
+    detail,
     message: message ?? `Request failed with status ${response.status}`,
     requestId: response.headers.get("x-request-id") ?? undefined,
   });

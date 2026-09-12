@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### 1.9 — Forms and validation (2026-09-13)
+
+- `Field` (render prop, full ARIA wiring), `Input`, `Textarea`, `SubmitButton`,
+  `FormError`, and `applyServerErrors` mapping a 422 back onto its fields.
+- React Hook Form with a Zod resolver; one schema for client validation and the
+  API payload.
+- Working demo at `(dev)/forms` covering client validation, a server field error
+  and a form-level failure.
+- Fixes 1.7: `errorFromResponse` parsed the server's `detail` and discarded it.
+
 ### 1.8 — Query and cache architecture (2026-09-12)
 
 - TanStack Query 5.102.8: `queryKeys` built centrally so an invalidation cannot
