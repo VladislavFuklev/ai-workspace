@@ -297,6 +297,11 @@ Because nothing is shared at compile time, the web app validates every response
 body with Zod inside `lib/api` before it reaches a component. A cast would only
 move the failure somewhere harder to diagnose.
 
+The API's OpenAPI document is shaped for that role: stable operation ids, the
+error envelope on every operation, and `ErrorResponse` in the components. It is
+good enough to generate a typed client from, which would replace the hand-written
+schemas on the web side.
+
 No shared build tool spans the two languages. CI runs them as separate jobs.
 
 ## Architectural principles

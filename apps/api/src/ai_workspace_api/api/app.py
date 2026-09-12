@@ -16,6 +16,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from ai_workspace_api import __version__
 from ai_workspace_api.api.exception_handlers import register_exception_handlers
 from ai_workspace_api.api.middleware import RequestContextMiddleware
+from ai_workspace_api.api.openapi import (
+    COMMON_RESPONSES,
+    custom_openapi,
+    route_name_operation_id,
+)
 from ai_workspace_api.api.routes import health
 from ai_workspace_api.api.v1 import api_router as v1_router
 from ai_workspace_api.core.database import create_engine, create_session_factory
@@ -59,6 +64,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         # Interactive docs are for humans in development. Task 2.10 decides what
         # production exposes; until then, closed.
         docs_url="/docs" if resolved.debug else None,
+        # Documented on every operation, so a generated client knows the error
+        # envelope exists rather than assuming 200 is the only outcome.
+        responses=COMMON_RESPONSES,
+        # Inherited by every included router, so operation ids stay readable and
+        # stable wherever a route lives.
+        generate_unique_id_function=route_name_operation_id,
         redoc_url=None,
         openapi_url="/openapi.json" if resolved.debug else None,
     )
@@ -101,6 +112,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             "version": __version__,
             "environment": resolved.environment.value,
         }
+
+    app.openapi = custom_openapi(app, resolved)  # type: ignore[method-assign]
 
     return app
 

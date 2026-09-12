@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### 2.10 — OpenAPI documentation (2026-09-13)
+
+- Operation ids come from the route name, so a generated client's method names
+  stay stable when a route moves; duplicates are refused when the document builds.
+- Every operation documents 422 and 500 with the error envelope — a client
+  written against a schema listing only 200 does not know it exists.
+- Description covers the error contract and `X-Request-ID`; tags and servers set;
+  the document is built once.
+
 ### 2.9 — API versioning (2026-09-13)
 
 - `api/v1/` with a single router mounted under `settings.api_prefix`; a future
