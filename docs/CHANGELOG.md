@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### 1.8 — Query and cache architecture (2026-09-12)
+
+- TanStack Query 5.102.8: `queryKeys` built centrally so an invalidation cannot
+  miss its own query, and a hierarchy where a parent key covers its children.
+- Retry follows `ApiError.isRetryable` — a 403 is not worth four attempts — with a
+  ceiling of two and exponential backoff. Mutations never retry.
+- `QueryProvider` creates the client in state, not at module scope, so server
+  requests cannot share a cache.
+
 ### 1.7 — API client (2026-09-12)
 
 - `createApiClient({ baseUrl })` with a bounded timeout, `credentials: "include"`,

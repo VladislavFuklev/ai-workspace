@@ -11,19 +11,14 @@ Phase 1 — Frontend foundation
 None in progress.
 
 ## Last completed task
-1.7 — API client (2026-09-12)
+1.8 — Query and cache architecture (2026-09-12)
 
 ## Last session
 
-1.7 only. See `docs/tasks/1.7-api-client.md`.
-
-Beyond that file: there is still no web test runner, so the client's thirteen
-behaviours were verified once through a throwaway Next route handler rather than
-a suite. Task 12.1 should port them.
+1.8 only. See `docs/tasks/1.8-query-cache.md`.
 
 ## Next action
-Execute task **1.8 — Query/cache architecture**; write
-`docs/tasks/1.8-query-cache.md` first.
+Execute task **1.9 — Forms and validation**; write `docs/tasks/1.9-forms.md` first.
 
 ## Known blockers
 None.
