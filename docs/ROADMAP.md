@@ -3,7 +3,7 @@
 See `MASTER_PROMPT.md` for the complete product specification.
 
 ## Phase 0
-- [ ] 0.1 Repository initialization and architecture decision
+- [x] 0.1 Repository initialization and architecture decision
 - [ ] 0.2 Monorepo setup
 - [ ] 0.3 Development environment and Docker
 - [ ] 0.4 Code quality tooling
