@@ -17,6 +17,7 @@ from ai_workspace_api import __version__
 from ai_workspace_api.api.exception_handlers import register_exception_handlers
 from ai_workspace_api.api.middleware import RequestContextMiddleware
 from ai_workspace_api.api.routes import health
+from ai_workspace_api.api.v1 import api_router as v1_router
 from ai_workspace_api.core.database import create_engine, create_session_factory
 from ai_workspace_api.core.logging import configure_logging, get_logger
 from ai_workspace_api.core.settings import Settings, get_settings
@@ -83,9 +84,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             expose_headers=["X-Request-ID"],
         )
 
-    # Health endpoints stay off the versioned prefix (2.9): an orchestrator's
-    # probe URL should not change when the API version does.
+    # Health endpoints stay off the versioned prefix: an orchestrator's probe URL
+    # should not change when the API version does.
     app.include_router(health.router)
+    app.include_router(v1_router, prefix=resolved.api_prefix)
 
     @app.get("/", tags=["meta"], summary="Service identity")
     async def root() -> dict[str, str]:

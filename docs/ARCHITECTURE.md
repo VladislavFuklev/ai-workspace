@@ -117,7 +117,7 @@ apps/api/
 ├── uv.lock            [exists] fully resolved dependency lock
 ├── .python-version    [exists] 3.13
 ├── src/ai_workspace_api/
-│   ├── api/           HTTP routers, versioned (v1), request/response wiring only
+│   ├── api/           HTTP routers: `v1/` behind the prefix, health outside it
 │   ├── services/      business logic and orchestration
 │   ├── repositories/  data access
 │   ├── models/        SQLAlchemy ORM models

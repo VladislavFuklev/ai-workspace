@@ -33,7 +33,7 @@ See `MASTER_PROMPT.md` for the complete product specification.
 - [x] 2.6 Health endpoints
 - [x] 2.7 Structured logging
 - [x] 2.8 Exception handling
-- [ ] 2.9 API versioning
+- [x] 2.9 API versioning
 - [ ] 2.10 OpenAPI documentation
 
 ## Phase 3

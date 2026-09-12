@@ -11,19 +11,18 @@ Phase 2 — Backend foundation
 None in progress.
 
 ## Last completed task
-2.8 — Exception handling (2026-09-13)
+2.9 — API versioning (2026-09-13)
 
 ## Last session
 
-2.8 only. See `docs/tasks/2.8-errors.md`.
+2.9 only. See `docs/tasks/2.9-versioning.md`.
 
-Beyond that file: `BaseHTTPMiddleware` changes how exceptions surface and buffers
-streaming responses. The request middleware is now pure ASGI; keep it that way,
-especially before phase 7's streaming.
+Beyond that file: FastAPI 0.141 does not flatten an included router into
+`app.routes`, so tests must assert routing by request rather than introspection.
 
 ## Next action
-Execute task **2.9 — API versioning**; write `docs/tasks/2.9-versioning.md`
-first. `settings.api_prefix` exists and is unused; health endpoints stay off it.
+Execute task **2.10 — OpenAPI documentation**; write `docs/tasks/2.10-openapi.md`
+first. Last task of phase 2.
 
 ## Known blockers
 None.

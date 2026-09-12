@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### 2.9 — API versioning (2026-09-13)
+
+- `api/v1/` with a single router mounted under `settings.api_prefix`; a future
+  major version is a sibling package, so v1 keeps working unchanged.
+- The prefix is validated — it is concatenated into every route path, and a
+  trailing or missing slash produces routes nobody can reach.
+- Health endpoints stay off the prefix: a probe URL should not move with the API
+  version.
+
 ### 2.8 — Exception handling (2026-09-13)
 
 - Domain exceptions with stable machine-readable codes; nothing in the domain

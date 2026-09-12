@@ -88,7 +88,9 @@ class Settings(BaseSettings):
     log_level: LogLevel = LogLevel.INFO
 
     service_name: str = "ai-workspace-api"
-    api_prefix: str = "/api/v1"
+    # Validated because it is concatenated into every versioned route path; a
+    # trailing slash or a missing leading one produces routes nobody can reach.
+    api_prefix: Annotated[str, Field(pattern=r"^/[a-z0-9/_-]*[a-z0-9]$")] = "/api/v1"
 
     # NoDecode is required: without it the env source tries to JSON-decode any
     # list field before validators run, so "a,b" fails before it can be split.
