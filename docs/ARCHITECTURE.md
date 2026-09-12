@@ -221,6 +221,15 @@ Tailwind scans source as text: a class composed at runtime (`` `bg-${token}` ``)
 generates no CSS while building and typechecking cleanly. Write class names out
 in full.
 
+Tailwind 4 recognises a fixed set of `@theme` namespaces (colour, spacing, text,
+radius, shadow, ease, …). There is **no `z` or `duration` namespace**: those
+tokens are declared as variables and exposed with `@utility`. A `@theme` entry in
+an unknown namespace silently generates nothing.
+
+`check-contrast.mjs` enforces the system: WCAG AA for every pairing in both
+themes, `viewport.themeColor` matching `--color-bg`, and no raw hex anywhere in
+`apps/web/src` outside `globals.css`.
+
 Python checks run with `apps/api` as the working directory: Ruff's per-file-ignores
 and mypy's `files` resolve relative to the working directory, and mypy misreads the
 module layout from the repository root.

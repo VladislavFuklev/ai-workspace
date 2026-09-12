@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+### 1.3 — Design tokens (2026-09-12)
+
+- Layering (`z-sticky` … `z-skip-link`), motion (two durations, two easings) and
+  frame metrics (`h-header`, `w-sidebar`, `w-drawer`, `max-w-content`).
+- Tailwind 4 has no `z` or `duration` namespace, so those are declared with
+  `@utility`; the rest come from `@theme`.
+- `prefers-reduced-motion` zeroes the duration tokens themselves.
+- `check-contrast.mjs` now fails on a raw hex outside `globals.css`, with two
+  documented exemptions.
+- Overlapped 0.8; scoped to the gaps 1.2 exposed rather than redone.
+
 ### 1.2 — Responsive application layout (2026-09-12)
 
 - `AppShell` client component: sidebar inline at `lg`+, native `<dialog>` drawer

@@ -89,6 +89,51 @@ const SHAPES = [
   { name: "shadow-md", cls: "size-16 rounded-lg bg-surface shadow-md" },
 ];
 
+const LAYERS = [
+  { name: "z-sticky", value: "10", use: "a row or toolbar that pins while scrolling" },
+  { name: "z-header", value: "30", use: "the application header" },
+  { name: "z-backdrop", value: "40", use: "dimmed ground behind a modal" },
+  { name: "z-drawer", value: "50", use: "the navigation drawer" },
+  { name: "z-popover", value: "60", use: "menus, tooltips, comboboxes" },
+  { name: "z-toast", value: "70", use: "transient notifications" },
+  { name: "z-skip-link", value: "80", use: "above everything, or it cannot be used" },
+];
+
+const MOTION = [
+  { name: "duration-fast", value: "120ms", use: "hover, focus, colour changes" },
+  { name: "duration-slow", value: "240ms", use: "a panel entering or leaving" },
+  { name: "ease-out", value: "cubic-bezier(0.16, 1, 0.3, 1)", use: "something arriving" },
+  {
+    name: "ease-in-out",
+    value: "cubic-bezier(0.65, 0, 0.35, 1)",
+    use: "something moving in place",
+  },
+];
+
+const METRICS = [
+  { name: "h-header", value: "3.5rem", use: "application header height" },
+  { name: "w-sidebar", value: "15rem", use: "sidebar at lg and up" },
+  { name: "w-drawer", value: "18rem", use: "navigation drawer below lg" },
+  { name: "max-w-content", value: "64rem", use: "reading width of a content column" },
+];
+
+function TokenTable({ rows }: { rows: { name: string; value: string; use: string }[] }) {
+  return (
+    <div className="divide-y divide-border rounded-lg border border-border">
+      {rows.map((row) => (
+        <div
+          key={row.name}
+          className="flex flex-col gap-0.5 px-4 py-2.5 sm:flex-row sm:items-baseline sm:gap-6"
+        >
+          <span className="font-mono text-xs text-text sm:w-40 sm:shrink-0">{row.name}</span>
+          <span className="font-mono text-xs text-text-muted sm:w-56 sm:shrink-0">{row.value}</span>
+          <span className="text-xs text-text-subtle">{row.use}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function Section({
   title,
   note,
@@ -232,6 +277,27 @@ export default function DesignTokensPage() {
               </div>
             ))}
           </div>
+        </Section>
+
+        <Section
+          title="Layering"
+          note="Every stacking context the product has. A raw z-index is a number nobody can reason about three screens later, so there are no raw z-indexes."
+        >
+          <TokenTable rows={LAYERS} />
+        </Section>
+
+        <Section
+          title="Motion"
+          note="Two durations and two easings. Anything slower than slow reads as lag. Under prefers-reduced-motion the tokens themselves collapse to nothing, so code reading them directly is covered too."
+        >
+          <TokenTable rows={MOTION} />
+        </Section>
+
+        <Section
+          title="Frame metrics"
+          note="The dimensions of the application shell, so the layout does not repeat them and a change lands in one place."
+        >
+          <TokenTable rows={METRICS} />
         </Section>
 
         <Section

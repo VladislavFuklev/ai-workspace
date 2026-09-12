@@ -11,20 +11,22 @@ Phase 0 — Product and engineering foundation
 None in progress.
 
 ## Last completed task
-1.2 — Responsive application layout (2026-09-12)
+1.3 — Design tokens (2026-09-12)
 
 ## Last session
 
-1.1 only. See `docs/tasks/1.1-nextjs-application-shell.md`.
+1.2 and 1.3 in one session, at the user's request. See both task files.
 
-Beyond that file: route groups create no URL segment, so Next generates
-`LayoutRoutes = "/"` and every group layout types as `LayoutProps<"/">`. And a
-route that throws during prerender fails the build rather than reaching the error
-boundary — `force-dynamic` is needed to exercise the runtime path.
+Beyond those: Tailwind 4 has no `z` or `duration` theme namespace, so `@theme`
+entries for them generate nothing — declare such utilities with `@utility`. And
+1.3 overlapped 0.8; it was reinterpreted as the gaps 1.2 exposed rather than
+redone. Later phase-1 tasks may overlap phase 0 the same way — check before
+assuming a task is fresh work.
 
 ## Next action
-Execute task **1.2 — Responsive application layout**; write
-`docs/tasks/1.2-responsive-application-layout.md` first.
+Execute task **1.4 — Navigation**; write `docs/tasks/1.4-navigation.md` first.
+It fills the `<nav>` region 1.2 left empty and resolves the duplicate "Main"
+landmark noted there.
 
 ## Known blockers
 None.

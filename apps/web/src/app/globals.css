@@ -98,9 +98,61 @@
   --radius-lg: 0.5rem;
   --radius-xl: 0.75rem;
 
+  /* Stacking order, named. A raw z-index is a number nobody can reason about
+     three screens later; these are the only layers that exist. */
+  --z-base: 0;
+  --z-sticky: 10;
+  --z-header: 30;
+  --z-backdrop: 40;
+  --z-drawer: 50;
+  --z-popover: 60;
+  --z-toast: 70;
+  --z-skip-link: 80;
+
+  /* Motion. Two durations and two easings — anything slower than `slow` reads as
+     lag. All of it is disabled under prefers-reduced-motion (see the base layer). */
+  --duration-fast: 120ms;
+  --duration-slow: 240ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* Metrics of the application frame, so the shell does not repeat them. */
+  --spacing-header: 3.5rem;
+  --spacing-sidebar: 15rem;
+  --spacing-drawer: 18rem;
+  --spacing-content: 64rem;
+
   /* Two levels. Depth separates a popover from the page; it is not decoration. */
   --shadow-sm: 0 1px 2px 0 rgb(13 17 22 / 0.06), 0 1px 1px -1px rgb(13 17 22 / 0.04);
   --shadow-md: 0 4px 12px -2px rgb(13 17 22 / 0.1), 0 2px 4px -2px rgb(13 17 22 / 0.06);
+}
+
+/* Tailwind 4 has no `z` or `duration` theme namespace, so the layering and motion
+   tokens become utilities explicitly. Everything else (colour, spacing, radius,
+   shadow, ease, text) is generated from @theme above. */
+@utility z-sticky {
+  z-index: var(--z-sticky);
+}
+@utility z-header {
+  z-index: var(--z-header);
+}
+@utility z-drawer {
+  z-index: var(--z-drawer);
+}
+@utility z-popover {
+  z-index: var(--z-popover);
+}
+@utility z-toast {
+  z-index: var(--z-toast);
+}
+@utility z-skip-link {
+  z-index: var(--z-skip-link);
+}
+@utility duration-fast {
+  transition-duration: var(--duration-fast);
+}
+@utility duration-slow {
+  transition-duration: var(--duration-slow);
 }
 
 /* ---------------------------------------------------------------------------
@@ -173,6 +225,13 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
+    /* Neutralise the tokens at the source as well as the computed properties, so
+       anything reading --duration-* directly is covered too. */
+    :root {
+      --duration-fast: 0.01ms;
+      --duration-slow: 0.01ms;
+    }
+
     *,
     *::before,
     *::after {

@@ -15,7 +15,7 @@ See `MASTER_PROMPT.md` for the complete product specification.
 ## Phase 1
 - [x] 1.1 Next.js application shell
 - [x] 1.2 Responsive application layout
-- [ ] 1.3 Design tokens
+- [x] 1.3 Design tokens
 - [ ] 1.4 Navigation
 - [ ] 1.5 Theme system
 - [ ] 1.6 Error/loading/empty states

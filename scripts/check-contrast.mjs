@@ -4,9 +4,9 @@
 //
 //   node scripts/check-contrast.mjs             failures and a summary only
 //   node scripts/check-contrast.mjs --verbose   every measured ratio
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { dirname, resolve } from "node:path";
+import { dirname, relative as relativePath, resolve } from "node:path";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const verbose = process.argv.includes("--verbose");
@@ -106,10 +106,35 @@ for (const [theme, tokens] of Object.entries(themes)) {
   }
 }
 
+// Token discipline: a hex literal in a component is a colour that no theme can
+// change. Two files are exempt for reasons recorded next to them.
+{
+  const EXEMPT = new Set([
+    // Replaces <html> when the root layout fails, so it cannot load the stylesheet.
+    "apps/web/src/app/global-error.tsx",
+    // viewport.themeColor must be a literal; asserted against --color-bg above.
+    "apps/web/src/app/layout.tsx",
+  ]);
+  const walk = (dir) =>
+    readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+      const full = resolve(dir, entry.name);
+      if (entry.isDirectory()) return walk(full);
+      return /\.(tsx?|css)$/.test(entry.name) ? [full] : [];
+    });
+  for (const file of walk(resolve(root, "apps/web/src"))) {
+    const relative = relativePath(root, file);
+    if (relative.endsWith("globals.css") || EXEMPT.has(relative)) continue;
+    for (const [, hex] of readFileSync(file, "utf8").matchAll(/(#[0-9a-fA-F]{3,8})\b/g)) {
+      console.log(`  FAIL raw colour ${hex} in ${relative} — use a token`);
+      failures++;
+    }
+  }
+}
+
 const checked = PAIRINGS.length * Object.keys(themes).length + 2;
 console.log(
   failures === 0
-    ? `${checked} colour checks pass (WCAG AA, both themes)`
+    ? `${checked} colour checks pass (WCAG AA, both themes; no raw hex outside globals.css)`
     : `\n${failures} of ${checked} colour checks failed`,
 );
 process.exit(failures === 0 ? 0 : 1);
