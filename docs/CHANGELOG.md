@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+### 0.8 — Design system foundation (2026-09-12)
+
+- Semantic design tokens in `globals.css` under Tailwind 4 `@theme`: neutral ramp,
+  surfaces, text, one accent, three status colours, type scale, spacing, radii,
+  two elevations. Complete dark set under `[data-theme="dark"]`.
+- Inter and JetBrains Mono self-hosted through `next/font`; base layer sets a
+  visible `:focus-visible` ring and honours `prefers-reduced-motion`.
+- `/design` renders every token for review.
+- `scripts/check-contrast.mjs` measures 20 pairings in both themes against WCAG
+  AA and rejects malformed colour values. Part of `check.sh` and CI.
+
 ### 0.7 — Documentation system (2026-09-12)
 
 - `docs/README.md` — index of which document answers which question.

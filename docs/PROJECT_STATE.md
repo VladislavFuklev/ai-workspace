@@ -1,7 +1,7 @@
 # Project State
 
 ## Status
-Phase 0 in progress. Both workspaces install cleanly, the local backing services
+**Phase 0 complete.** Both workspaces install cleanly, the local backing services
 run in Docker, and a quality gate covers both languages. No product features.
 
 ## Current phase
@@ -11,18 +11,19 @@ Phase 0 — Product and engineering foundation
 None in progress.
 
 ## Last completed task
-0.7 — Documentation system (2026-09-12)
+0.8 — Design system foundation (2026-09-12)
 
 ## Last session
 
-0.7 only. See `docs/tasks/0.7-documentation-system.md`.
+0.8 only, completing phase 0. See `docs/tasks/0.8-design-system-foundation.md`.
 
-Beyond that file: an unescaped `.` in a grep pattern made the drift check pass on
-drifted input. Exercise the failure case, or a check proves nothing.
+Beyond that file: a Tailwind class composed at runtime (`bg-${token}`) generates
+no CSS, and both the build and the typechecker are happy about it. Grep the built
+stylesheet for the utilities a page claims to use.
 
 ## Next action
-Execute task **0.8 — Design system foundation** per
-`docs/tasks/0.8-design-system-foundation.md`. Last task of phase 0.
+Phase 1. Execute task **1.1 — Next.js application shell**; write
+`docs/tasks/1.1-nextjs-application-shell.md` first.
 
 ## Known blockers
 None.
@@ -41,6 +42,9 @@ None.
   `vector` extension in a migration.
 - CI is written and verified locally but has never run on GitHub: the branch is
   ahead of `origin/main` and unpushed.
+- No browser automation until 12.8, so UI review is limited to markup and
+  generated CSS. `/design` deserves a human look.
+- No theme switcher yet (1.5); `data-theme` must be set by hand.
 - `ci.yml` duplicates the commands in `scripts/check.sh`; both must be updated
   together.
 - Tests exist only for settings (18, via pytest, wired into `check.sh`). The wider

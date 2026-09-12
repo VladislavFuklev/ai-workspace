@@ -192,7 +192,22 @@ file, runs every check even after one fails, and exits non-zero if any did.
 | types | `next typegen && tsc --noEmit` | `mypy --strict` |
 | tests | phase 12 | `pytest` |
 
-Plus `scripts/check.sh docs`: documentation consistency (`scripts/check-docs.sh`).
+Plus `scripts/check.sh docs`: documentation consistency (`scripts/check-docs.sh`),
+and `scripts/check-contrast.mjs`: WCAG AA for every token pairing in both themes.
+
+## Design tokens
+
+`apps/web/src/app/globals.css` is the whole design system: Tailwind 4 `@theme`
+declares the light values and generates the utilities, `[data-theme="dark"]`
+redefines every semantic token, and no token is defined only inside a media query.
+
+Components reference semantic names (`surface`, `text-muted`, `border-strong`),
+never the neutral ramp or a raw colour. Contrast is measured, not estimated.
+`/design` renders the full set.
+
+Tailwind scans source as text: a class composed at runtime (`` `bg-${token}` ``)
+generates no CSS while building and typechecking cleanly. Write class names out
+in full.
 
 Python checks run with `apps/api` as the working directory: Ruff's per-file-ignores
 and mypy's `files` resolve relative to the working directory, and mypy misreads the

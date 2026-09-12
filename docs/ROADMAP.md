@@ -10,7 +10,7 @@ See `MASTER_PROMPT.md` for the complete product specification.
 - [x] 0.5 Environment configuration
 - [x] 0.6 CI baseline
 - [x] 0.7 Documentation system
-- [ ] 0.8 Design system foundation
+- [x] 0.8 Design system foundation
 
 ## Phase 1
 - [ ] 1.1 Next.js application shell
