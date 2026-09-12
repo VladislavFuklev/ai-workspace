@@ -174,6 +174,7 @@ differs from PG 17 and earlier, where it was `/var/lib/postgresql/data`.
 | Python lint + format | Ruff 0.16.7 | `apps/api/pyproject.toml` | ADR-011 |
 | Python types | mypy 2.3.1, `strict` | `apps/api/pyproject.toml` | ADR-011 |
 | Check entry point | `scripts/check.sh` / `scripts/fix.sh` | — | — |
+| CI | GitHub Actions, two parallel jobs | `.github/workflows/ci.yml` | — |
 | Local orchestration | Docker Compose | `infra/` (0.3) | — |
 
 The local system Python (3.9) is not used; uv provisions and pins the interpreter.

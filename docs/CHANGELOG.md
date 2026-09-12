@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### 0.6 — CI baseline (2026-09-12)
+
+- `.github/workflows/ci.yml` — parallel web and api jobs on push to `main` and
+  every PR; concurrency cancellation; read-only token.
+- Versions come from `.nvmrc`, `packageManager` and `.python-version`; installs
+  use `--frozen-lockfile` / `--locked` so a stale lockfile fails.
+- pnpm store and uv cache keyed on the lockfiles.
+- Verified locally without a `.env`: both jobs pass, a lint error and a stale
+  lockfile each fail. Not yet observed green on GitHub.
+
 ### 0.5 — Environment configuration (2026-09-12)
 
 **Added**

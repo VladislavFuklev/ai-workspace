@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# A new push to the same branch cancels the previous run.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  # Two jobs, not one: the dependency graphs are independent (ADR-005), they run
+  # in parallel, and a red build names the ecosystem without reading the log.
+  web:
+    name: web
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+        # Version comes from packageManager in the root package.json.
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install
+        working-directory: .
+        # --frozen-lockfile: a stale lockfile must fail here, not resolve quietly.
+        run: pnpm install --frozen-lockfile
+
+      - run: pnpm format
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm build
+        env:
+          # No .env in CI; the build validates this value (src/lib/env.ts).
+          NEXT_PUBLIC_API_URL: http://localhost:8000
+
+  api:
+    name: api
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: apps/api
+    env:
+      # The settings object requires these; no .env exists in CI. Values are
+      # syntactically valid but point nowhere — nothing here opens a connection.
+      ENVIRONMENT: test
+      DATABASE_URL: postgresql+psycopg://ci:ci@localhost:5432/ci
+      REDIS_URL: redis://localhost:6379/0
+      S3_ENDPOINT_URL: http://localhost:9000
+      S3_BUCKET: ai-workspace-ci
+      S3_ACCESS_KEY: ci-access-key
+      S3_SECRET_KEY: ci-secret-key
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v10
+        with:
+          enable-cache: true
+          cache-dependency-glob: apps/api/uv.lock
+          # Interpreter version comes from apps/api/.python-version.
+
+      - name: Install
+        # --locked: fail on a stale lockfile rather than re-resolving.
+        run: uv sync --locked
+
+      - run: uv run ruff format --check .
+      - run: uv run ruff check .
+      - run: uv run mypy
+      - run: uv run pytest

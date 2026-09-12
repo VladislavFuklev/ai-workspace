@@ -11,19 +11,17 @@ Phase 0 — Product and engineering foundation
 None in progress.
 
 ## Last completed task
-0.5 — Environment configuration (2026-09-12)
+0.6 — CI baseline (2026-09-12)
 
 ## Last session
 
-0.5 only. Details and the check table are in
-`docs/tasks/0.5-environment-configuration.md`.
+0.6 only. See `docs/tasks/0.6-ci-baseline.md`.
 
-Worth knowing beyond that file: `@next/env`'s `loadEnvConfig` silently no-ops
-without `forceReload`, because Next has already called it for the app directory.
+Beyond that file: every GitHub Action version written from memory was a major
+behind. Check the API before pinning one.
 
 ## Next action
-Execute task **0.6 — CI baseline** per `docs/tasks/0.6-ci-baseline.md`. Run
-`scripts/check.sh` in GitHub Actions for both workspaces with dependency caching.
+Execute task **0.7 — Documentation system** per `docs/tasks/0.7-documentation-system.md`.
 
 ## Known blockers
 None.
@@ -40,6 +38,10 @@ None.
 - Container Python is 3.13.15 vs 3.13.14 on the host; dependencies are locked.
 - `infra/postgres/init/` runs only on a fresh volume; task 2.5 must also enable the
   `vector` extension in a migration.
+- CI is written and verified locally but has never run on GitHub: the branch is
+  ahead of `origin/main` and unpushed.
+- `ci.yml` duplicates the commands in `scripts/check.sh`; both must be updated
+  together.
 - Tests exist only for settings (18, via pytest, wired into `check.sh`). The wider
   test tooling is phase 12. No CI yet (0.6).
 
