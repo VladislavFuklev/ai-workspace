@@ -11,7 +11,7 @@ Phase 0 — Product and engineering foundation
 None in progress.
 
 ## Last completed task
-1.1 — Next.js application shell (2026-09-12)
+1.2 — Responsive application layout (2026-09-12)
 
 ## Last session
 

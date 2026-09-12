@@ -1,11 +1,19 @@
 // Measure WCAG contrast for every meaningful token pairing, in both themes.
 // Reads the values straight out of globals.css so the report cannot drift from
-// the stylesheet. Run: node scripts/check-contrast.mjs
+// the stylesheet.
+//
+//   node scripts/check-contrast.mjs             failures and a summary only
+//   node scripts/check-contrast.mjs --verbose   every measured ratio
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const verbose = process.argv.includes("--verbose");
+// Quiet by default: this runs on every commit, and 40 passing lines are noise.
+const report = (ok, line) => {
+  if (verbose || !ok) console.log(line);
+};
 const css = readFileSync(resolve(root, "apps/web/src/app/globals.css"), "utf8");
 
 /** Tokens from a block, e.g. `@theme {` (light) or `[data-theme="dark"] {`. */
@@ -71,35 +79,37 @@ let failures = 0;
 {
   const layout = readFileSync(resolve(root, "apps/web/src/app/layout.tsx"), "utf8");
   const declared = [...layout.matchAll(/prefers-color-scheme:\s*(light|dark)\)",\s*color:\s*"(#[0-9a-fA-F]{6})"/g)];
-  console.log("\nbrowser theme-color vs the bg token");
+  if (verbose) console.log("\nbrowser theme-color vs the bg token");
   for (const scheme of ["light", "dark"]) {
     const found = declared.find(([, s]) => s === scheme)?.[2]?.toLowerCase();
     const expected = themes[scheme].bg.toLowerCase();
     const ok = found === expected;
     if (!ok) failures++;
-    console.log(`  ${ok ? "ok  " : "FAIL"} ${scheme}: layout.tsx ${found ?? "missing"} vs --color-bg ${expected}`);
+    report(ok, `  ${ok ? "ok  " : "FAIL"} theme-color ${scheme}: layout.tsx ${found ?? "missing"} vs --color-bg ${expected}`);
   }
 }
 for (const [theme, tokens] of Object.entries(themes)) {
-  console.log(`\n${theme}`);
+  if (verbose) console.log(`\n${theme}`);
   for (const [fg, bg, min, label] of PAIRINGS) {
     if (!tokens[fg] || !tokens[bg]) {
-      console.log(`  MISSING  ${fg} on ${bg}`);
+      console.log(`  MISSING  ${theme} ${fg} on ${bg}`);
       failures++;
       continue;
     }
     const r = ratio(tokens[fg], tokens[bg]);
     const ok = r >= min;
     if (!ok) failures++;
-    console.log(
-      `  ${ok ? "ok  " : "FAIL"} ${r.toFixed(2).padStart(5)}:1 (min ${min})  ${fg} on ${bg} — ${label}`,
+    report(
+      ok,
+      `  ${ok ? "ok  " : "FAIL"} ${theme} ${r.toFixed(2).padStart(5)}:1 (min ${min})  ${fg} on ${bg} — ${label}`,
     );
   }
 }
 
+const checked = PAIRINGS.length * Object.keys(themes).length + 2;
 console.log(
   failures === 0
-    ? "\nEvery pairing meets WCAG AA."
-    : `\n${failures} pairing(s) below AA.`,
+    ? `${checked} colour checks pass (WCAG AA, both themes)`
+    : `\n${failures} of ${checked} colour checks failed`,
 );
 process.exit(failures === 0 ? 0 : 1);

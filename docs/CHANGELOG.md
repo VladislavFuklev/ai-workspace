@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### 1.2 — Responsive application layout (2026-09-12)
+
+- `AppShell` client component: sidebar inline at `lg`+, native `<dialog>` drawer
+  below, so focus trapping, `Escape` and an inert background come from the browser.
+- `(app)/layout.tsx` stays a Server Component and composes it.
+- `Sidebar` takes an `id`: it renders twice, and only the drawer instance may
+  carry the one `aria-controls` points at.
+
 ### 1.1 — Next.js application shell (2026-09-12)
 
 - Route groups: `(marketing)` owns `/`, `(app)` wraps the authenticated product at
