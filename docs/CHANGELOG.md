@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Fix — documentation drift check missed a stale phase (2026-09-12)
+
+- `PROJECT_STATE.md` still said "Phase 0" four tasks into phase 1.
+- `check-docs.sh` now asserts the recorded phase matches the phase of the next
+  unticked roadmap task, and extracts task ids by pattern rather than awk field
+  number — `- [ ] 1.5` has four fields where `- [x] 1.1` has three, which had the
+  new check reporting `]` as the task id.
+
 ### 1.4 — Navigation (2026-09-12)
 
 - `NAVIGATION_ITEMS` as the single source of destinations; `Navigation` renders

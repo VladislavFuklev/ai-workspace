@@ -1,11 +1,11 @@
 # Project State
 
 ## Status
-Phase 1 in progress; phase 0 complete. Both workspaces install cleanly, the local backing services
+Phase 1 in progress. Phase 0 complete: both workspaces, Docker services, quality gate, CI, docs system, design tokens. Both workspaces install cleanly, the local backing services
 run in Docker, and a quality gate covers both languages. No product features.
 
 ## Current phase
-Phase 0 — Product and engineering foundation
+Phase 1 — Frontend foundation
 
 ## Current task
 None in progress.

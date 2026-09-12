@@ -11,7 +11,7 @@ problems=0
 fail() { printf '  %s\n' "$1"; problems=$((problems + 1)); }
 
 # --- 1. A ticked roadmap entry needs a task file with an outcome, and vice versa.
-for id in $(grep -oE '^- \[x\] [0-9]+\.[0-9]+' docs/ROADMAP.md | awk '{print $3}'); do
+for id in $(grep -oE '^- \[x\] [0-9]+\.[0-9]+' docs/ROADMAP.md | grep -oE '[0-9]+\.[0-9]+$'); do
   file=$(ls docs/tasks/"$id"-*.md 2>/dev/null | head -1)
   if [ -z "$file" ]; then
     fail "roadmap: $id is ticked but docs/tasks/$id-*.md does not exist"
@@ -48,11 +48,22 @@ done
 # --- 4. PROJECT_STATE must name the last ticked roadmap task.
 # Compare extracted ids, not a grep: "0.6" as a pattern matches "026" inside a
 # date, which made an earlier version of this check silently pass.
-last_ticked=$(grep -E '^- \[x\]' docs/ROADMAP.md | tail -1 | awk '{print $3}')
+last_ticked=$(grep -E '^- \[x\] [0-9]+\.[0-9]+' docs/ROADMAP.md | tail -1 | grep -oE '[0-9]+\.[0-9]+' | head -1)
 state_task=$(grep -A2 '^## Last completed task' docs/PROJECT_STATE.md |
              grep -oE '^[0-9]+\.[0-9]+' | head -1)
 [ "$state_task" = "$last_ticked" ] ||
   fail "state: ROADMAP's last ticked task is $last_ticked, PROJECT_STATE says ${state_task:-nothing}"
+
+# --- 5. PROJECT_STATE's phase must match the phase of the next unticked task.
+# Not awk field numbers: "- [ ] 1.5" has four fields and "- [x] 1.1" has three.
+next_id=$(grep -m1 -oE '^- \[ \] [0-9]+\.[0-9]+' docs/ROADMAP.md | grep -oE '[0-9]+\.[0-9]+$')
+if [ -n "$next_id" ]; then
+  next_phase=${next_id%%.*}
+  state_phase=$(grep -A2 '^## Current phase' docs/PROJECT_STATE.md |
+                grep -oE 'Phase [0-9]+' | head -1 | awk '{print $2}')
+  [ "$state_phase" = "$next_phase" ] ||
+    fail "state: next task is $next_id (phase $next_phase) but PROJECT_STATE says phase ${state_phase:-nothing}"
+fi
 
 if [ "$problems" -eq 0 ]; then
   echo "docs consistent"
