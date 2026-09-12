@@ -1,23 +1,23 @@
 # Architecture Decision Records
 
-Format:
+Format (keep an ADR to ~25 lines — every fact, no padding):
 
 ## ADR-XXX — Title
 
-### Context
-What problem exists?
+**Context.** The problem, in two or three sentences.
 
-### Decision
-What was chosen?
+**Decision.** What was chosen, with the evidence it rests on.
 
-### Alternatives
-What alternatives were considered?
+**Rejected.** Each alternative and the one reason it lost.
 
-### Consequences
-What becomes easier/harder?
+**Revisit when** the condition that would change this.
 
-### Status
-Accepted / Superseded / Rejected
+**Consequence.** What becomes harder. What becomes easier is usually obvious.
+
+Accepted / Superseded / Rejected — date
+
+ADR-001 through ADR-012 use an earlier, longer template. They are not rewritten:
+the churn would cost more than the inconsistency does.
 
 ---
 

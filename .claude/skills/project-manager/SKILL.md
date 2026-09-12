@@ -48,20 +48,23 @@ Then wait. Do not begin editing on an unanswered plan.
 
 ## Phase C — Verify before claiming anything
 
-Never write "done" on the basis of code that was not run. The gate, as it exists
-today (grow it as tooling lands in 0.4 and phase 12):
+Never write "done" on the basis of code that was not run.
 
 ```bash
-rtk pnpm typecheck            # from a clean state — delete .next/ first
-rtk pnpm --filter @ai-workspace/web lint
-rtk pnpm build
-rtk uv run --project apps/api python -c "import ai_workspace_api"
+./scripts/check.sh            # format, lint, types — both workspaces, ~2s
 git add -A -n                 # nothing generated must be staged
 ```
 
-Add for the task at hand: the acceptance criteria in the task spec, each one
-actually exercised. A criterion you did not test is a criterion you did not meet —
-say so rather than implying otherwise.
+**Do not run `check.sh` and then commit.** The pre-commit hook runs it again; that
+is a duplicate. Commit and let the hook be the gate. Run it by hand only while
+iterating, or when committing with `--no-verify`.
+
+Run `rtk pnpm build` only when the change could affect the build.
+
+Then the acceptance criteria in the task spec, each one actually exercised. A
+criterion you did not test is a criterion you did not meet — say so rather than
+implying otherwise. That verification is the expensive part of a task and it is
+the part worth spending on.
 
 ## Phase D — Persist state (all of it, every time)
 
@@ -79,6 +82,27 @@ A task is not complete until every one of these is true:
 
 The deviations section is the highest-value thing you write. Any real task departs
 from its plan; a future session that cannot see why will undo the reasoning.
+
+### One fact, one place — and a budget
+
+Measured across tasks 0.1–0.4: ~400 lines of documentation per task, most of it the
+same facts restated in four files. That, not running checks, is where a task's
+budget actually goes. So:
+
+| File | Budget | Holds |
+| --- | --- | --- |
+| `docs/tasks/<id>-*.md` outcome | ~40 lines | the detail — the only place it is spelled out |
+| `docs/DECISIONS.md` per ADR | ~25 lines | see the template at the top of that file |
+| `docs/CHANGELOG.md` | ~12 lines | what changed, in a reader's terms |
+| `docs/PROJECT_STATE.md` | edit sections, do not rewrite | status, next action, blockers, limitations |
+| chat handoff | ~15 lines | what the user cannot get from `ctx.sh` |
+
+`PROJECT_STATE.md` is read by `scripts/ctx.sh`, which pulls five specific sections.
+"Last session" is a pointer to the task file plus anything genuinely surprising —
+not a narrative. Do not restate a check table that already exists in the task file.
+
+Tables beat prose for versions, checks and criteria: same information, a third of
+the tokens, easier to scan.
 
 ## Phase E — Commit
 

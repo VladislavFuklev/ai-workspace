@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### Tooling — documentation budgets (2026-09-12, not a roadmap task)
+
+**Changed**
+- `docs/DECISIONS.md` — compact ADR template (~25 lines). ADR-001..012 keep the
+  older longer form; rewriting them would cost more than the inconsistency.
+- `project-manager` skill — a per-file documentation budget and a one-fact-one-place
+  rule; commit without a manual `check.sh` run, since the pre-commit hook is the gate.
+- `token-economy` skill — leads with the measured costs: ~400 lines of docs per
+  task, ~470 lines of state documents per session, ~13K of recoverable Bash output.
+
+**Why**
+- Measured across 0.1–0.4: documentation output, not running checks, dominates a
+  task's cost, and most of it was the same facts restated in four files.
+
 ### 0.4 — Code quality tooling (2026-09-12)
 
 **Added**

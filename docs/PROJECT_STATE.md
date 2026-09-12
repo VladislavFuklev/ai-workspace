@@ -68,4 +68,6 @@ None.
 - The roadmap and task files are the source of truth.
 - Update this file after every completed task.
 - Start a session with `./scripts/ctx.sh`, not by reading every document.
-- Run `./scripts/check.sh` before committing; the pre-commit hook does it too.
+- Commit and let the pre-commit hook run `check.sh`; do not run it manually first.
+- Documentation budgets per task are in the `project-manager` skill. Verification
+  is worth spending on; restating the same facts in four files is not.

@@ -6,8 +6,20 @@ description: Keep context spend low in this repository. Use at session start to 
 # Token Economy
 
 Context is the scarce resource in a long multi-session project. This repository is
-built over ~140 roadmap tasks, so the same costs recur every session. Two of them
-dominate, and neither is covered by the global RTK hook.
+built over ~140 roadmap tasks, so every recurring cost is paid ~140 times.
+
+Measured across tasks 0.1–0.4, in order of size:
+
+1. **Documentation written per task: ~400 lines**, most of it the same facts
+   restated across four files. This is the dominant cost, and it is *output*.
+   Budgets are in the `project-manager` skill — follow them.
+2. **Reading state documents at session start: ~470 lines.** Use `./scripts/ctx.sh`.
+3. **Bash output: ~13K tokens recoverable per session.** RTK adoption measured
+   **2.8%** — the hook cannot rewrite the compound commands used here.
+
+Running checks is *not* on this list. `scripts/check.sh` costs six lines of output
+and is what keeps "done" from being a guess. Never economize by skipping
+verification; economize by not writing the same paragraph four times.
 
 ## 1. Session start — use the digest, not the documents
 
@@ -66,6 +78,13 @@ filter, or output you must quote exactly).
 Do not wrap the dedicated Read/Edit/Write tools in rtk — this applies to Bash.
 
 ## 3. Habits that cost the most here
+
+- **Running `scripts/check.sh` and then committing.** The pre-commit hook runs it
+  again. Commit and let the hook be the gate.
+- **Configuring a library from memory.** The `eslint-plugin-boundaries` config took
+  three round trips on deprecated syntax. Its README was in `node_modules` the
+  whole time. Read the installed package's docs before writing its config — one
+  file read against three failed runs.
 
 - **Verifying an edit by re-reading the file.** Edit and Write fail loudly; a
   successful call means the change landed.
