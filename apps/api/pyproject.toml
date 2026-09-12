@@ -4,6 +4,7 @@ version = "0.0.0"
 description = "AI Workspace API — multi-tenant AI document intelligence backend"
 requires-python = ">=3.13"
 dependencies = [
+    "alembic==1.20.0",
     "fastapi>=0.141.1",
     "psycopg[binary,pool]==3.3.5",
     "pydantic-settings==2.15.0",
@@ -30,7 +31,7 @@ dev = [
 [tool.ruff]
 target-version = "py313"
 line-length = 100
-src = ["src", "tests", "scripts"]
+src = ["src", "tests"]
 
 [tool.ruff.lint]
 # Rule sets are enabled deliberately rather than with ALL, so every warning the
@@ -59,7 +60,7 @@ ignore = [
 # Tests assert, use fixtures, and hardcode credentials on purpose.
 "tests/**" = ["S101", "S105", "S106", "S311"]
 # Alembic generates its own style and shadows builtins in revision templates.
-"migrations/**" = ["A", "F401", "I001"]
+"migrations/**" = ["A", "F401", "I001", "INP001"]
 
 [tool.ruff.lint.flake8-tidy-imports]
 ban-relative-imports = "parents"
@@ -69,7 +70,7 @@ docstring-code-format = true
 
 [tool.mypy]
 python_version = "3.13"
-files = ["src", "tests", "scripts"]
+files = ["src", "tests"]
 strict = true
 # Fail loudly on the two things that silently erode a strict codebase.
 warn_unreachable = true

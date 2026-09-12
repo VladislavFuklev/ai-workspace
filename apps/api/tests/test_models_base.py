@@ -11,12 +11,12 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from ai_workspace_api.core.database import create_engine, create_session_factory
 from ai_workspace_api.core.settings import Settings
-from ai_workspace_api.models import Base, Timestamps, UUIDPrimaryKey
+from ai_workspace_api.models import Timestamps, UUIDPrimaryKey
 
-from .conftest import BuildSettings
+from .conftest import BuildSettings, ScratchBase
 
 
-class Sample(Base, UUIDPrimaryKey, Timestamps):
+class Sample(ScratchBase, UUIDPrimaryKey, Timestamps):
     """A throwaway table, so the base is exercised without inventing a domain."""
 
     __tablename__ = "base_probe"
@@ -25,7 +25,7 @@ class Sample(Base, UUIDPrimaryKey, Timestamps):
     label: Mapped[str] = mapped_column(String(50))
 
 
-SAMPLE_TABLE = Base.metadata.tables["base_probe"]
+SAMPLE_TABLE = ScratchBase.metadata.tables["base_probe"]
 
 
 def test_primary_key_is_a_uuid_with_an_application_default() -> None:
@@ -60,7 +60,7 @@ async def test_timestamps_are_set_by_the_database(
     factory = create_session_factory(engine)
     try:
         async with engine.begin() as connection:
-            await connection.run_sync(Base.metadata.create_all, tables=[SAMPLE_TABLE])
+            await connection.run_sync(ScratchBase.metadata.create_all, tables=[SAMPLE_TABLE])
 
         async with factory() as session:
             row = Sample(label="written")

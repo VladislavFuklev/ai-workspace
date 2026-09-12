@@ -125,7 +125,7 @@ apps/api/
 │   ├── workers/       background jobs
 │   ├── ai/            provider abstraction: embeddings, chat, structured output, tools
 │   └── core/          configuration, logging, error handling, security primitives
-├── migrations/        [reserved: 2.5] Alembic revisions
+├── migrations/        [exists] Alembic revisions; URL comes from settings
 └── tests/             [exists] unit and integration tests
 ```
 

@@ -98,8 +98,8 @@ jobs:
       - run: uv run ruff check .
       - run: uv run mypy
       - run: uv run pytest
-      - name: Enable pgvector
-        # The compose stack does this with an init script; a service container
-        # has no init hook.
-        run: uv run python scripts/enable_pgvector.py
+      - name: Migrate
+        # Running the migrations here also tests them: a broken revision fails
+        # CI rather than a deployment.
+        run: uv run alembic upgrade head
       - run: uv run pytest -m integration

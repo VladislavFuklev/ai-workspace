@@ -29,7 +29,7 @@ See `MASTER_PROMPT.md` for the complete product specification.
 - [x] 2.2 Configuration
 - [x] 2.3 Database connection
 - [x] 2.4 SQLAlchemy models
-- [ ] 2.5 Alembic migrations
+- [x] 2.5 Alembic migrations
 - [ ] 2.6 Health endpoints
 - [ ] 2.7 Structured logging
 - [ ] 2.8 Exception handling

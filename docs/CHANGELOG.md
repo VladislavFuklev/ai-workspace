@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+### 2.5 — Alembic migrations (2026-09-13)
+
+- Alembic on the async template, reading the URL from the application's settings
+  rather than `alembic.ini`, with `compare_type` and `compare_server_default` on.
+- First revision creates the `vector` extension; its downgrade is a documented
+  no-op because dropping it would take every vector column with it.
+- CI runs `alembic upgrade head`, which also tests the migrations; the helper
+  script from 2.3 is deleted.
+- Tests: single head, every revision has a downgrade, and models do not drift from
+  the schema — with a second test proving the drift check can fail.
+
 ### 2.4 — SQLAlchemy models (2026-09-13)
 
 - `Base` with a constraint naming convention, plus `UUIDPrimaryKey` and

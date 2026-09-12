@@ -11,8 +11,11 @@ from __future__ import annotations
 from collections.abc import Callable
 
 import pytest
+from sqlalchemy import MetaData
+from sqlalchemy.orm import DeclarativeBase
 
 from ai_workspace_api.core.settings import Settings
+from ai_workspace_api.models import NAMING_CONVENTION
 
 BuildSettings = Callable[[dict[str, str]], Settings]
 
@@ -80,3 +83,16 @@ def database_url() -> str:
     if not url:
         pytest.skip("DATABASE_URL is not set; run scripts/dev-up.sh and copy .env")
     return url
+
+
+class ScratchBase(DeclarativeBase):
+    """Declarative base for throwaway tables in tests.
+
+    Not named Test* — pytest tries to collect any class with that prefix.
+
+    Separate metadata from the application's: a scratch table registered on
+    `Base.metadata` would make the model/schema drift check report a difference
+    that does not exist.
+    """
+
+    metadata = MetaData(naming_convention=NAMING_CONVENTION)

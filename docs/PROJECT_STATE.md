@@ -11,20 +11,21 @@ Phase 2 — Backend foundation
 None in progress.
 
 ## Last completed task
-2.4 — SQLAlchemy models (2026-09-13)
+2.5 — Alembic migrations (2026-09-13)
 
 ## Last session
 
-2.4 only. See `docs/tasks/2.4-models.md`.
+2.5 only. See `docs/tasks/2.5-migrations.md`.
 
-Beyond that file: a SQLAlchemy column `default` runs at flush, not at object
-construction — a draft docstring claimed otherwise and a test caught it.
+Beyond that file: tables defined in tests must use `ScratchBase`, not the
+application's `Base` — otherwise they register on `Base.metadata` and the
+model/schema drift check reports differences that do not exist.
 
 ## Next action
-Execute task **2.5 — Alembic migrations**; write `docs/tasks/2.5-migrations.md`
-first. The first revision must also create the `vector` extension, for
-environments built from neither the compose init script nor
-`scripts/enable_pgvector.py`.
+Execute task **2.6 — Health endpoints**; write `docs/tasks/2.6-health.md` first.
+Liveness and readiness must be separate: a process that is alive but cannot reach
+Postgres should fail readiness, not liveness, or the orchestrator restarts it in a
+loop while the database is the thing that is down.
 
 ## Known blockers
 None.
