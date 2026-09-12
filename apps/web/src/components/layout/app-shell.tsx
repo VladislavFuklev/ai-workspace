@@ -46,7 +46,7 @@ export function AppShell({
     <div className="min-h-dvh bg-bg">
       <a
         href="#main"
-        className="sr-only rounded-md bg-accent px-3 py-2 text-sm font-medium text-accent-fg focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50"
+        className="sr-only rounded-md bg-accent px-3 py-2 text-sm font-medium text-accent-fg focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50"
       >
         Skip to content
       </a>
