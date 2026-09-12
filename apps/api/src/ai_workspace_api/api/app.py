@@ -7,7 +7,6 @@ The module-level `app` is what uvicorn imports.
 
 from __future__ import annotations
 
-import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
@@ -15,11 +14,13 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from ai_workspace_api import __version__
+from ai_workspace_api.api.middleware import RequestContextMiddleware
 from ai_workspace_api.api.routes import health
 from ai_workspace_api.core.database import create_engine, create_session_factory
+from ai_workspace_api.core.logging import configure_logging, get_logger
 from ai_workspace_api.core.settings import Settings, get_settings
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 @asynccontextmanager
@@ -31,7 +32,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     per request is how a service runs out of connections under load.
     """
     settings: Settings = app.state.settings
-    logger.info("starting api", extra={"environment": settings.environment.value})
+    logger.info("starting api", environment=settings.environment.value)
 
     engine = create_engine(settings)
     app.state.engine = engine
@@ -47,6 +48,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
 def create_app(settings: Settings | None = None) -> FastAPI:
     resolved = settings or get_settings()
+    configure_logging(resolved)
 
     app = FastAPI(
         title="AI Workspace API",
@@ -61,6 +63,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     # Read by the lifespan and by the settings dependency, so nothing below has to
     # import the module-level singleton.
     app.state.settings = resolved
+
+    # Outermost, so every request — including one rejected by CORS — gets an id
+    # and a log line.
+    app.add_middleware(RequestContextMiddleware)
 
     if resolved.cors_origins:
         app.add_middleware(

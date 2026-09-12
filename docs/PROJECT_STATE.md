@@ -11,21 +11,21 @@ Phase 2 — Backend foundation
 None in progress.
 
 ## Last completed task
-2.6 — Health endpoints (2026-09-13)
+2.7 — Structured logging (2026-09-13)
 
 ## Last session
 
-2.6 only. See `docs/tasks/2.6-health.md`.
+2.7 only. See `docs/tasks/2.7-logging.md`.
 
-Beyond that file: `httpx.ASGITransport` does **not** run the lifespan. Tests that
-need anything the lifespan installs must use the `running_app` helper in
-`tests/conftest.py`.
+Beyond that file: the request-id bug was invisible to the tests as written and
+only showed when the server was run and its output read. Worth doing that after
+anything that touches middleware or logging.
 
 ## Next action
-Execute task **2.7 — Structured logging**; write `docs/tasks/2.7-logging.md`
-first. JSON in production, a request id on every line, and nothing sensitive —
-the readiness endpoint already logs full exception detail that must not reach a
-response body.
+Execute task **2.8 — Exception handling**; write `docs/tasks/2.8-errors.md`
+first. The error envelope must match what the web client already parses in
+`apps/web/src/lib/api/errors.ts`: `code`, `message`, and a `detail` array of
+`{field, message}` for a 422.
 
 ## Known blockers
 None.

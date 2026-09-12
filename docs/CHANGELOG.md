@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+### 2.7 — Structured logging (2026-09-13)
+
+- structlog: JSON outside local, console locally, with the standard library and
+  uvicorn routed through the same processors.
+- A request-id context variable so a line written deep in a repository carries it
+  without a parameter; middleware assigns it, logs each request's outcome and
+  duration, and returns it as `X-Request-ID`.
+- A valid inbound id is honoured so a trace spans services; anything else is
+  replaced, since the value is echoed in a header and written to logs.
+- Credential-shaped keys are redacted.
+
 ### 2.6 — Health endpoints (2026-09-13)
 
 - `/health/live` checks nothing external: a failure there means restart, and a
