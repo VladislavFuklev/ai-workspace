@@ -83,26 +83,35 @@ A task is not complete until every one of these is true:
 The deviations section is the highest-value thing you write. Any real task departs
 from its plan; a future session that cannot see why will undo the reasoning.
 
-### One fact, one place — and a budget
+### One fact, one place — hard budgets
 
-Measured across tasks 0.1–0.4: ~400 lines of documentation per task, most of it the
-same facts restated in four files. That, not running checks, is where a task's
-budget actually goes. So:
+Measured across 0.1–0.5: ~400 lines of documentation per task, mostly the same
+facts restated. Documentation output, not running checks, is what a task costs.
 
-| File | Budget | Holds |
+| Where | Budget | Holds |
 | --- | --- | --- |
-| `docs/tasks/<id>-*.md` outcome | ~40 lines | the detail — the only place it is spelled out |
-| `docs/DECISIONS.md` per ADR | ~25 lines | see the template at the top of that file |
-| `docs/CHANGELOG.md` | ~12 lines | what changed, in a reader's terms |
-| `docs/PROJECT_STATE.md` | edit sections, do not rewrite | status, next action, blockers, limitations |
-| chat handoff | ~15 lines | what the user cannot get from `ctx.sh` |
+| task outcome | **~20 lines** | check table, deviations, limitations, next task |
+| ADR | **~12 lines** | context, decision, rejected, revisit-when, consequence |
+| CHANGELOG | **~6 lines** | what changed, one line each |
+| PROJECT_STATE | **edit 3 fields** | last completed, next action, limitations delta |
+| next task spec | **~20 lines** | objective, steps, acceptance criteria |
+| chat handoff | **~8 lines** | only what `ctx.sh` does not already say |
 
-`PROJECT_STATE.md` is read by `scripts/ctx.sh`, which pulls five specific sections.
-"Last session" is a pointer to the task file plus anything genuinely surprising —
-not a narrative. Do not restate a check table that already exists in the task file.
+Rules that keep it there:
+- Never restate a fact that is already in another file. Point at it.
+- Tables, not prose, for versions, checks and criteria.
+- No "Files created/modified" list — `git show --stat` has it.
+- No preamble, no rationale paragraphs. A rejected alternative is one clause.
+- Skip a section entirely when it is empty. "None" is a line worth not writing.
 
-Tables beat prose for versions, checks and criteria: same information, a third of
-the tokens, easier to scan.
+### Process costs worth avoiding
+
+- **Write it right the first time.** Iterating check → fix → check costs a full
+  round trip each. Run the gate once, at the end.
+- **Do not print a file back after writing it.** The write either succeeded or errored.
+- **Do not run `check.sh` before committing.** The pre-commit hook is the gate.
+- **Read an installed package's docs before configuring it**, not after it fails.
+- **Batch verification** into one command instead of one per criterion.
 
 ## Phase E — Commit
 
