@@ -13,7 +13,7 @@ See `MASTER_PROMPT.md` for the complete product specification.
 - [x] 0.8 Design system foundation
 
 ## Phase 1
-- [ ] 1.1 Next.js application shell
+- [x] 1.1 Next.js application shell
 - [ ] 1.2 Responsive application layout
 - [ ] 1.3 Design tokens
 - [ ] 1.4 Navigation

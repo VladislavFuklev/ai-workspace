@@ -89,6 +89,18 @@ Only `src/app/` exists today. The remaining directories are created when the fir
 file that belongs in them is written (phase 1 onwards) rather than as empty
 placeholders — the layering below is the contract, not the directory listing.
 
+Route groups (no URL segment of their own):
+
+| Group | Owns | Holds |
+| --- | --- | --- |
+| `(marketing)` | `/` | the public surface; landing page is task 14.1 |
+| `(app)` | `/workspace`, and the product routes to come | header, `<main>`, skip link |
+| `(dev)` | `/design` | internal reference surfaces, not product |
+
+Top-level `error.tsx`, `global-error.tsx` and `not-found.tsx` cover every route.
+Next 16 passes `retry` to an error boundary, not `reset`, and generates
+`LayoutRoutes = "/"` only — group layouts all type as `LayoutProps<"/">`.
+
 Dependency direction: `app → features → components → lib`.
 A feature may not import another feature's internals; shared code moves down a layer.
 

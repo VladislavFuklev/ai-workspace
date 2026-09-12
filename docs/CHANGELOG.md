@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### 1.1 — Next.js application shell (2026-09-12)
+
+- Route groups: `(marketing)` owns `/`, `(app)` wraps the authenticated product at
+  concrete routes such as `/workspace`, `(dev)` holds the token page.
+- Root layout: title template, `themeColor` for both schemes, font variables.
+- `(app)/layout.tsx`: header region, `<main>` landmark, skip link.
+- Boundaries: `error.tsx` (Next 16 passes `retry`, not `reset`),
+  `global-error.tsx` with inline styles, `not-found.tsx`, skeleton `loading.tsx`.
+- `check-contrast.mjs` also asserts `viewport.themeColor` matches `--color-bg`.
+
 ### Fix — CI red on its first real run (2026-09-12)
 
 - `ci.yml`: `NEXT_PUBLIC_API_URL` moved to job level — `next typegen` validates the

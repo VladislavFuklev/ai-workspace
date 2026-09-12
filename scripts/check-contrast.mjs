@@ -65,7 +65,21 @@ const themes = {
   dark: tokensFrom('[data-theme="dark"] {'),
 };
 
+// The browser-chrome colour in layout.tsx has to be a literal — metadata cannot
+// read CSS — so assert it still matches the token it is duplicating.
 let failures = 0;
+{
+  const layout = readFileSync(resolve(root, "apps/web/src/app/layout.tsx"), "utf8");
+  const declared = [...layout.matchAll(/prefers-color-scheme:\s*(light|dark)\)",\s*color:\s*"(#[0-9a-fA-F]{6})"/g)];
+  console.log("\nbrowser theme-color vs the bg token");
+  for (const scheme of ["light", "dark"]) {
+    const found = declared.find(([, s]) => s === scheme)?.[2]?.toLowerCase();
+    const expected = themes[scheme].bg.toLowerCase();
+    const ok = found === expected;
+    if (!ok) failures++;
+    console.log(`  ${ok ? "ok  " : "FAIL"} ${scheme}: layout.tsx ${found ?? "missing"} vs --color-bg ${expected}`);
+  }
+}
 for (const [theme, tokens] of Object.entries(themes)) {
   console.log(`\n${theme}`);
   for (const [fg, bg, min, label] of PAIRINGS) {

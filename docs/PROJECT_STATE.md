@@ -1,7 +1,7 @@
 # Project State
 
 ## Status
-**Phase 0 complete.** Both workspaces install cleanly, the local backing services
+Phase 1 in progress; phase 0 complete. Both workspaces install cleanly, the local backing services
 run in Docker, and a quality gate covers both languages. No product features.
 
 ## Current phase
@@ -11,20 +11,20 @@ Phase 0 — Product and engineering foundation
 None in progress.
 
 ## Last completed task
-0.8 — Design system foundation (2026-09-12)
+1.1 — Next.js application shell (2026-09-12)
 
 ## Last session
 
-0.8, completing phase 0, then a CI fix. See the task files.
+1.1 only. See `docs/tasks/1.1-nextjs-application-shell.md`.
 
-Two lessons worth carrying: a Tailwind class composed at runtime (`bg-${token}`)
-generates no CSS while the build and typechecker stay green — grep the built
-stylesheet. And verifying CI by hand does not work: run `scripts/check-ci.sh`
-before pushing a workflow change.
+Beyond that file: route groups create no URL segment, so Next generates
+`LayoutRoutes = "/"` and every group layout types as `LayoutProps<"/">`. And a
+route that throws during prerender fails the build rather than reaching the error
+boundary — `force-dynamic` is needed to exercise the runtime path.
 
 ## Next action
-Phase 1. Execute task **1.1 — Next.js application shell**; write
-`docs/tasks/1.1-nextjs-application-shell.md` first.
+Execute task **1.2 — Responsive application layout**; write
+`docs/tasks/1.2-responsive-application-layout.md` first.
 
 ## Known blockers
 None.
@@ -44,7 +44,7 @@ None.
 - CI's first real run was red; both causes fixed and `scripts/check-ci.sh` added
   to catch that class before pushing. Needs one green run to confirm.
 - No browser automation until 12.8, so UI review is limited to markup and
-  generated CSS. `/design` deserves a human look.
+  generated CSS. `/design` and the error boundary deserve a human look.
 - No theme switcher yet (1.5); `data-theme` must be set by hand.
 - `ci.yml` duplicates the commands in `scripts/check.sh`; both must be updated
   together.
