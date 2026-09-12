@@ -2,7 +2,7 @@
   "name": "ai-workspace",
   "version": "0.0.0",
   "private": true,
-  "description": "AI Workspace — multi-tenant AI document intelligence platform",
+  "description": "AI Workspace \u2014 multi-tenant AI document intelligence platform",
   "packageManager": "pnpm@11.4.0",
   "engines": {
     "node": ">=22.0.0 <23.0.0",
@@ -12,6 +12,8 @@
     "dev": "pnpm --filter @ai-workspace/web dev",
     "build": "pnpm --filter @ai-workspace/web build",
     "start": "pnpm --filter @ai-workspace/web start",
-    "typecheck": "pnpm --filter @ai-workspace/web typecheck"
+    "typecheck": "pnpm --filter @ai-workspace/web typecheck",
+    "check": "./scripts/check.sh",
+    "fix": "./scripts/fix.sh"
   }
 }

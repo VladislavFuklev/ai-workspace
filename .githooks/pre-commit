@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Runs scripts/check.sh before every commit (~2s on the current codebase).
+#
+# Enabled by scripts/bootstrap.sh, or manually:
+#     git config core.hooksPath .githooks
+# Disable for one commit with `git commit --no-verify`, and permanently with
+#     git config --unset core.hooksPath
+#
+# The whole tree is checked rather than only staged files: partially-staged files
+# make "what did the linter actually see" ambiguous, and the run is fast enough
+# that the simpler behaviour is worth it. Revisit if it stops being fast.
+set -euo pipefail
+
+repo_root="$(git rev-parse --show-toplevel)"
+
+if ! "$repo_root/scripts/check.sh"; then
+  echo
+  echo "Commit aborted by pre-commit hook."
+  echo "  scripts/fix.sh        apply automatic fixes"
+  echo "  git commit --no-verify   skip this check deliberately"
+  exit 1
+fi

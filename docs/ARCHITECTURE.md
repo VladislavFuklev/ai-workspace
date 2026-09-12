@@ -168,9 +168,38 @@ differs from PG 17 and earlier, where it was `/var/lib/postgresql/data`.
 | Database | PostgreSQL 18.6 + pgvector 0.8.6 | compose | ADR-008 |
 | Cache / queue | Redis 8 | compose | — |
 | Object storage | MinIO, S3-compatible | compose | ADR-009 |
+| Web format | Prettier 3.9 + Tailwind class sorting | `apps/web/.prettierrc.json` | — |
+| Web lint | ESLint 9 + `eslint-config-next` | `apps/web/eslint.config.mjs` | ADR-010 |
+| Layering enforcement | `eslint-plugin-boundaries` | `apps/web/eslint.config.mjs` | ADR-012 |
+| Python lint + format | Ruff 0.16.7 | `apps/api/pyproject.toml` | ADR-011 |
+| Python types | mypy 2.3.1, `strict` | `apps/api/pyproject.toml` | ADR-011 |
+| Check entry point | `scripts/check.sh` / `scripts/fix.sh` | — | — |
 | Local orchestration | Docker Compose | `infra/` (0.3) | — |
 
 The local system Python (3.9) is not used; uv provisions and pins the interpreter.
+
+## Quality gate
+
+`scripts/check.sh` is the single command for both workspaces; it never rewrites a
+file, runs every check even after one fails, and exits non-zero if any did.
+`scripts/fix.sh` applies the automatic fixes and then re-runs the check.
+
+| | web | api |
+| --- | --- | --- |
+| format | `prettier --check` | `ruff format --check` |
+| lint | `eslint` | `ruff check` |
+| types | `next typegen && tsc --noEmit` | `mypy --strict` |
+
+Python checks run with `apps/api` as the working directory: Ruff's per-file-ignores
+and mypy's `files` resolve relative to the working directory, and mypy misreads the
+module layout from the repository root.
+
+`.githooks/pre-commit` runs the whole suite (~2s) before each commit; it is enabled
+by `scripts/bootstrap.sh` via `core.hooksPath` and skippable with `--no-verify`.
+
+The layering stated below is enforced by the linter for the web app (ADR-012), not
+only by review. The API's layering is documented and reviewed; enforcing it in
+Python is deferred until there is code in those packages to enforce it against.
 
 ## Domain boundaries
 

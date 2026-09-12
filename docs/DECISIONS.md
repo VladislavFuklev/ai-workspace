@@ -338,3 +338,144 @@ and configuration depends on it.
 
 ### Status
 Accepted — 2026-09-12
+
+---
+
+## ADR-010 — Stay on TypeScript 5 and ESLint 9
+
+### Context
+Task 0.2 deferred a version question: the Next.js scaffold pins `typescript@^5`
+while TypeScript **7.0.2** is published. Separately, installing dependencies in 0.4
+surfaced that `eslint@9.39.5` is deprecated — npm's `latest` is **10.10.0**, and 9.x
+is now the `maintenance` channel.
+
+Both are tempting upgrades on a project meant to demonstrate current practice.
+Neither is currently possible.
+
+### Decision
+Stay on **TypeScript 5** and **ESLint 9**, both pinned by what
+`eslint-config-next@16.3.5` supports.
+
+Evidence, read from the registry rather than assumed:
+
+- `typescript-eslint@8.70.0` declares `peerDependencies.typescript: ">=4.8.4
+  <6.1.0"`. It is a direct dependency of `eslint-config-next`, so TypeScript 7
+  would break linting, not just type checking.
+- `eslint-plugin-import`, `eslint-plugin-react`, `eslint-plugin-jsx-a11y` and
+  `eslint-plugin-react-hooks` — all pulled in by `eslint-config-next` — cap their
+  `eslint` peer range at `^9`. ESLint 10 would produce four peer conflicts inside
+  Next.js's own config.
+
+Revisit when `eslint-config-next` ships a plugin set declaring ESLint 10, and when
+`typescript-eslint` widens its TypeScript range. Both are single-line changes plus
+a re-lock; the check suite will show immediately whether they hold.
+
+### Alternatives
+- **Force the upgrades with overrides.** Rejected: overriding a peer range does not
+  make the code compatible, it only silences the warning. A linter that
+  intermittently misparses is worse than an older linter that works.
+- **Drop `eslint-config-next`** and assemble the config by hand. Rejected: it
+  supplies the Next.js and React Hooks rules that catch real App Router mistakes.
+
+### Consequences
+- Easier: the toolchain is internally consistent and the checks are trustworthy.
+- Harder: the project runs an ESLint release that no longer receives support. This
+  is a documented, dated limitation rather than an oversight, and the constraint
+  belongs to Next.js's dependency set rather than to a choice made here.
+
+### Status
+Accepted — 2026-09-12
+
+---
+
+## ADR-011 — Ruff plus mypy for Python, with rule sets chosen explicitly
+
+### Context
+The API needed a linter, a formatter and a type checker that run identically
+locally and in CI (task 0.6), with no network access and no interactive prompts.
+
+### Decision
+**Ruff 0.16.7** for both linting and formatting, and **mypy 2.3.1** in `strict`
+mode for type checking. Both are dev dependencies of `apps/api`, locked in
+`uv.lock`, configured in `apps/api/pyproject.toml`.
+
+Rule sets are enumerated rather than enabled with `ALL`:
+`E`/`W`, `F`, `I`, `UP`, `B`, `S`, `ASYNC`, `A`, `C4`, `DTZ`, `T20`, `SIM`, `PTH`,
+`RUF`. Three of these were chosen for what this product specifically gets wrong:
+
+- **`S`** (bandit) — the app handles uploaded files, tokens and credentials.
+- **`ASYNC`** — a blocking call inside `async def` stalls the event loop for every
+  concurrent request; this is the FastAPI failure mode that is hardest to spot in
+  review.
+- **`DTZ`** — naive datetimes in a multi-tenant, multi-region product produce
+  corruption that surfaces months later. Every timestamp must be timezone-aware.
+
+`E501` is disabled: line length belongs to the formatter.
+
+### Alternatives
+- **`select = ["ALL"]`** with a long ignore list. Rejected: every Ruff release then
+  adds rules nobody chose, and the ignore list becomes the real configuration —
+  read in reverse, which is harder.
+- **`ty`** (Astral's type checker) instead of mypy. Rejected for now: at 0.0.80 it
+  is pre-release, and a type checker that gates CI needs a stable contract. Worth
+  revisiting once it reaches 1.0 — it would remove the one slow check.
+- **pyright.** Viable and fast, but it needs Node in the Python toolchain, which
+  cuts across ADR-005's separation of the two dependency graphs.
+- **Black + isort + flake8.** Rejected: three tools and three configs for what Ruff
+  does in one, considerably faster.
+
+### Consequences
+- Easier: the full check suite for both workspaces runs in about two seconds, which
+  is what makes the pre-commit hook viable. `strict` mypy from the first file means
+  types are never retrofitted onto an untyped codebase.
+- Harder: `strict` mode requires annotating everything, including test helpers, and
+  third-party packages without stubs must be declared rather than ignored silently
+  (`disallow_any_unimported`). This is the intended cost.
+- Ruff's `S` rules will flag legitimate patterns in tests; `tests/**` already
+  ignores the assert and hardcoded-credential rules.
+
+### Status
+Accepted — 2026-09-12
+
+---
+
+## ADR-012 — Architectural layering enforced by the linter
+
+### Context
+`docs/ARCHITECTURE.md` states the frontend layering as `app → features →
+components → lib`, with the additional rule that a feature may not import another
+feature's internals. Documented conventions decay: the violation that matters is
+the one added at 6pm by someone who has not read the document.
+
+### Decision
+Enforce the layering with `eslint-plugin-boundaries` in
+`apps/web/eslint.config.mjs`, using `boundaries/dependencies` with
+`default: "disallow"` and explicit allow policies per layer. The capture on the
+feature element (`captured: { feature: "{{from.feature}}" }`) is what distinguishes
+"a feature importing itself" from "a feature importing a sibling".
+
+Violations are errors, not warnings, and the message points at
+`docs/ARCHITECTURE.md`.
+
+### Alternatives
+- **Code review alone.** Rejected: it is the mechanism that already fails in every
+  project that has this problem.
+- **`no-restricted-imports` patterns.** Rejected: it cannot express "this feature
+  but not that feature" relative to the importing file, which is the rule that
+  matters most.
+- **`eslint-plugin-import`'s `no-restricted-paths`.** Closer, but the same-type
+  distinction is awkward, and `eslint-config-next` already pins that plugin's
+  version.
+
+### Consequences
+- Easier: a layering violation fails locally, in the pre-commit hook and in CI,
+  with a message naming the layers involved. New contributors learn the
+  architecture from the error rather than from a document.
+- Harder: genuinely shared code must be moved down a layer rather than imported
+  sideways — which is the intended pressure, but it will occasionally require a
+  refactor that a quick import would have avoided.
+- The rule is configuration, not proof: it was verified against four deliberate
+  violations and one legal case, not assumed to work.
+
+### Status
+Accepted — 2026-09-12

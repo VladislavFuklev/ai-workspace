@@ -6,7 +6,7 @@ See `MASTER_PROMPT.md` for the complete product specification.
 - [x] 0.1 Repository initialization and architecture decision
 - [x] 0.2 Monorepo setup
 - [x] 0.3 Development environment and Docker
-- [ ] 0.4 Code quality tooling
+- [x] 0.4 Code quality tooling
 - [ ] 0.5 Environment configuration
 - [ ] 0.6 CI baseline
 - [ ] 0.7 Documentation system

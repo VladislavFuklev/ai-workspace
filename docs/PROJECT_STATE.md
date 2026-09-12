@@ -1,8 +1,8 @@
 # Project State
 
 ## Status
-Phase 0 in progress. Both workspaces install cleanly and the local backing
-services run in Docker. No product features, no schema, no AI code.
+Phase 0 in progress. Both workspaces install cleanly, the local backing services
+run in Docker, and a quality gate covers both languages. No product features.
 
 ## Current phase
 Phase 0 — Product and engineering foundation
@@ -11,61 +11,61 @@ Phase 0 — Product and engineering foundation
 None in progress.
 
 ## Last completed task
-0.3 — Development environment and Docker (2026-09-12)
+0.4 — Code quality tooling (2026-09-12)
 
 ## Last session
 
-Executed task 0.3 only.
+Executed task 0.4 only.
 
-Created `infra/docker-compose.yml` (PostgreSQL 18.6 + pgvector 0.8.6, Redis 8,
-MinIO, plus a one-shot bucket initializer), `infra/api.Dockerfile` behind an
-optional `api` profile, `infra/postgres/init/01-extensions.sql`,
-`scripts/dev-up.sh`, `scripts/dev-down.sh` and `.env.example`.
+Added Prettier (with Tailwind class sorting) and `eslint-plugin-boundaries` to the
+web app, Ruff and strict mypy to the API, `.editorconfig`, `scripts/check.sh` and
+`scripts/fix.sh`, and a `.githooks/pre-commit` hook enabled by `bootstrap.sh`.
 
-Three environment findings shaped the design and are recorded as ADRs:
-- Homebrew `postgresql@16` and `redis` already hold 5432/6379, so host ports are
-  5433/6380/9000-9001 and configurable (ADR-008).
-- `minio/minio` on Docker Hub no longer permits anonymous pulls; the image comes
-  from quay.io (ADR-009).
-- Apps run on the host, containers hold backing services (ADR-007).
+The version question deferred in 0.2 is answered from the registry rather than
+assumed: `typescript-eslint` declares `typescript >=4.8.4 <6.1.0`, so TypeScript 7
+is unusable while `eslint-config-next` depends on it; and four plugins inside
+`eslint-config-next` cap their `eslint` peer at `^9`, so ESLint 10 is unusable even
+though npm marks 9.x deprecated. Both recorded in ADR-010 with the condition that
+lifts them.
 
-Verified: all services healthy; `vector` extension present at 0.8.6 and vector
-arithmetic works; Redis PING and SET/GET; bucket created; MinIO API and console
-both HTTP 200; **data in all three services survived a full `down`/`up`**; all four
-host ports reachable with Homebrew's services still running; API image builds,
-imports every layer package, and runs as a non-root user; `down` left 0 containers
-and 0 networks while keeping the 3 volumes; `.env` ignored and `.env.example`
-tracked.
+Verified: the full suite passes in 2.2s; every check was made to fail on a
+deliberately broken file and then reverted; Prettier is deterministic across two
+runs; the layering rule rejects feature→sibling-feature, component→feature and
+lib→component while allowing a feature to import its own internals; `fix.sh`
+repairs both languages and reports what remains; the pre-commit hook aborted a bad
+commit with HEAD unchanged; the API image rebuilds and runs the tools.
 
-One bug found by running rather than reading: `docker compose up --wait` treats the
-one-shot initializer's clean exit as a failure, which killed `dev-up.sh` under
-`set -e`. The script now waits on the long-running services and checks the
-initializer's exit code separately.
+Two bugs found by running rather than reading: the first boundaries config used
+deprecated v5 syntax, and mypy misreads the module layout when invoked from the
+repository root — the Python checks now run with `apps/api` as the working
+directory.
 
 ## Next action
-Execute task **0.4 — Code quality tooling** per
-`docs/tasks/0.4-code-quality-tooling.md`. Add Prettier and layering rules to the
-web app, Ruff and a type checker to the API, resolve the deferred TypeScript
-version question, and expose one check command per workspace.
+Execute task **0.5 — Environment configuration** per
+`docs/tasks/0.5-environment-configuration.md`. Add a typed `pydantic-settings`
+object in `ai_workspace_api/core`, validate the web app's public environment, and
+resolve the host-vs-container connection split flagged in ADR-007.
 
 ## Known blockers
 None.
 
 ## Known limitations
-- The API has dependencies and a container image but no ASGI application; the
-  `api` compose profile and `scripts/dev-api.sh` both report this. Task 2.1.
-- Container Python is 3.13.15 vs 3.13.14 on the host — the base image ships a newer
-  patch. Dependencies are locked; pin the base image by digest if it ever matters.
-- `infra/postgres/init/` runs only on a fresh volume. Task 2.5 must also enable the
-  `vector` extension in a migration for environments not built from this compose
-  file.
-- `.env` is read only by compose; typed application configuration is task 0.5.
-- No formatter, Python linter or type checker yet (0.4); no tests (phase 12); no CI
-  (0.6).
-- The MinIO image is pinned to a September 2025 release; see ADR-009.
+- ESLint 9 is on the maintenance channel and marked deprecated by npm; blocked by
+  `eslint-config-next`'s plugin set (ADR-010).
+- API layering is documented and reviewed but not linter-enforced; revisit in
+  phase 2 when those packages contain code.
+- Prettier is scoped to `apps/web`; `docs/**` Markdown is deliberately unformatted.
+- The API has dependencies, tooling and a container image but no ASGI application
+  (task 2.1) and no configuration (task 0.5).
+- Container Python is 3.13.15 vs 3.13.14 on the host; dependencies are locked.
+- `infra/postgres/init/` runs only on a fresh volume; task 2.5 must also enable the
+  `vector` extension in a migration.
+- No tests anywhere yet — the first arrive with 0.5's settings object; the wider
+  tooling is phase 12. No CI (0.6).
 
 ## Important notes
 - Do not skip ahead.
 - The roadmap and task files are the source of truth.
 - Update this file after every completed task.
 - Start a session with `./scripts/ctx.sh`, not by reading every document.
+- Run `./scripts/check.sh` before committing; the pre-commit hook does it too.

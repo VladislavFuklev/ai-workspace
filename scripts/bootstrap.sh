@@ -22,7 +22,13 @@ pnpm install
 echo "==> Installing Python API dependencies"
 uv sync --project apps/api
 
+echo "==> Enabling repository git hooks"
+git config core.hooksPath .githooks
+echo "    pre-commit will run scripts/check.sh (git config --unset core.hooksPath to disable)"
+
 echo
 echo "Done. Next:"
 echo "  pnpm dev              # web dev server on http://localhost:3000"
 echo "  scripts/dev-api.sh    # API dev server on http://localhost:8000"
+echo "  scripts/dev-up.sh     # PostgreSQL + pgvector, Redis, MinIO"
+echo "  scripts/check.sh      # lint, format and type checks for both workspaces"

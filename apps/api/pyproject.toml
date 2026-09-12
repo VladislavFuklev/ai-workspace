@@ -14,3 +14,61 @@ build-backend = "uv_build"
 
 [tool.uv.build-backend]
 module-name = "ai_workspace_api"
+
+[dependency-groups]
+dev = [
+    "mypy==2.3.1",
+    "ruff==0.16.7",
+]
+
+[tool.ruff]
+target-version = "py313"
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+# Rule sets are enabled deliberately rather than with ALL, so every warning the
+# build produces is one somebody chose to care about.
+select = [
+    "E", "W",   # pycodestyle
+    "F",        # pyflakes: real errors — undefined names, unused imports
+    "I",        # isort: deterministic import order
+    "UP",       # pyupgrade: keep syntax current with the pinned interpreter
+    "B",        # bugbear: mutable defaults, silent except, loop-variable capture
+    "S",        # bandit: hardcoded secrets, subprocess misuse, weak crypto
+    "ASYNC",    # blocking calls inside async def — an event-loop stall
+    "A",        # builtin shadowing
+    "C4",       # comprehension clarity
+    "DTZ",      # naive datetimes; every timestamp here must be tz-aware
+    "T20",      # no print(): the project uses structured logging
+    "SIM",      # simplifications
+    "PTH",      # pathlib over os.path
+    "RUF",      # ruff's own checks
+]
+ignore = [
+    "E501",     # line length is the formatter's job, not the linter's
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests assert, use fixtures, and hardcode credentials on purpose.
+"tests/**" = ["S101", "S105", "S106", "S311"]
+# Alembic generates its own style and shadows builtins in revision templates.
+"migrations/**" = ["A", "F401", "I001"]
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "parents"
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.mypy]
+python_version = "3.13"
+files = ["src", "tests"]
+strict = true
+# Fail loudly on the two things that silently erode a strict codebase.
+warn_unreachable = true
+warn_unused_ignores = true
+# Third-party packages without type information must be declared, not assumed.
+disallow_untyped_defs = true
+disallow_any_unimported = true
+pretty = true

@@ -2,6 +2,40 @@
 
 ## Unreleased
 
+### 0.4 — Code quality tooling (2026-09-12)
+
+**Added**
+- `scripts/check.sh` — one read-only command for both workspaces: format, lint and
+  types. Runs every check even after one fails, then exits non-zero. ~2.2s.
+- `scripts/fix.sh` — applies automatic fixes, then re-runs the check.
+- `.githooks/pre-commit` — runs the full suite before each commit; enabled by
+  `scripts/bootstrap.sh` via `core.hooksPath`, skippable with `--no-verify`. No
+  husky or lint-staged dependency.
+- Web: Prettier 3.9.6 with Tailwind class sorting, `eslint-config-prettier`, and
+  `eslint-plugin-boundaries` enforcing `app → features → components → lib`
+  including the "no sibling feature" rule (ADR-012).
+- API: Ruff 0.16.7 (lint + format) and mypy 2.3.1 in `strict` mode, configured in
+  `apps/api/pyproject.toml` with rule sets enumerated deliberately (ADR-011).
+- `.editorconfig`.
+- ADR-010 (TypeScript 5 and ESLint 9 held back), ADR-011 (Ruff + mypy and the rule
+  selection), ADR-012 (layering enforced by the linter).
+- `docs/tasks/0.5-environment-configuration.md`.
+
+**Changed**
+- `apps/web/eslint.config.mjs` — Prettier compatibility plus the layering policy.
+- `apps/web/next.config.ts` — reformatted by Prettier.
+- `scripts/bootstrap.sh` — enables the git hooks and lists the new commands.
+- `docs/ARCHITECTURE.md` — quality-gate section and toolchain rows.
+
+**Notes**
+- The TypeScript version question deferred in 0.2 is answered: `typescript-eslint`
+  declares `typescript >=4.8.4 <6.1.0`, so TypeScript 7 is not usable while
+  `eslint-config-next` depends on it. Separately, ESLint 9 is deprecated on npm but
+  four plugins inside `eslint-config-next` cap their peer at `^9`, so ESLint 10 is
+  not usable either. Both are registry facts, recorded in ADR-010.
+- Every check was verified to fail on a deliberately broken file and then reverted;
+  the layering rule was verified against three violation shapes and one legal case.
+
 ### 0.3 — Development environment and Docker (2026-09-12)
 
 **Added**
