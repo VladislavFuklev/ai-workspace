@@ -11,19 +11,14 @@ Phase 1 — Frontend foundation
 None in progress.
 
 ## Last completed task
-1.5 — Theme system (2026-09-12)
+1.6 — Error, loading and empty states (2026-09-12)
 
 ## Last session
 
-1.5 only. See `docs/tasks/1.5-theme-system.md`.
-
-Beyond that file: 0.8's `prefers-color-scheme` block applied `color-scheme` but
-not the tokens, so system dark rendered light. Worth re-reading other "it renders,
-so it works" assumptions from phase 0.
+1.6 only. See `docs/tasks/1.6-state-components.md`.
 
 ## Next action
-Execute task **1.6 — Error/loading/empty states**; write
-`docs/tasks/1.6-state-components.md` first.
+Execute task **1.7 — API client**; write `docs/tasks/1.7-api-client.md` first.
 
 ## Known blockers
 None.

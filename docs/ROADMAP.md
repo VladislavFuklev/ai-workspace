@@ -18,7 +18,7 @@ See `MASTER_PROMPT.md` for the complete product specification.
 - [x] 1.3 Design tokens
 - [x] 1.4 Navigation
 - [x] 1.5 Theme system
-- [ ] 1.6 Error/loading/empty states
+- [x] 1.6 Error/loading/empty states
 - [ ] 1.7 API client
 - [ ] 1.8 Query/cache architecture
 - [ ] 1.9 Forms and validation

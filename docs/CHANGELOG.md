@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### 1.6 — Error, loading and empty states (2026-09-12)
+
+- `Skeleton`, `SkeletonText`, `EmptyState`, `ErrorState`, `Spinner` in
+  `components/ui/`; `error.tsx` and `(app)/loading.tsx` recomposed on them.
+- Every destination has an empty state naming the action that fills it, with the
+  action rendered disabled and labelled with the phase that enables it.
+
 ### 1.5 — Theme system (2026-09-12)
 
 - Three-way `ThemeToggle` (light / dark / system) as a radiogroup, persisted in
