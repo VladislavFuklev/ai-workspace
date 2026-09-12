@@ -513,3 +513,25 @@ the alternative of assembling the DSN from parts, which would diverge from manag
 Postgres, where a URL is what you are given.
 
 Accepted — 2026-09-12
+
+---
+
+## ADR-014 — Keep the decision log in one file
+
+**Context.** `DECISIONS.md` is 515 lines across 13 ADRs and will roughly triple
+over the remaining roadmap. Task 0.7 asked whether to split it into
+`docs/decisions/NNN-*.md` with an index.
+
+**Decision.** One file. `scripts/ctx.sh` indexes the titles, and reading a single
+ADR is `sed -n '/## ADR-010/,/^## ADR-/p'` — as cheap as opening a small file.
+
+**Rejected.** *One file per ADR* — its main benefit is avoiding merge conflicts in
+a team, which does not apply here, and it would cost a migration plus a more
+complex `ctx.sh` today.
+
+**Revisit when** the file passes ~1500 lines, or more than one person edits it.
+
+**Consequence.** Appends always touch the same file. Numbers are never reused, so
+a superseded ADR stays in place and is marked, not deleted.
+
+Accepted — 2026-09-12

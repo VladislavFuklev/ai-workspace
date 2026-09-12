@@ -9,7 +9,7 @@ See `MASTER_PROMPT.md` for the complete product specification.
 - [x] 0.4 Code quality tooling
 - [x] 0.5 Environment configuration
 - [x] 0.6 CI baseline
-- [ ] 0.7 Documentation system
+- [x] 0.7 Documentation system
 - [ ] 0.8 Design system foundation
 
 ## Phase 1

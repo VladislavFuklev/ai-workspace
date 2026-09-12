@@ -192,6 +192,8 @@ file, runs every check even after one fails, and exits non-zero if any did.
 | types | `next typegen && tsc --noEmit` | `mypy --strict` |
 | tests | phase 12 | `pytest` |
 
+Plus `scripts/check.sh docs`: documentation consistency (`scripts/check-docs.sh`).
+
 Python checks run with `apps/api` as the working directory: Ruff's per-file-ignores
 and mypy's `files` resolve relative to the working directory, and mypy misreads the
 module layout from the repository root.

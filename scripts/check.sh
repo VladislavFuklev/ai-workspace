@@ -5,6 +5,7 @@
 #   scripts/check.sh          run everything, report all failures
 #   scripts/check.sh web      web only
 #   scripts/check.sh api      API only
+#   scripts/check.sh docs     documentation consistency only
 #
 # Runs every check even after one fails, so a single run surfaces every problem,
 # then exits non-zero if any failed.
@@ -26,6 +27,10 @@ run() {
     failed+=("$label")
   fi
 }
+
+if [ "$target" = "all" ] || [ "$target" = "docs" ]; then
+  run "docs · consistency" ./scripts/check-docs.sh
+fi
 
 if [ "$target" = "all" ] || [ "$target" = "web" ]; then
   run "web · format"    pnpm --filter @ai-workspace/web format

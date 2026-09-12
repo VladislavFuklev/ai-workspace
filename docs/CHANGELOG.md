@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### 0.7 — Documentation system (2026-09-12)
+
+- `docs/README.md` — index of which document answers which question.
+- `docs/tasks/_TEMPLATE.md` — task spec and outcome template.
+- `scripts/check-docs.sh` — fails on a roadmap entry contradicting its task file,
+  a dead relative link, an ADR cited but never defined, or a project state that
+  disagrees with the roadmap. Runs in 0.2s as part of `scripts/check.sh`.
+- ADR-014 — the decision log stays in one file.
+
 ### 0.6 — CI baseline (2026-09-12)
 
 - `.github/workflows/ci.yml` — parallel web and api jobs on push to `main` and

@@ -11,17 +11,18 @@ Phase 0 — Product and engineering foundation
 None in progress.
 
 ## Last completed task
-0.6 — CI baseline (2026-09-12)
+0.7 — Documentation system (2026-09-12)
 
 ## Last session
 
-0.6 only. See `docs/tasks/0.6-ci-baseline.md`.
+0.7 only. See `docs/tasks/0.7-documentation-system.md`.
 
-Beyond that file: every GitHub Action version written from memory was a major
-behind. Check the API before pinning one.
+Beyond that file: an unescaped `.` in a grep pattern made the drift check pass on
+drifted input. Exercise the failure case, or a check proves nothing.
 
 ## Next action
-Execute task **0.7 — Documentation system** per `docs/tasks/0.7-documentation-system.md`.
+Execute task **0.8 — Design system foundation** per
+`docs/tasks/0.8-design-system-foundation.md`. Last task of phase 0.
 
 ## Known blockers
 None.
