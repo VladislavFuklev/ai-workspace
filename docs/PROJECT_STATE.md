@@ -11,16 +11,18 @@ Phase 2 — Backend foundation
 None in progress.
 
 ## Last completed task
-2.1 — FastAPI application structure (2026-09-13)
+2.2 — Configuration (2026-09-13)
 
 ## Last session
 
-2.1 only. See `docs/tasks/2.1-fastapi-application-structure.md`.
+2.2 only. See `docs/tasks/2.2-configuration.md`.
+
+Beyond that file: pydantic-settings JSON-decodes list fields in the env source
+before validators run, so a comma-separated value needs `NoDecode` on the field.
 
 ## Next action
-Execute task **2.2 — Configuration**. It overlaps 0.5, which already delivered
-typed validated settings — scope it to what 0.5 left out (CORS origins, app
-metadata, per-environment behaviour) rather than redoing it.
+Execute task **2.3 — Database connection**; write
+`docs/tasks/2.3-database-connection.md` first.
 
 ## Known blockers
 None.

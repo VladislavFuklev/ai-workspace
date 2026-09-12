@@ -26,7 +26,7 @@ See `MASTER_PROMPT.md` for the complete product specification.
 
 ## Phase 2
 - [x] 2.1 FastAPI application structure
-- [ ] 2.2 Configuration
+- [x] 2.2 Configuration
 - [ ] 2.3 Database connection
 - [ ] 2.4 SQLAlchemy models
 - [ ] 2.5 Alembic migrations

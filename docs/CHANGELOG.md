@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### 2.2 — Configuration (2026-09-13)
+
+- `service_name`, `api_prefix`, `cors_origins`, `max_request_body_bytes`; CORS
+  wired from settings, with the middleware omitted entirely when no origin is set.
+- A wildcard origin in production fails startup: browsers reject it alongside
+  credentials, so the misconfiguration would otherwise surface as a browser error.
+- Overlapped 0.5; scoped to the gap rather than redone.
+
 ### 2.1 — FastAPI application structure (2026-09-13)
 
 - `create_app(settings)` factory plus the module-level `app` uvicorn imports; a

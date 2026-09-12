@@ -12,6 +12,7 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from ai_workspace_api import __version__
 from ai_workspace_api.core.settings import Settings, get_settings
@@ -50,6 +51,18 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     # import the module-level singleton.
     app.state.settings = resolved
 
+    if resolved.cors_origins:
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=resolved.cors_origins,
+            # The session is a cookie (phase 3), so the browser must be told to
+            # send it. This is why a wildcard origin is refused in production.
+            allow_credentials=True,
+            allow_methods=["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
+            allow_headers=["Authorization", "Content-Type"],
+            expose_headers=["X-Request-ID"],
+        )
+
     @app.get("/", tags=["meta"], summary="Service identity")
     async def root() -> dict[str, str]:
         """Confirms which service and which environment answered.
@@ -58,7 +71,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         balancer keeps sending traffic to a process that cannot reach its database.
         """
         return {
-            "service": "ai-workspace-api",
+            "service": resolved.service_name,
             "version": __version__,
             "environment": resolved.environment.value,
         }

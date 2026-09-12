@@ -16,8 +16,16 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Annotated
 
-from pydantic import AnyHttpUrl, Field, PostgresDsn, RedisDsn, SecretStr
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import (
+    AnyHttpUrl,
+    Field,
+    PostgresDsn,
+    RedisDsn,
+    SecretStr,
+    field_validator,
+    model_validator,
+)
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 
 def _find_env_file() -> Path | None:
@@ -79,6 +87,20 @@ class Settings(BaseSettings):
     environment: Environment = Environment.LOCAL
     log_level: LogLevel = LogLevel.INFO
 
+    service_name: str = "ai-workspace-api"
+    api_prefix: str = "/api/v1"
+
+    # NoDecode is required: without it the env source tries to JSON-decode any
+    # list field before validators run, so "a,b" fails before it can be split.
+    cors_origins: Annotated[list[str], NoDecode] = Field(
+        default_factory=list,
+        description="Origins allowed to call the API with credentials.",
+    )
+
+    # Documents are uploaded through this API; an unbounded body is a denial of
+    # service. Enforced at the edge in task 5.3.
+    max_request_body_bytes: Annotated[int, Field(gt=0)] = 25 * 1024 * 1024
+
     database_url: Annotated[
         PostgresDsn,
         Field(description="SQLAlchemy-style DSN, e.g. postgresql+psycopg://user:pw@host:5432/db"),
@@ -90,6 +112,33 @@ class Settings(BaseSettings):
     s3_access_key: SecretStr
     s3_secret_key: SecretStr
     s3_region: str = "us-east-1"
+
+    @field_validator("cors_origins", mode="before")
+    @classmethod
+    def _split_origins(cls, value: object) -> object:
+        """Accepts a comma-separated string and drops empty entries.
+
+        A trailing comma or a blank `CORS_ORIGINS=` is the most common way this
+        setting is written, and an empty origin would silently match nothing.
+        """
+        if isinstance(value, str):
+            return [item.strip() for item in value.split(",") if item.strip()]
+        return value
+
+    @model_validator(mode="after")
+    def _reject_unsafe_cors_in_production(self) -> Settings:
+        """A wildcard origin cannot be combined with credentials.
+
+        Browsers refuse the combination outright, so a deployment configured this
+        way fails at the first cross-origin request with a message that points at
+        the browser rather than at the configuration. Better to refuse to start.
+        """
+        if self.environment is Environment.PRODUCTION and "*" in self.cors_origins:
+            raise ValueError(
+                "cors_origins must not contain '*' in production: the API sends "
+                "credentials, and browsers reject a wildcard origin with them."
+            )
+        return self
 
     @property
     def is_production(self) -> bool:

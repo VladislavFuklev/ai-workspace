@@ -27,7 +27,15 @@ VALID_ENVIRONMENT: dict[str, str] = {
 }
 
 # Every variable Settings looks at, so a leftover one cannot influence a test.
-MANAGED_KEYS: tuple[str, ...] = (*VALID_ENVIRONMENT, "LOG_LEVEL", "S3_REGION")
+MANAGED_KEYS: tuple[str, ...] = (
+    *VALID_ENVIRONMENT,
+    "LOG_LEVEL",
+    "S3_REGION",
+    "CORS_ORIGINS",
+    "SERVICE_NAME",
+    "API_PREFIX",
+    "MAX_REQUEST_BODY_BYTES",
+)
 
 
 @pytest.fixture
