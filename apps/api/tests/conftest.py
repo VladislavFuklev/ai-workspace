@@ -73,6 +73,21 @@ def settings(valid_env: dict[str, str], settings_from: BuildSettings) -> Setting
 
 
 @pytest.fixture(scope="session")
+def redis_url() -> str:
+    """The real Redis, from the same environment the developer already has.
+
+    A hard-coded fallback here would make the test pass locally and assert a
+    degraded service in CI — which is exactly what it did before.
+    """
+    import os
+
+    url = os.environ.get("REDIS_URL")
+    if not url:
+        pytest.skip("REDIS_URL is not set; run scripts/dev-up.sh and copy .env")
+    return url
+
+
+@pytest.fixture(scope="session")
 def database_url() -> str:
     """The real database, from the environment the developer already has.
 

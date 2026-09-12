@@ -51,17 +51,12 @@ async def test_readiness_reports_the_failure_type_not_the_message(settings: Sett
 
 @pytest.mark.integration
 async def test_readiness_is_200_when_everything_is_reachable(
-    valid_env: dict[str, str], settings_from: BuildSettings, database_url: str
+    valid_env: dict[str, str],
+    settings_from: BuildSettings,
+    database_url: str,
+    redis_url: str,
 ) -> None:
-    import os
-
-    settings = settings_from(
-        {
-            **valid_env,
-            "DATABASE_URL": database_url,
-            "REDIS_URL": os.environ.get("REDIS_URL", "redis://localhost:6380/0"),
-        }
-    )
+    settings = settings_from({**valid_env, "DATABASE_URL": database_url, "REDIS_URL": redis_url})
     app = create_app(settings)
 
     async with running_app(app) as client:

@@ -76,6 +76,15 @@ jobs:
         options: >-
           --health-cmd "pg_isready -U ci -d ci"
           --health-interval 5s --health-timeout 5s --health-retries 12
+      redis:
+        # The readiness check covers Postgres and Redis, so CI needs both or the
+        # integration run asserts a degraded service.
+        image: redis:8-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 5s --health-retries 12
     env:
       ENVIRONMENT: test
       DATABASE_URL: postgresql+psycopg://ci:ci@localhost:5432/ci

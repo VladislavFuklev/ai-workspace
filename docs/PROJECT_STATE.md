@@ -15,12 +15,12 @@ None in progress.
 
 ## Last session
 
-1.11 only — added at the user's request after phase 2, and sequenced before phase
-3 so the authentication screens are translated as they are written rather than
-retrofitted. See `docs/tasks/1.11-internationalisation.md`.
+1.11, then a CI fix. See `docs/tasks/1.11-internationalisation.md` and the
+follow-up section in `docs/tasks/2.6-health.md`.
 
-Beyond that file: internal links must import `Link` from `@/i18n/navigation`, not
-`next/link`, or they lose the locale prefix silently.
+Beyond those: a test fixture that falls back to a hard-coded URL instead of
+skipping will pass locally and fail in CI. `database_url` and `redis_url` both
+skip; any future one should too.
 
 ## Next action
 Phase 3. Execute task **3.1 — User model**; write `docs/tasks/3.1-user-model.md`

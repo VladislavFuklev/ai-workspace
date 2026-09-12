@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Fix — CI had no Redis (2026-09-13)
+
+- Added a `redis:8-alpine` service to the API job: the readiness check covers both
+  dependencies, so with only Postgres the integration run correctly reported a
+  degraded service.
+- The readiness test read `REDIS_URL` from the ambient environment with a
+  hard-coded fallback, which made it pass on any machine with the stack up. It now
+  uses a `redis_url` fixture that skips when unset, like `database_url`.
+
 ### 1.11 — Internationalisation, English and Ukrainian (2026-09-13)
 
 - next-intl with the locale in the path (`/en`, `/uk`) and a `[locale]` segment
