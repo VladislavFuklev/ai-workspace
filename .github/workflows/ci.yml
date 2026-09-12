@@ -23,6 +23,11 @@ jobs:
     defaults:
       run:
         working-directory: apps/web
+    env:
+      # Job-level, not step-level: `next typegen` loads next.config.ts, which
+      # validates the public environment (src/lib/env.ts), so typecheck needs it
+      # as much as build does. There is no .env in CI.
+      NEXT_PUBLIC_API_URL: http://localhost:8000
     steps:
       - uses: actions/checkout@v7
 
@@ -46,9 +51,6 @@ jobs:
         working-directory: .
         run: node scripts/check-contrast.mjs
       - run: pnpm build
-        env:
-          # No .env in CI; the build validates this value (src/lib/env.ts).
-          NEXT_PUBLIC_API_URL: http://localhost:8000
 
   api:
     name: api
@@ -70,7 +72,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: astral-sh/setup-uv@v10
+      - uses: astral-sh/setup-uv@v10.1.0
         with:
           enable-cache: true
           cache-dependency-glob: apps/api/uv.lock

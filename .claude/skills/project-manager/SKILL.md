@@ -51,9 +51,15 @@ Then wait. Do not begin editing on an unanswered plan.
 Never write "done" on the basis of code that was not run.
 
 ```bash
-./scripts/check.sh            # format, lint, types — both workspaces, ~2s
+./scripts/check.sh            # format, lint, types, tests, docs, contrast — ~3s
+./scripts/check-ci.sh         # only when .github/workflows changed
 git add -A -n                 # nothing generated must be staged
 ```
+
+`check-ci.sh` exists because hand-checking a workflow failed twice: a step that
+passed only because the developer's `.env` was present, and an action tag read
+from the *releases* API that has no matching git ref. It runs the workflow's own
+steps with `.env` moved aside, and verifies every `uses:` resolves.
 
 **Do not run `check.sh` and then commit.** The pre-commit hook runs it again; that
 is a duplicate. Commit and let the hook be the gate. Run it by hand only while

@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### Fix — CI red on its first real run (2026-09-12)
+
+- `ci.yml`: `NEXT_PUBLIC_API_URL` moved to job level — `next typegen` validates the
+  environment, so typecheck needs it as much as build.
+- `ci.yml`: `astral-sh/setup-uv@v10` does not exist; that action publishes major
+  aliases only up to v7. Pinned `@v10.1.0`.
+- `scripts/check-ci.sh` — runs the workflow locally: verifies every action ref
+  resolves, then executes each step with its declared cwd and env and the root
+  `.env` moved aside. Both failures were reintroduced and confirmed caught.
+
 ### 0.8 — Design system foundation (2026-09-12)
 
 - Semantic design tokens in `globals.css` under Tailwind 4 `@theme`: neutral ramp,

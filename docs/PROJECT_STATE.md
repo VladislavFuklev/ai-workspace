@@ -15,11 +15,12 @@ None in progress.
 
 ## Last session
 
-0.8 only, completing phase 0. See `docs/tasks/0.8-design-system-foundation.md`.
+0.8, completing phase 0, then a CI fix. See the task files.
 
-Beyond that file: a Tailwind class composed at runtime (`bg-${token}`) generates
-no CSS, and both the build and the typechecker are happy about it. Grep the built
-stylesheet for the utilities a page claims to use.
+Two lessons worth carrying: a Tailwind class composed at runtime (`bg-${token}`)
+generates no CSS while the build and typechecker stay green — grep the built
+stylesheet. And verifying CI by hand does not work: run `scripts/check-ci.sh`
+before pushing a workflow change.
 
 ## Next action
 Phase 1. Execute task **1.1 — Next.js application shell**; write
@@ -40,8 +41,8 @@ None.
 - Container Python is 3.13.15 vs 3.13.14 on the host; dependencies are locked.
 - `infra/postgres/init/` runs only on a fresh volume; task 2.5 must also enable the
   `vector` extension in a migration.
-- CI is written and verified locally but has never run on GitHub: the branch is
-  ahead of `origin/main` and unpushed.
+- CI's first real run was red; both causes fixed and `scripts/check-ci.sh` added
+  to catch that class before pushing. Needs one green run to confirm.
 - No browser automation until 12.8, so UI review is limited to markup and
   generated CSS. `/design` deserves a human look.
 - No theme switcher yet (1.5); `data-theme` must be set by hand.
