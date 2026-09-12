@@ -9,7 +9,7 @@ from ai_workspace_api import __version__
 from ai_workspace_api.api.app import create_app
 from ai_workspace_api.core.settings import Environment, Settings
 
-from .conftest import BuildSettings
+from .conftest import BuildSettings, running_app
 
 
 @pytest.fixture
@@ -59,11 +59,13 @@ async def test_docs_are_closed_outside_local(
     assert production.openapi_url is None
 
 
-async def test_lifespan_runs(settings: Settings) -> None:
-    """A failure in startup must surface as a failure to start, not a stuck app."""
+async def test_lifespan_puts_the_session_factory_on_app_state(settings: Settings) -> None:
+    """ASGITransport does not run the lifespan — it dispatches requests only. So
+    anything the lifespan provides is missing unless it is entered explicitly,
+    which is what `running_app` does and what every dependency here relies on."""
     app = create_app(settings)
-    async with httpx.AsyncClient(
-        transport=httpx.ASGITransport(app=app), base_url="http://test"
-    ) as client:
-        # ASGITransport runs the lifespan; a raising lifespan fails this call.
+
+    assert not hasattr(app.state, "session_factory")
+    async with running_app(app) as client:
         assert (await client.get("/")).status_code == 200
+        assert app.state.session_factory is not None

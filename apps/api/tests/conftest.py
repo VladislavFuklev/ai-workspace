@@ -8,9 +8,12 @@ discovery — so each test states its whole environment.
 
 from __future__ import annotations
 
-from collections.abc import Callable
+import contextlib
+from collections.abc import AsyncIterator, Callable
 
+import httpx
 import pytest
+from fastapi import FastAPI
 from sqlalchemy import MetaData
 from sqlalchemy.orm import DeclarativeBase
 
@@ -96,3 +99,18 @@ class ScratchBase(DeclarativeBase):
     """
 
     metadata = MetaData(naming_convention=NAMING_CONVENTION)
+
+
+@contextlib.asynccontextmanager
+async def running_app(app: FastAPI) -> AsyncIterator[httpx.AsyncClient]:
+    """A client talking to an app whose lifespan has actually run.
+
+    `httpx.ASGITransport` does **not** run the lifespan — it dispatches requests
+    only. Anything the lifespan puts on `app.state`, such as the session factory,
+    is therefore missing unless the lifespan is entered explicitly.
+    """
+    async with (
+        app.router.lifespan_context(app),
+        httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client,
+    ):
+        yield client

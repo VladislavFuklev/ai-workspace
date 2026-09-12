@@ -15,6 +15,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from ai_workspace_api import __version__
+from ai_workspace_api.api.routes import health
 from ai_workspace_api.core.database import create_engine, create_session_factory
 from ai_workspace_api.core.settings import Settings, get_settings
 
@@ -72,6 +73,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             allow_headers=["Authorization", "Content-Type"],
             expose_headers=["X-Request-ID"],
         )
+
+    # Health endpoints stay off the versioned prefix (2.9): an orchestrator's
+    # probe URL should not change when the API version does.
+    app.include_router(health.router)
 
     @app.get("/", tags=["meta"], summary="Service identity")
     async def root() -> dict[str, str]:

@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+### 2.6 — Health endpoints (2026-09-13)
+
+- `/health/live` checks nothing external: a failure there means restart, and a
+  liveness probe that touched the database would restart every replica in a loop
+  during an outage.
+- `/health/ready` checks Postgres and Redis concurrently with a timeout and
+  returns 503 when either is down, naming which. The body carries a failure class,
+  not a driver message — the endpoint is often unauthenticated.
+- Both mounted off the versioned prefix: a probe URL should not change with the
+  API version.
+
 ### 2.5 — Alembic migrations (2026-09-13)
 
 - Alembic on the async template, reading the URL from the application's settings

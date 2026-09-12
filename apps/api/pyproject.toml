@@ -8,6 +8,7 @@ dependencies = [
     "fastapi>=0.141.1",
     "psycopg[binary,pool]==3.3.5",
     "pydantic-settings==2.15.0",
+    "redis==8.1.0",
     "sqlalchemy[asyncio]==2.0.52",
     "uvicorn[standard]>=0.52.4",
 ]
@@ -42,6 +43,7 @@ select = [
     "I",        # isort: deterministic import order
     "UP",       # pyupgrade: keep syntax current with the pinned interpreter
     "B",        # bugbear: mutable defaults, silent except, loop-variable capture
+    "BLE",      # blind `except Exception` — legitimate at a boundary, a bug inside one
     "S",        # bandit: hardcoded secrets, subprocess misuse, weak crypto
     "ASYNC",    # blocking calls inside async def — an event-loop stall
     "A",        # builtin shadowing
