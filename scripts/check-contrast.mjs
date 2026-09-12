@@ -10,6 +10,10 @@ import { dirname, relative as relativePath, resolve } from "node:path";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const verbose = process.argv.includes("--verbose");
+// The root layout moved under the locale segment in task 1.11; keeping the path
+// in one constant means the next move breaks loudly here rather than silently
+// exempting nothing.
+const LAYOUT = "apps/web/src/app/[locale]/layout.tsx";
 // Quiet by default: this runs on every commit, and 40 passing lines are noise.
 const report = (ok, line) => {
   if (verbose || !ok) console.log(line);
@@ -77,7 +81,7 @@ const themes = {
 // read CSS — so assert it still matches the token it is duplicating.
 let failures = 0;
 {
-  const layout = readFileSync(resolve(root, "apps/web/src/app/layout.tsx"), "utf8");
+  const layout = readFileSync(resolve(root, LAYOUT), "utf8");
   const declared = [...layout.matchAll(/prefers-color-scheme:\s*(light|dark)\)",\s*color:\s*"(#[0-9a-fA-F]{6})"/g)];
   if (verbose) console.log("\nbrowser theme-color vs the bg token");
   for (const scheme of ["light", "dark"]) {
@@ -130,7 +134,7 @@ for (const [theme, tokens] of Object.entries(themes)) {
     // Replaces <html> when the root layout fails, so it cannot load the stylesheet.
     "apps/web/src/app/global-error.tsx",
     // viewport.themeColor must be a literal; asserted against --color-bg above.
-    "apps/web/src/app/layout.tsx",
+    LAYOUT,
   ]);
   const walk = (dir) =>
     readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {

@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+### 1.11 — Internationalisation, English and Ukrainian (2026-09-13)
+
+- next-intl with the locale in the path (`/en`, `/uk`) and a `[locale]` segment
+  wrapping the route groups; cookie, then `Accept-Language`, then the default.
+- 50 message keys per locale; a switcher labelling each language in its own
+  language; `<html lang>` follows the locale.
+- Inter and JetBrains Mono now load the Cyrillic subset — without it Ukrainian
+  fell back to a system font mid-page.
+- `scripts/check-messages.mjs` fails on a key present in one catalogue and not the
+  other, or on an empty string.
+- ADR-015 (the API returns codes, the client owns wording) and ADR-016 (the locale
+  is in the URL).
+
 ### 2.10 — OpenAPI documentation (2026-09-13)
 
 - Operation ids come from the route name, so a generated client's method names

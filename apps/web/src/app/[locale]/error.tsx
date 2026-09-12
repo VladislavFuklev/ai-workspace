@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect } from "react";
 
 import { ErrorState } from "@/components/ui";
@@ -18,6 +19,9 @@ export default function RouteError({
   error: Error & { digest?: string };
   retry: () => void;
 }) {
+  const t = useTranslations("errors");
+  const ts = useTranslations("states");
+
   useEffect(() => {
     // Replaced by the error-tracking boundary in task 11.7.
     console.error(error);
@@ -26,9 +30,11 @@ export default function RouteError({
   return (
     <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 lg:px-8">
       <ErrorState
-        title="This page could not be loaded"
-        description="The problem has been recorded. Trying again is often enough."
+        title={t("pageTitle")}
+        description={t("pageDescription")}
         reference={error.digest}
+        referenceLabel={ts("reference")}
+        retryLabel={ts("retry")}
         onRetry={retry}
       />
     </div>

@@ -11,17 +11,16 @@ Phase 3 — Authentication and identity
 None in progress.
 
 ## Last completed task
-2.10 — OpenAPI documentation (2026-09-13)
+1.11 — Internationalisation (2026-09-13)
 
 ## Last session
 
-2.1 through 2.10 in one session, at the user's request — phase 2 complete. See the
-individual task files.
+1.11 only — added at the user's request after phase 2, and sequenced before phase
+3 so the authentication screens are translated as they are written rather than
+retrofitted. See `docs/tasks/1.11-internationalisation.md`.
 
-Carried forward: the two discoveries that changed how tests are written here.
-`httpx.ASGITransport` does not run the lifespan (use `running_app`), and FastAPI
-0.141 does not flatten included routers into `app.routes` (assert routing by
-request). Both cost a debugging cycle each.
+Beyond that file: internal links must import `Link` from `@/i18n/navigation`, not
+`next/link`, or they lose the locale prefix silently.
 
 ## Next action
 Phase 3. Execute task **3.1 — User model**; write `docs/tasks/3.1-user-model.md`
@@ -41,6 +40,9 @@ None.
 - No authentication, so OpenAPI declares no security schemes.
 - No generated TypeScript client; `apps/web/src/lib/api` still hand-writes the
   response schemas the OpenAPI document could produce.
+- The API's error codes have no catalogue entries, so a domain error shows the
+  server's English fallback (ADR-015).
+- Ukrainian copy has not been reviewed by a native speaker.
 - `POSTGRES_*` and `DATABASE_URL` in `.env` are separate and must agree (ADR-013).
 - Container Python is 3.13.15 vs 3.13.14 on the host; dependencies are locked.
 - `infra/postgres/init/` runs only on a fresh volume; task 2.5 must also enable the

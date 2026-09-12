@@ -89,6 +89,10 @@ Only `src/app/` exists today. The remaining directories are created when the fir
 file that belongs in them is written (phase 1 onwards) rather than as empty
 placeholders — the layering below is the contract, not the directory listing.
 
+Everything sits under a `[locale]` segment (ADR-016), so a URL names one page in
+one language. Internal links come from `@/i18n/navigation`; `next/link` drops the
+prefix.
+
 Route groups (no URL segment of their own):
 
 | Group | Owns | Holds |

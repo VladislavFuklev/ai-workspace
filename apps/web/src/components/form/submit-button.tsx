@@ -9,11 +9,11 @@ import { Spinner } from "@/components/ui";
 export function SubmitButton({
   children,
   pending,
-  pendingLabel = "Saving",
+  pendingLabel,
 }: {
   children: React.ReactNode;
   pending?: boolean;
-  pendingLabel?: string;
+  pendingLabel: string;
 }) {
   return (
     <button

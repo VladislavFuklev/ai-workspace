@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 
 import { Navigation } from "./navigation";
@@ -19,6 +20,7 @@ export function AppShell({
   header: React.ReactNode;
   children: React.ReactNode;
 }) {
+  const t = useTranslations("common");
   const [open, setOpen] = useState(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
@@ -56,7 +58,7 @@ export function AppShell({
             aria-controls="navigation-drawer"
             className="-ml-1 rounded-md p-2 text-text-muted transition-colors duration-fast hover:bg-surface-muted hover:text-text lg:hidden"
           >
-            <span className="sr-only">Open navigation</span>
+            <span className="sr-only">{t("openNavigation")}</span>
             <svg aria-hidden="true" viewBox="0 0 20 20" className="size-5" fill="currentColor">
               <path d="M3 5.5h14v1.5H3zM3 9.25h14v1.5H3zM3 13h14v1.5H3z" />
             </svg>
@@ -68,7 +70,7 @@ export function AppShell({
       <div className="flex">
         {/* Rendered inline only at lg and up; below that the drawer holds it. */}
         <div className="sticky top-header hidden h-[calc(100dvh-var(--spacing-header))] w-sidebar shrink-0 border-r border-border bg-surface lg:block">
-          <Navigation label="Main" />
+          <Navigation label={t("appName")} />
         </div>
 
         <main id="main" tabIndex={-1} className="min-w-0 flex-1 focus:outline-none">
@@ -85,17 +87,17 @@ export function AppShell({
         onClick={(event) => {
           if (event.target === dialogRef.current) dialogRef.current?.close();
         }}
-        aria-label="Navigation"
+        aria-label={t("openNavigation")}
         className="z-drawer m-0 h-dvh max-h-dvh w-drawer max-w-[85vw] border-r border-border bg-surface p-0 text-text backdrop:bg-neutral-950/40 lg:hidden"
       >
         <div className="flex h-header items-center justify-between border-b border-border px-4">
-          <span className="text-sm font-semibold tracking-tight text-text">AI Workspace</span>
+          <span className="text-sm font-semibold tracking-tight text-text">{t("appName")}</span>
           <button
             type="button"
             onClick={() => dialogRef.current?.close()}
             className="-mr-1 rounded-md p-2 text-text-muted transition-colors duration-fast hover:bg-surface-muted hover:text-text"
           >
-            <span className="sr-only">Close navigation</span>
+            <span className="sr-only">{t("closeNavigation")}</span>
             <svg aria-hidden="true" viewBox="0 0 20 20" className="size-5" fill="currentColor">
               <path d="M5.28 4.22a.75.75 0 0 0-1.06 1.06L8.94 10l-4.72 4.72a.75.75 0 1 0 1.06 1.06L10 11.06l4.72 4.72a.75.75 0 1 0 1.06-1.06L11.06 10l4.72-4.72a.75.75 0 0 0-1.06-1.06L10 8.94z" />
             </svg>

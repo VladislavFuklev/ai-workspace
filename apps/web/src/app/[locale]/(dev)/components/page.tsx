@@ -10,6 +10,10 @@ export const metadata: Metadata = { title: "Components" };
  * The point is the awkward ones. A component gallery that shows only the happy
  * path is where empty states go to be forgotten, and empty and error are the two
  * that reach users broken.
+ *
+ * Copy here is deliberately untranslated: this is an internal reference surface,
+ * and running it through the catalogue would fill the catalogue with strings no
+ * user ever sees.
  */
 function Case({
   title,
@@ -82,7 +86,11 @@ export default function ComponentsPage() {
           title="Error state"
           note="Written for the reader, never carrying raw error text. The reference is what support can actually use."
         >
-          <ErrorState reference="req-7f3a9c21" />
+          <ErrorState
+            title="Something went wrong"
+            description="This could not be loaded. Trying again is often enough."
+            reference="req-7f3a9c21"
+          />
         </Case>
 
         <Case
@@ -98,7 +106,7 @@ export default function ComponentsPage() {
 
         <Case title="Spinner" note="For a pending control, never as a whole-page loading state.">
           <div className="flex items-center gap-4">
-            <Spinner />
+            <Spinner label="Loading" />
             <span className="text-sm text-text-muted">Inline, with a visually hidden label</span>
           </div>
         </Case>

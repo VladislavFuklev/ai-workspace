@@ -7,6 +7,11 @@ packages:
 allowBuilds:
   sharp: false
   unrs-resolver: false
+  # Pulled in by next-intl. Denied, and the build verified without them: a
+  # postinstall script is a supply-chain surface (ADR-006), and neither is on
+  # the path of anything this project uses.
+  '@parcel/watcher': false
+  '@swc/core': false
 
 minimumReleaseAgeExclude:
   - '@next/env@16.3.5'

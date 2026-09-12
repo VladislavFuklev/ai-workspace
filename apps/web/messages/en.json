@@ -1,0 +1,76 @@
+{
+  "common": {
+    "appName": "AI Workspace",
+    "internal": "internal",
+    "skipToContent": "Skip to content",
+    "openNavigation": "Open navigation",
+    "closeNavigation": "Close navigation"
+  },
+  "theme": {
+    "label": "Colour theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "locale": {
+    "label": "Language"
+  },
+  "navigation": {
+    "main": "Main",
+    "overview": "Overview",
+    "documents": "Documents",
+    "assistant": "Assistant",
+    "usage": "Usage",
+    "settings": "Settings"
+  },
+  "landing": {
+    "eyebrow": "AI Workspace",
+    "title": "Document intelligence for teams",
+    "description": "Upload documents, search them semantically, and ask questions that come back with citations. This page is a placeholder until task 14.1.",
+    "openWorkspace": "Open the workspace",
+    "designTokens": "Design tokens"
+  },
+  "workspace": {
+    "title": "Workspace",
+    "description": "The application frame. Documents, search and the assistant arrive in phases 5 to 7; this route exists so they have somewhere to land."
+  },
+  "documents": {
+    "title": "Documents",
+    "emptyTitle": "No documents yet",
+    "emptyDescription": "Upload a PDF, Word file or plain text and it will be processed, chunked and made searchable.",
+    "emptyAction": "Upload a document"
+  },
+  "assistant": {
+    "title": "Assistant",
+    "emptyTitle": "No conversations yet",
+    "emptyDescription": "Ask a question about your documents and the answer comes back with the passages it came from.",
+    "emptyAction": "Start a conversation"
+  },
+  "usage": {
+    "title": "Usage",
+    "emptyTitle": "No usage recorded",
+    "emptyDescription": "Token consumption and AI cost appear here once the workspace starts processing documents."
+  },
+  "settings": {
+    "title": "Settings",
+    "emptyTitle": "No organisation yet",
+    "emptyDescription": "Create an organisation to invite members, assign roles and control who can see which documents.",
+    "emptyAction": "Create an organisation"
+  },
+  "states": {
+    "loading": "Loading",
+    "errorTitle": "Something went wrong",
+    "errorDescription": "This could not be loaded. Trying again is often enough.",
+    "retry": "Try again",
+    "reference": "Reference"
+  },
+  "errors": {
+    "pageTitle": "This page could not be loaded",
+    "pageDescription": "The problem has been recorded. Trying again is often enough.",
+    "notFoundEyebrow": "Error 404",
+    "notFoundTitle": "Page not found",
+    "notFoundDescription": "This address does not match anything in the workspace. It may have been moved, or the link may be out of date.",
+    "backToWorkspace": "Back to the workspace"
+  },
+  "comingSoon": "{feature} — phase {phase}"
+}

@@ -535,3 +535,51 @@ complex `ctx.sh` today.
 a superseded ADR stays in place and is marked, not deleted.
 
 Accepted — 2026-09-12
+
+---
+
+## ADR-015 — Translation lives in the client; the API returns codes
+
+**Context.** The product ships in English and Ukrainian (task 1.11). Failures
+reach the user as text, and that text has to be in their language.
+
+**Decision.** The API returns a stable machine-readable `code` with every failure
+and never a translated message; the web app owns all wording. This is what task
+2.8 already built — the envelope's `message` is a fallback for a code the client
+does not recognise, not the string a user is meant to read.
+
+**Rejected.** *Message catalogues in the API* — it would need the same
+translations, kept in step with the frontend's, and would still get the tone
+wrong because it cannot see the surrounding interface. *`Accept-Language` on API
+requests* — moves the same problem to a header and makes responses uncacheable
+per language for no gain.
+
+**Revisit when** a non-browser client needs human-readable errors — a webhook
+payload, or an email the API sends itself.
+
+**Consequence.** Every new domain error needs a matching catalogue entry, or the
+user sees the English fallback. Worth a check once the catalogue covers codes.
+
+Accepted — 2026-09-13
+
+---
+
+## ADR-016 — The locale is in the URL
+
+**Context.** next-intl can keep the locale in a cookie alone or in the path.
+
+**Decision.** Always in the path: `/en/workspace`, `/uk/workspace`. The cookie
+only remembers a choice for the next visit and for negotiating `/`.
+
+**Rejected.** *Cookie only* — one URL would then serve two languages, which
+breaks sharing a link, makes a CDN cache key wrong unless it varies on the
+cookie, and makes "this page is broken" in a bug report ambiguous.
+
+**Revisit when** the marketing site and the app diverge enough that the app could
+drop prefixes while the public pages keep them for SEO.
+
+**Consequence.** Every internal link must go through `@/i18n/navigation`, not
+`next/link`, or it loses the prefix. An unknown prefix redirects into the
+negotiated locale and 404s there rather than 404ing directly.
+
+Accepted — 2026-09-13

@@ -12,14 +12,20 @@ import type { ReactNode } from "react";
  * role="alert" so the failure is announced rather than silently replacing content.
  */
 export function ErrorState({
-  title = "Something went wrong",
-  description = "This could not be loaded. Trying again is often enough.",
+  title,
+  description,
   reference,
+  referenceLabel = "Reference",
+  retryLabel = "Try again",
   onRetry,
   action,
 }: {
-  title?: string;
-  description?: string;
+  // No default copy: a shared component with English baked in is a string that
+  // no catalogue can reach.
+  title: string;
+  description: string;
+  referenceLabel?: string;
+  retryLabel?: string;
   reference?: string;
   onRetry?: () => void;
   action?: ReactNode;
@@ -29,7 +35,9 @@ export function ErrorState({
       <h2 className="text-sm font-semibold text-danger">{title}</h2>
       <p className="mt-1 max-w-prose text-sm text-text-muted">{description}</p>
       {reference ? (
-        <p className="mt-2 font-mono text-xs text-text-subtle">Reference: {reference}</p>
+        <p className="mt-2 font-mono text-xs text-text-subtle">
+          {referenceLabel}: {reference}
+        </p>
       ) : null}
       {onRetry || action ? (
         <div className="mt-4 flex flex-wrap gap-2">
@@ -39,7 +47,7 @@ export function ErrorState({
               onClick={onRetry}
               className="rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-accent-fg transition-colors duration-fast hover:bg-accent-hover"
             >
-              Try again
+              {retryLabel}
             </button>
           ) : null}
           {action}

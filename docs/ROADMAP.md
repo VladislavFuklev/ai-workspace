@@ -23,6 +23,7 @@ See `MASTER_PROMPT.md` for the complete product specification.
 - [x] 1.8 Query/cache architecture
 - [x] 1.9 Forms and validation
 - [x] 1.10 Reusable UI surface
+- [x] 1.11 Internationalisation (English, Ukrainian)
 
 ## Phase 2
 - [x] 2.1 FastAPI application structure

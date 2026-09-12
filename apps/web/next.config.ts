@@ -1,3 +1,4 @@
+import createNextIntlPlugin from "next-intl/plugin";
 import type { NextConfig } from "next";
 
 // Order matters: the first import loads the repository-root .env into
@@ -6,6 +7,8 @@ import type { NextConfig } from "next";
 import "./src/lib/load-root-env";
 import "./src/lib/env";
 
+const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
+
 const nextConfig: NextConfig = {/* config options here */};
 
-export default nextConfig;
+export default withNextIntl(nextConfig);

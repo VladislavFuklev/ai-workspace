@@ -1,4 +1,7 @@
-import Link from "next/link";
+import { getTranslations } from "next-intl/server";
+
+import { LocaleSwitcher } from "@/components/locale-switcher";
+import { Link } from "@/i18n/navigation";
 
 import { DevNav } from "./dev-nav";
 
@@ -7,7 +10,9 @@ import { DevNav } from "./dev-nav";
  * of the product: grouped so it is never mistaken for one, and so a single place
  * can gate it when that matters.
  */
-export default function DevLayout({ children }: LayoutProps<"/">) {
+export default async function DevLayout({ children }: LayoutProps<"/[locale]">) {
+  const t = await getTranslations("common");
+
   return (
     <div className="min-h-dvh bg-bg">
       <header className="sticky top-0 z-header border-b border-border bg-surface">
@@ -16,15 +21,16 @@ export default function DevLayout({ children }: LayoutProps<"/">) {
             href="/"
             className="rounded-sm text-sm font-semibold tracking-tight text-text hover:text-accent"
           >
-            AI Workspace
+            {t("appName")}
           </Link>
           <span
             className="rounded-sm bg-warning-subtle px-1.5 py-0.5 font-mono text-xs text-warning"
             title="Not part of the product"
           >
-            internal
+            {t("internal")}
           </span>
           <DevNav />
+          <LocaleSwitcher />
         </div>
       </header>
       {children}

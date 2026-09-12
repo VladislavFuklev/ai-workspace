@@ -50,6 +50,9 @@ jobs:
       - name: Contrast (WCAG AA)
         working-directory: .
         run: node scripts/check-contrast.mjs
+      - name: Message catalogues
+        working-directory: .
+        run: node scripts/check-messages.mjs
       - run: pnpm build
 
   api:

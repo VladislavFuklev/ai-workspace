@@ -1,7 +1,9 @@
 "use client";
 
-import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useSelectedLayoutSegment } from "next/navigation";
+
+import { Link } from "@/i18n/navigation";
 
 import { NAVIGATION_ITEMS } from "./navigation-items";
 
@@ -24,6 +26,7 @@ export function Navigation({
   /** Closes the drawer, so following a link does not leave it open over the page. */
   onNavigate?: () => void;
 }) {
+  const t = useTranslations("navigation");
   const segment = useSelectedLayoutSegment();
 
   return (
@@ -51,7 +54,7 @@ export function Navigation({
             >
               <path d={item.icon} />
             </svg>
-            <span className="truncate">{item.label}</span>
+            <span className="truncate">{t(item.labelKey)}</span>
           </Link>
         );
       })}

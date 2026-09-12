@@ -45,14 +45,16 @@ for ref in $(grep -rhoE 'ADR-[0-9]{3}' docs .claude/skills README.md 2>/dev/null
   grep -qx "$ref" <<<"$declared" || fail "reference: ADR-$ref is cited but not defined in docs/DECISIONS.md"
 done
 
-# --- 4. PROJECT_STATE must name the last ticked roadmap task.
-# Compare extracted ids, not a grep: "0.6" as a pattern matches "026" inside a
-# date, which made an earlier version of this check silently pass.
-last_ticked=$(grep -E '^- \[x\] [0-9]+\.[0-9]+' docs/ROADMAP.md | tail -1 | grep -oE '[0-9]+\.[0-9]+' | head -1)
+# --- 4. PROJECT_STATE's last completed task must be a ticked roadmap task.
+# Not "the last ticked one": completion order and roadmap order legitimately
+# diverge — 1.11 was added and completed after 2.10.
 state_task=$(grep -A2 '^## Last completed task' docs/PROJECT_STATE.md |
              grep -oE '^[0-9]+\.[0-9]+' | head -1)
-[ "$state_task" = "$last_ticked" ] ||
-  fail "state: ROADMAP's last ticked task is $last_ticked, PROJECT_STATE says ${state_task:-nothing}"
+if [ -z "$state_task" ]; then
+  fail "state: PROJECT_STATE names no completed task"
+elif ! grep -qE "^- \[x\] $state_task " docs/ROADMAP.md; then
+  fail "state: PROJECT_STATE claims $state_task is complete, but ROADMAP does not tick it"
+fi
 
 # --- 5. PROJECT_STATE's phase must match the phase of the next unticked task.
 # Not awk field numbers: "- [ ] 1.5" has four fields and "- [x] 1.1" has three.
