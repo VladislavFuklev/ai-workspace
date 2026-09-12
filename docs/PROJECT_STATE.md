@@ -11,21 +11,20 @@ Phase 2 — Backend foundation
 None in progress.
 
 ## Last completed task
-2.3 — Database connection (2026-09-13)
+2.4 — SQLAlchemy models (2026-09-13)
 
 ## Last session
 
-2.3 only. See `docs/tasks/2.3-database-connection.md`.
+2.4 only. See `docs/tasks/2.4-models.md`.
 
-Beyond that file: the test suite now has two halves. `pytest` runs units only;
-integration tests are marked and run by `scripts/check.sh` when the stack is up,
-with an explicit skipped line when it is not. CI has its own Postgres service.
+Beyond that file: a SQLAlchemy column `default` runs at flush, not at object
+construction — a draft docstring claimed otherwise and a test caught it.
 
 ## Next action
-Execute task **2.4 — SQLAlchemy models**; write `docs/tasks/2.4-models.md` first.
-Base class, id and timestamp mixins, and a constraint naming convention — Alembic
-autogenerate produces unnamed constraints without one, and they cannot be dropped
-in a later migration.
+Execute task **2.5 — Alembic migrations**; write `docs/tasks/2.5-migrations.md`
+first. The first revision must also create the `vector` extension, for
+environments built from neither the compose init script nor
+`scripts/enable_pgvector.py`.
 
 ## Known blockers
 None.

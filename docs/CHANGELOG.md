@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### 2.4 — SQLAlchemy models (2026-09-13)
+
+- `Base` with a constraint naming convention, plus `UUIDPrimaryKey` and
+  `Timestamps` mixins. No domain tables — those belong to the phases that need them.
+- The convention is the point: Postgres names unnamed constraints itself, in a
+  form the metadata cannot predict, so a later migration has nothing to drop.
+
 ### 2.3 — Database connection (2026-09-13)
 
 - `core/database.py`: one async engine per process opened in the lifespan and
