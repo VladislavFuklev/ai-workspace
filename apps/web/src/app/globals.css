@@ -191,10 +191,51 @@
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.4);
   --shadow-md: 0 4px 12px -2px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.4);
 }
-
-/* System preference applies only when the user has not chosen explicitly. */
+/* Same values, for a visitor whose system prefers dark before the theme script
+   has run — or if it never runs. The two blocks are asserted identical by
+   scripts/check-contrast.mjs, so they cannot drift apart. */
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
+  :root:not([data-theme]) {
+    --color-bg: #0d1116;
+    --color-surface: #151a21;
+    --color-surface-muted: #1b212a;
+    --color-surface-sunken: #0a0d11;
+    --color-border: #272e39;
+    --color-border-strong: #636e7d;
+
+    --color-text: #e7eaee;
+    --color-text-muted: #a6aeba;
+    --color-text-subtle: #939cab;
+    --color-text-inverted: #0d1116;
+
+    --color-accent: #8aa6ff;
+    --color-accent-hover: #a6bbff;
+    --color-accent-fg: #0d1116;
+    --color-accent-subtle: #1b2440;
+    --color-focus: #8aa6ff;
+
+    --color-success: #4fc98d;
+    --color-success-fg: #0d1116;
+    --color-success-subtle: #10251b;
+    --color-warning: #e2a83f;
+    --color-warning-fg: #0d1116;
+    --color-warning-subtle: #2a2011;
+    --color-danger: #ff8590;
+    --color-danger-fg: #0d1116;
+    --color-danger-subtle: #2d1418;
+
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.4);
+    --shadow-md: 0 4px 12px -2px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.4);
+  }
+}
+
+/* color-scheme drives form controls, scrollbars and the default canvas. */
+[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
     color-scheme: dark;
   }
 }

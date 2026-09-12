@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 
+import { THEME_INIT_SCRIPT } from "@/lib/theme";
+
 import "./globals.css";
 
 // next/font self-hosts the files and emits a size-adjusted fallback, so there is
@@ -34,6 +36,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     // suppressHydrationWarning: task 1.5 will set data-theme on this element
     // before hydration, which the server render cannot know about.
     <html lang="en" className={`${sans.variable} ${mono.variable}`} suppressHydrationWarning>
+      <head>
+        {/* Before first paint: applies a stored theme so the page never renders
+            light and then flips. Everything else about the theme is React's. */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body>{children}</body>
     </html>
   );

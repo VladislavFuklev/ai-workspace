@@ -11,19 +11,19 @@ Phase 1 — Frontend foundation
 None in progress.
 
 ## Last completed task
-1.4 — Navigation (2026-09-12)
+1.5 — Theme system (2026-09-12)
 
 ## Last session
 
-1.4 only. See `docs/tasks/1.4-navigation.md`.
+1.5 only. See `docs/tasks/1.5-theme-system.md`.
 
-Beyond that file: `useSelectedLayoutSegment` is the right hook for nav highlighting
-— it avoids the prefix matching `usePathname` would need for nested routes.
+Beyond that file: 0.8's `prefers-color-scheme` block applied `color-scheme` but
+not the tokens, so system dark rendered light. Worth re-reading other "it renders,
+so it works" assumptions from phase 0.
 
 ## Next action
-Execute task **1.5 — Theme system**; write `docs/tasks/1.5-theme-system.md` first.
-The tokens and `data-theme` mechanism exist (0.8); this adds the control, the
-persisted choice, and no flash of the wrong theme before hydration.
+Execute task **1.6 — Error/loading/empty states**; write
+`docs/tasks/1.6-state-components.md` first.
 
 ## Known blockers
 None.

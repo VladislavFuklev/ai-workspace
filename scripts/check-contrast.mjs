@@ -106,6 +106,23 @@ for (const [theme, tokens] of Object.entries(themes)) {
   }
 }
 
+// The system-preference fallback repeats the dark tokens for visitors whose theme
+// script has not run. Identical or not at all — a drift here shows up only for
+// people with dark mode and slow JS, which is nobody's idea of a test case.
+{
+  const fallback = tokensFrom(":root:not([data-theme]) {");
+  const names = new Set([...Object.keys(themes.dark), ...Object.keys(fallback)]);
+  for (const name of names) {
+    if (themes.dark[name] !== fallback[name]) {
+      console.log(
+        `  FAIL --color-${name}: [data-theme="dark"] has ${themes.dark[name] ?? "nothing"}, ` +
+          `the prefers-color-scheme fallback has ${fallback[name] ?? "nothing"}`,
+      );
+      failures++;
+    }
+  }
+}
+
 // Token discipline: a hex literal in a component is a colour that no theme can
 // change. Two files are exempt for reasons recorded next to them.
 {

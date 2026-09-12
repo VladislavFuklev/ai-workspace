@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### 1.5 — Theme system (2026-09-12)
+
+- Three-way `ThemeToggle` (light / dark / system) as a radiogroup, persisted in
+  `localStorage` with every access guarded.
+- Inline `<head>` script applies a stored choice before first paint.
+- **Fixes a 0.8 bug:** the `prefers-color-scheme` path set `color-scheme` but not
+  the dark tokens, so system dark rendered the light palette. Dark now works with
+  no JavaScript, and `check-contrast.mjs` asserts the two dark blocks are identical.
+
 ### Fix — documentation drift check missed a stale phase (2026-09-12)
 
 - `PROJECT_STATE.md` still said "Phase 0" four tasks into phase 1.
