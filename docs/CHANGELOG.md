@@ -2,6 +2,28 @@
 
 ## Unreleased
 
+### 0.5 — Environment configuration (2026-09-12)
+
+**Added**
+- `ai_workspace_api/core/settings.py` — typed `pydantic-settings` object, the only
+  module that reads the environment. Validated on construction; secrets are
+  `SecretStr`; no secret has a working default.
+- `apps/api/tests/` — the repository's first tests (18), covering a valid
+  environment, six missing-variable cases and seven malformed-value cases.
+- `apps/web/src/lib/env.ts` — Zod-validated public environment, checked at build
+  time via `next.config.ts`; `load-root-env.ts` loads the monorepo-root `.env`.
+- ADR-013 — one host-facing `.env`, overridden per container.
+
+**Changed**
+- `.env.example` — application configuration section, host-facing by design.
+- `infra/docker-compose.yml` — the `api` service loads the root `.env` and
+  overrides the three addresses that differ inside the cluster.
+- `scripts/check.sh` — runs `pytest`.
+
+**Notes**
+- Verified from the same `.env`: on the host the API resolves `localhost:5433`, in
+  the container `postgres:5432`. No secret appears in `.next/static`.
+
 ### Tooling — documentation budgets (2026-09-12, not a roadmap task)
 
 **Changed**

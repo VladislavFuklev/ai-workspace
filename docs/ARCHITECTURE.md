@@ -189,6 +189,7 @@ file, runs every check even after one fails, and exits non-zero if any did.
 | format | `prettier --check` | `ruff format --check` |
 | lint | `eslint` | `ruff check` |
 | types | `next typegen && tsc --noEmit` | `mypy --strict` |
+| tests | phase 12 | `pytest` |
 
 Python checks run with `apps/api` as the working directory: Ruff's per-file-ignores
 and mypy's `files` resolve relative to the working directory, and mypy misreads the
@@ -200,6 +201,28 @@ by `scripts/bootstrap.sh` via `core.hooksPath` and skippable with `--no-verify`.
 The layering stated below is enforced by the linter for the web app (ADR-012), not
 only by review. The API's layering is documented and reviewed; enforcing it in
 Python is deferred until there is code in those packages to enforce it against.
+
+## Configuration
+
+One `.env` at the repository root serves both apps and Docker Compose. It is
+**host-facing** (ADR-013): its addresses are `localhost` plus the published ports.
+Compose overrides the three that differ for the `api` service, so the same file
+works in both contexts.
+
+| | reads it | how |
+| --- | --- | --- |
+| API | `ai_workspace_api/core/settings.py` | `pydantic-settings`, validated on construction; the only module that reads the environment |
+| Web (public) | `src/lib/env.ts` | Zod; `NEXT_PUBLIC_*` only, validated at build time via `next.config.ts` |
+| Web (root `.env`) | `src/lib/load-root-env.ts` | `@next/env` with `forceReload`; Next only looks in the app directory |
+| Compose | `infra/docker-compose.yml` | `${VAR:-default}`, plus `env_file` for the `api` service |
+
+Rules: no secret has a working default; secrets are `SecretStr` so they do not
+appear in logs or tracebacks; nothing outside those modules reads the environment;
+`NEXT_PUBLIC_*` is world-readable, so server-only values will go in a future
+`src/lib/env.server.ts` guarded by `import "server-only"`.
+
+Both settings modules locate the root `.env` by walking up to the `.git` directory,
+because the apps are run from more than one working directory.
 
 ## Domain boundaries
 

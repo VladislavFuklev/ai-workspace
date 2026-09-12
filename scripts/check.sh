@@ -41,6 +41,7 @@ if [ "$target" = "all" ] || [ "$target" = "api" ]; then
   run "api · format"    api ruff format --check .
   run "api · lint"      api ruff check .
   run "api · types"     api mypy
+  run "api · tests"     api pytest
 fi
 
 echo

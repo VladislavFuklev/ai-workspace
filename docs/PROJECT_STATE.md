@@ -11,40 +11,19 @@ Phase 0 — Product and engineering foundation
 None in progress.
 
 ## Last completed task
-0.4 — Code quality tooling (2026-09-12)
+0.5 — Environment configuration (2026-09-12)
 
 ## Last session
 
-Executed task 0.4 only.
+0.5 only. Details and the check table are in
+`docs/tasks/0.5-environment-configuration.md`.
 
-Added Prettier (with Tailwind class sorting) and `eslint-plugin-boundaries` to the
-web app, Ruff and strict mypy to the API, `.editorconfig`, `scripts/check.sh` and
-`scripts/fix.sh`, and a `.githooks/pre-commit` hook enabled by `bootstrap.sh`.
-
-The version question deferred in 0.2 is answered from the registry rather than
-assumed: `typescript-eslint` declares `typescript >=4.8.4 <6.1.0`, so TypeScript 7
-is unusable while `eslint-config-next` depends on it; and four plugins inside
-`eslint-config-next` cap their `eslint` peer at `^9`, so ESLint 10 is unusable even
-though npm marks 9.x deprecated. Both recorded in ADR-010 with the condition that
-lifts them.
-
-Verified: the full suite passes in 2.2s; every check was made to fail on a
-deliberately broken file and then reverted; Prettier is deterministic across two
-runs; the layering rule rejects feature→sibling-feature, component→feature and
-lib→component while allowing a feature to import its own internals; `fix.sh`
-repairs both languages and reports what remains; the pre-commit hook aborted a bad
-commit with HEAD unchanged; the API image rebuilds and runs the tools.
-
-Two bugs found by running rather than reading: the first boundaries config used
-deprecated v5 syntax, and mypy misreads the module layout when invoked from the
-repository root — the Python checks now run with `apps/api` as the working
-directory.
+Worth knowing beyond that file: `@next/env`'s `loadEnvConfig` silently no-ops
+without `forceReload`, because Next has already called it for the app directory.
 
 ## Next action
-Execute task **0.5 — Environment configuration** per
-`docs/tasks/0.5-environment-configuration.md`. Add a typed `pydantic-settings`
-object in `ai_workspace_api/core`, validate the web app's public environment, and
-resolve the host-vs-container connection split flagged in ADR-007.
+Execute task **0.6 — CI baseline** per `docs/tasks/0.6-ci-baseline.md`. Run
+`scripts/check.sh` in GitHub Actions for both workspaces with dependency caching.
 
 ## Known blockers
 None.
@@ -55,13 +34,14 @@ None.
 - API layering is documented and reviewed but not linter-enforced; revisit in
   phase 2 when those packages contain code.
 - Prettier is scoped to `apps/web`; `docs/**` Markdown is deliberately unformatted.
-- The API has dependencies, tooling and a container image but no ASGI application
-  (task 2.1) and no configuration (task 0.5).
+- The API has dependencies, tooling, configuration and a container image but no
+  ASGI application (task 2.1).
+- `POSTGRES_*` and `DATABASE_URL` in `.env` are separate and must agree (ADR-013).
 - Container Python is 3.13.15 vs 3.13.14 on the host; dependencies are locked.
 - `infra/postgres/init/` runs only on a fresh volume; task 2.5 must also enable the
   `vector` extension in a migration.
-- No tests anywhere yet — the first arrive with 0.5's settings object; the wider
-  tooling is phase 12. No CI (0.6).
+- Tests exist only for settings (18, via pytest, wired into `check.sh`). The wider
+  test tooling is phase 12. No CI yet (0.6).
 
 ## Important notes
 - Do not skip ahead.

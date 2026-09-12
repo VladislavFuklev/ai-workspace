@@ -479,3 +479,37 @@ Violations are errors, not warnings, and the message points at
 
 ### Status
 Accepted — 2026-09-12
+
+---
+
+## ADR-013 — One host-facing `.env`, overridden per container
+
+**Context.** ADR-007 left a trap: host processes reach services at `localhost` and
+the published ports (5433/6380/9000), containers reach them by service name on the
+internal port. The same setting has two correct values, and Compose, the API and
+the web app all need configuration.
+
+**Decision.** A single `.env` at the repository root, written for the **host**.
+`infra/docker-compose.yml` gives the `api` service `env_file: ../.env` and then
+overrides only `DATABASE_URL`, `REDIS_URL` and `S3_ENDPOINT_URL` with in-cluster
+addresses. Verified both ways: on the host the API resolves `localhost:5433`, in
+the container `postgres:5432`, from the same file.
+
+Both apps locate the file by walking up to `.git` — `scripts/dev-api.sh` runs from
+`apps/api`, and Next.js only looks in the app directory, so a plain relative path
+would resolve against whichever directory happened to be current.
+
+**Rejected.** *Container-facing `.env` with host overrides* — the host is the
+common case and would carry the overrides. *One `.env` per app* — three files to
+keep in step, and Compose needs the same values. *Only environment variables, no
+file* — no working `git clone && start`.
+
+**Revisit when** a second deployable needs different values, or secrets move to a
+secret manager (phase 13).
+
+**Consequence.** `POSTGRES_*` and `DATABASE_URL` both exist and must agree; a
+password changed in one and not the other fails at connection time. Accepted over
+the alternative of assembling the DSN from parts, which would diverge from managed
+Postgres, where a URL is what you are given.
+
+Accepted — 2026-09-12

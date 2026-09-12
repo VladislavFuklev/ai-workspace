@@ -1,0 +1,111 @@
+"""Typed application configuration.
+
+This module is the only place in the API that reads the environment. Everything
+else receives a ``Settings`` instance, so configuration is explicit in signatures
+and substitutable in tests.
+
+Validation happens when the object is constructed, so a misconfigured deployment
+fails at startup with a message naming the field rather than at the first request
+that happens to touch it.
+"""
+
+from __future__ import annotations
+
+from enum import StrEnum
+from functools import lru_cache
+from pathlib import Path
+from typing import Annotated
+
+from pydantic import AnyHttpUrl, Field, PostgresDsn, RedisDsn, SecretStr
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+def _find_env_file() -> Path | None:
+    """Locate the repository's .env by walking up from the working directory.
+
+    The API is run both from the repository root and from ``apps/api``
+    (``scripts/dev-api.sh`` does the latter), while ``.env`` lives at the root and
+    is shared with Docker Compose. A plain relative filename would resolve against
+    whichever directory happened to be current.
+
+    Returns None when there is no file — in a container the values come from the
+    environment directly, and that is not an error.
+    """
+    for directory in (Path.cwd(), *Path.cwd().parents):
+        candidate = directory / ".env"
+        if candidate.is_file():
+            return candidate
+        if (directory / ".git").exists():  # stop at the repository root
+            break
+    return None
+
+
+class Environment(StrEnum):
+    """Deployment environment. Behaviour that differs between environments keys
+    off this rather than off a scattered collection of boolean flags."""
+
+    LOCAL = "local"
+    TEST = "test"
+    STAGING = "staging"
+    PRODUCTION = "production"
+
+
+class LogLevel(StrEnum):
+    DEBUG = "DEBUG"
+    INFO = "INFO"
+    WARNING = "WARNING"
+    ERROR = "ERROR"
+
+
+class Settings(BaseSettings):
+    """Everything the API reads from the environment.
+
+    No secret has a working default: a missing one must stop the process rather
+    than let it run in an insecure but apparently healthy state.
+    """
+
+    model_config = SettingsConfigDict(
+        env_file=_find_env_file(),
+        env_file_encoding="utf-8",
+        # The repository's .env is shared with Docker Compose and carries keys this
+        # object does not model (POSTGRES_PORT, MINIO_CONSOLE_PORT, ...). Ignoring
+        # them keeps one .env for the whole project.
+        extra="ignore",
+        case_sensitive=False,
+        # Secrets are only ever revealed by an explicit .get_secret_value().
+        validate_default=True,
+    )
+
+    environment: Environment = Environment.LOCAL
+    log_level: LogLevel = LogLevel.INFO
+
+    database_url: Annotated[
+        PostgresDsn,
+        Field(description="SQLAlchemy-style DSN, e.g. postgresql+psycopg://user:pw@host:5432/db"),
+    ]
+    redis_url: RedisDsn
+
+    s3_endpoint_url: AnyHttpUrl
+    s3_bucket: Annotated[str, Field(min_length=3, max_length=63)]
+    s3_access_key: SecretStr
+    s3_secret_key: SecretStr
+    s3_region: str = "us-east-1"
+
+    @property
+    def is_production(self) -> bool:
+        return self.environment is Environment.PRODUCTION
+
+    @property
+    def debug(self) -> bool:
+        return self.environment is Environment.LOCAL
+
+
+@lru_cache(maxsize=1)
+def get_settings() -> Settings:
+    """The process-wide settings instance.
+
+    Cached so the environment is read and validated once. Tests that need a
+    different environment should construct ``Settings(...)`` directly, or call
+    ``get_settings.cache_clear()`` after changing the environment.
+    """
+    return Settings()  # type: ignore[call-arg]  # values come from the environment
