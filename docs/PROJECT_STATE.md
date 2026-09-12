@@ -11,22 +11,19 @@ Phase 0 — Product and engineering foundation
 None in progress.
 
 ## Last completed task
-1.3 — Design tokens (2026-09-12)
+1.4 — Navigation (2026-09-12)
 
 ## Last session
 
-1.2 and 1.3 in one session, at the user's request. See both task files.
+1.4 only. See `docs/tasks/1.4-navigation.md`.
 
-Beyond those: Tailwind 4 has no `z` or `duration` theme namespace, so `@theme`
-entries for them generate nothing — declare such utilities with `@utility`. And
-1.3 overlapped 0.8; it was reinterpreted as the gaps 1.2 exposed rather than
-redone. Later phase-1 tasks may overlap phase 0 the same way — check before
-assuming a task is fresh work.
+Beyond that file: `useSelectedLayoutSegment` is the right hook for nav highlighting
+— it avoids the prefix matching `usePathname` would need for nested routes.
 
 ## Next action
-Execute task **1.4 — Navigation**; write `docs/tasks/1.4-navigation.md` first.
-It fills the `<nav>` region 1.2 left empty and resolves the duplicate "Main"
-landmark noted there.
+Execute task **1.5 — Theme system**; write `docs/tasks/1.5-theme-system.md` first.
+The tokens and `data-theme` mechanism exist (0.8); this adds the control, the
+persisted choice, and no flash of the wrong theme before hydration.
 
 ## Known blockers
 None.

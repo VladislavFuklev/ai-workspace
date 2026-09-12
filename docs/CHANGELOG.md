@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### 1.4 — Navigation (2026-09-12)
+
+- `NAVIGATION_ITEMS` as the single source of destinations; `Navigation` renders
+  them in both the sidebar and the drawer, closing the drawer on navigation.
+- Active state from `useSelectedLayoutSegment`, marked with `aria-current="page"`.
+- Route skeletons for `/documents`, `/assistant`, `/usage`, `/settings`.
+- Duplicate "Main" landmark resolved: the drawer's `<nav>` is unnamed because the
+  dialog already names the region.
+
 ### 1.3 — Design tokens (2026-09-12)
 
 - Layering (`z-sticky` … `z-skip-link`), motion (two durations, two easings) and

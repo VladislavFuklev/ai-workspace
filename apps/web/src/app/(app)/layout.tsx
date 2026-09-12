@@ -1,7 +1,6 @@
 import Link from "next/link";
 
 import { AppShell } from "@/components/layout/app-shell";
-import { Sidebar } from "@/components/layout/sidebar";
 
 /**
  * Server Component: it composes the shell but holds no state, so nothing here is
@@ -21,8 +20,6 @@ export default function AppLayout({ children }: LayoutProps<"/">) {
           AI Workspace
         </Link>
       }
-      sidebar={<Sidebar />}
-      drawerSidebar={<Sidebar id="app-navigation" />}
     >
       {children}
     </AppShell>

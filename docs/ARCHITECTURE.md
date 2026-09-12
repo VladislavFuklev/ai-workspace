@@ -94,7 +94,7 @@ Route groups (no URL segment of their own):
 | Group | Owns | Holds |
 | --- | --- | --- |
 | `(marketing)` | `/` | the public surface; landing page is task 14.1 |
-| `(app)` | `/workspace`, and the product routes to come | header, `<main>`, skip link |
+| `(app)` | `/workspace`, `/documents`, `/assistant`, `/usage`, `/settings` | header, sidebar/drawer, `<main>`, skip link |
 | `(dev)` | `/design` | internal reference surfaces, not product |
 
 Top-level `error.tsx`, `global-error.tsx` and `not-found.tsx` cover every route.

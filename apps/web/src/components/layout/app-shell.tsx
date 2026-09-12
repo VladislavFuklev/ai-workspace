@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { Navigation } from "./navigation";
+
 /**
  * The authenticated frame: sidebar beside the content on large screens, a modal
  * drawer below that.
@@ -11,16 +13,9 @@ import { useEffect, useRef, useState } from "react";
  * gets subtly wrong. Only opening, closing and returning focus are ours.
  */
 export function AppShell({
-  sidebar,
-  drawerSidebar,
   header,
   children,
 }: {
-  /** Rendered inline at lg and up. */
-  sidebar: React.ReactNode;
-  /** Rendered inside the drawer below lg. A separate node because the two are in
-   *  the DOM at the same time and only one may carry the id the toggle controls. */
-  drawerSidebar: React.ReactNode;
   header: React.ReactNode;
   children: React.ReactNode;
 }) {
@@ -58,7 +53,7 @@ export function AppShell({
             type="button"
             onClick={() => setOpen(true)}
             aria-expanded={open}
-            aria-controls="app-navigation"
+            aria-controls="navigation-drawer"
             className="-ml-1 rounded-md p-2 text-text-muted transition-colors duration-fast hover:bg-surface-muted hover:text-text lg:hidden"
           >
             <span className="sr-only">Open navigation</span>
@@ -73,7 +68,7 @@ export function AppShell({
       <div className="flex">
         {/* Rendered inline only at lg and up; below that the drawer holds it. */}
         <div className="sticky top-header hidden h-[calc(100dvh-var(--spacing-header))] w-sidebar shrink-0 border-r border-border bg-surface lg:block">
-          {sidebar}
+          <Navigation label="Main" />
         </div>
 
         <main id="main" tabIndex={-1} className="min-w-0 flex-1 focus:outline-none">
@@ -83,6 +78,7 @@ export function AppShell({
 
       <dialog
         ref={dialogRef}
+        id="navigation-drawer"
         onClose={handleClose}
         // A native dialog's click target covers the backdrop, so compare against
         // the element itself to tell a backdrop click from a click inside.
@@ -105,7 +101,9 @@ export function AppShell({
             </svg>
           </button>
         </div>
-        {drawerSidebar}
+        {/* No label here: the dialog already names this region, and a second
+            landmark called "Main" would be a duplicate in the accessibility tree. */}
+        <Navigation onNavigate={() => dialogRef.current?.close()} />
       </dialog>
     </div>
   );
