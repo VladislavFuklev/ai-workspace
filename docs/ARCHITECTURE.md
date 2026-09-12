@@ -288,6 +288,10 @@ at exactly two places:
    consumes it and does not import Python code.
 2. **Docker Compose** — the local development topology that runs both.
 
+Because nothing is shared at compile time, the web app validates every response
+body with Zod inside `lib/api` before it reaches a component. A cast would only
+move the failure somewhere harder to diagnose.
+
 No shared build tool spans the two languages. CI runs them as separate jobs.
 
 ## Architectural principles

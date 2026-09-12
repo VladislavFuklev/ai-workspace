@@ -11,14 +11,19 @@ Phase 1 — Frontend foundation
 None in progress.
 
 ## Last completed task
-1.6 — Error, loading and empty states (2026-09-12)
+1.7 — API client (2026-09-12)
 
 ## Last session
 
-1.6 only. See `docs/tasks/1.6-state-components.md`.
+1.7 only. See `docs/tasks/1.7-api-client.md`.
+
+Beyond that file: there is still no web test runner, so the client's thirteen
+behaviours were verified once through a throwaway Next route handler rather than
+a suite. Task 12.1 should port them.
 
 ## Next action
-Execute task **1.7 — API client**; write `docs/tasks/1.7-api-client.md` first.
+Execute task **1.8 — Query/cache architecture**; write
+`docs/tasks/1.8-query-cache.md` first.
 
 ## Known blockers
 None.

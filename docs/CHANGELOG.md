@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### 1.7 — API client (2026-09-12)
+
+- `createApiClient({ baseUrl })` with a bounded timeout, `credentials: "include"`,
+  and Zod validation of every response body at the boundary.
+- `ApiError` with a `kind` discriminator (network / timeout / http / parse), the
+  server's code and request id, and a retryability rule.
+- Configured instance in `lib/api/index.ts`; the transport itself imports no
+  configuration, which is what makes it exercisable.
+
 ### 1.6 — Error, loading and empty states (2026-09-12)
 
 - `Skeleton`, `SkeletonText`, `EmptyState`, `ErrorState`, `Spinner` in
