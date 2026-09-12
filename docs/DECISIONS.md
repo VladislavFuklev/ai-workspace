@@ -228,3 +228,113 @@ report it) is enough friction to notice without blocking work.
 
 ### Status
 Accepted — 2026-09-12
+
+---
+
+## ADR-007 — Apps run on the host in development; containers hold backing services
+
+### Context
+Task 0.3 needed a local environment. The obvious options are to containerize
+everything, or to containerize only what the apps depend on.
+
+Both apps are developed on macOS, where bind-mounted source in a Linux VM has slow
+filesystem events. Next.js Fast Refresh and uvicorn `--reload` both depend on those
+events, so containerizing the apps directly degrades the inner loop that gets used
+hundreds of times a day.
+
+### Decision
+`infra/docker-compose.yml` runs PostgreSQL + pgvector, Redis and MinIO. The web app
+runs on the host via `pnpm dev`; the API runs on the host via `scripts/dev-api.sh`.
+
+`infra/api.Dockerfile` exists and is wired to an **optional `api` compose profile**,
+not started by default. It provides a container-parity check now and the basis for
+the production image in task 13.1.
+
+### Alternatives
+- **Everything in compose.** Rejected: slow reload on macOS, plus an extra rebuild
+  step between editing a file and seeing the result.
+- **No API container at all until 13.1.** Rejected: the Dockerfile is cheap now,
+  catches "works on my machine" dependency problems early, and CI will want it.
+
+### Consequences
+- Easier: fast native reload for both apps; contributors debug and profile with
+  host tooling; backing services are still identical to everyone else's.
+- Harder: the host must have Node, pnpm, uv and Docker rather than only Docker.
+  `scripts/bootstrap.sh` checks for them and says what is missing.
+- Two connection contexts exist: host processes reach services on `localhost` and
+  the mapped ports, containers reach them by service name on the internal port.
+  Task 0.5 must make this explicit in configuration rather than implicit.
+
+### Status
+Accepted — 2026-09-12
+
+---
+
+## ADR-008 — Non-default host ports for the development stack
+
+### Context
+The development machine already runs Homebrew `postgresql@16` on 5432 and `redis`
+on 6379 as launch agents. Binding the compose services to those ports would either
+fail to start or, worse, appear to work while the application talked to the wrong
+database.
+
+### Decision
+Publish on non-default host ports by default: PostgreSQL **5433**, Redis **6380**,
+MinIO **9000/9001**. Every port is overridable from the root `.env`
+(`POSTGRES_PORT`, `REDIS_PORT`, `MINIO_PORT`, `MINIO_CONSOLE_PORT`), and compose
+carries the defaults inline so the stack starts with no `.env` at all.
+
+Container-to-container traffic keeps standard ports; only the host mapping shifts.
+
+### Alternatives
+- **Standard ports, ask contributors to stop conflicting services.** Rejected: it
+  breaks other work on the machine, and the failure mode when someone forgets is
+  connecting to the wrong database.
+- **No published ports, exec into containers.** Rejected: apps run on the host
+  (ADR-007) and need to reach the services.
+
+### Consequences
+- Easier: the stack coexists with anything already installed; verified with
+  Homebrew's postgres and redis running throughout.
+- Harder: every connection string and document must use the project's ports, and
+  `psql`'s defaults are wrong here — pass `-p 5433`. `scripts/dev-up.sh` prints the
+  effective ports after start, read from compose rather than reprinted from the
+  defaults.
+
+### Status
+Accepted — 2026-09-12
+
+---
+
+## ADR-009 — Pull MinIO from quay.io, not Docker Hub
+
+### Context
+`minio/minio` on Docker Hub now returns `401 UNAUTHORIZED` for anonymous pulls,
+verified against the registry API while writing task 0.3. An image that cannot be
+pulled without credentials is unusable in a fresh clone and in CI.
+
+### Decision
+Pull MinIO and its client from **quay.io**, pinned by release tag:
+`quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z` and
+`quay.io/minio/mc:RELEASE.2025-08-13T08-35-41Z`. Both were confirmed to be
+anonymously pullable and were pulled and run.
+
+MinIO stays behind the storage abstraction (task 5.1), so nothing outside `infra/`
+and configuration depends on it.
+
+### Alternatives
+- **Authenticate to Docker Hub.** Rejected: a credential requirement in the
+  onboarding path and in CI, for a development dependency.
+- **LocalStack, SeaweedFS, Garage.** Viable, and worth revisiting if MinIO's open
+  releases stop. Not chosen now: MinIO is the closest behavioral match to S3 and
+  the one contributors are most likely to recognize.
+
+### Consequences
+- Easier: a fresh clone can start the stack with no registry login.
+- Harder: the pinned release is from September 2025 — MinIO's open-source release
+  cadence has slowed, so this will age. The storage abstraction is what keeps
+  replacing it a contained change; revisit at task 5.1 or if the image stops being
+  maintained.
+
+### Status
+Accepted — 2026-09-12

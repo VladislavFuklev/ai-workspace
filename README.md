@@ -14,6 +14,24 @@ asynchronously, search semantically, and ask questions with cited answers.
 - **Storage:** S3-compatible object storage
 - **AI:** provider-abstracted embeddings, RAG, structured outputs, tool calling
 
+## Local development
+
+Requires Node 22, pnpm 11, uv and Docker.
+
+```bash
+cp .env.example .env      # development defaults; override ports if they clash
+./scripts/bootstrap.sh    # install both workspaces
+./scripts/dev-up.sh       # start PostgreSQL + pgvector, Redis, MinIO
+pnpm dev                  # web app on http://localhost:3000
+```
+
+`./scripts/dev-down.sh` stops the services and keeps the data; add `--volumes` to
+delete it. The API (`./scripts/dev-api.sh`) has no application yet — roadmap 2.1.
+
+Host ports are non-standard on purpose so the stack coexists with a locally
+installed Postgres or Redis: **5433** (PostgreSQL), **6380** (Redis), **9000/9001**
+(MinIO and its console).
+
 ## Documentation
 
 The `docs/` directory is the project's persistent source of truth.

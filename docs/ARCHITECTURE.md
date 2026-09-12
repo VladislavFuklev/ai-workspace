@@ -51,7 +51,7 @@ ai-workspace/
 │   ├── web/           [exists] Next.js App Router frontend
 │   └── api/           [exists] FastAPI backend + workers
 ├── packages/          [reserved: on demand] shared TypeScript packages
-├── infra/             [reserved: 0.3] Docker Compose, container and deploy config
+├── infra/             [exists] Docker Compose, container and deploy config
 ├── scripts/           [exists] repo-level developer and CI helper scripts
 ├── docs/              [exists] persistent project memory
 │   └── tasks/         [exists] per-task specifications
@@ -66,8 +66,7 @@ ai-workspace/
 └── README.md          [exists] placeholder until task 14.6
 ```
 
-`packages/` and `infra/` stay empty until they have real content; `packages/` waits
-for a second genuine consumer. Shared code is extracted when duplication appears,
+`packages/` stays empty until a second genuine consumer exists. Shared code is extracted when duplication appears,
 not in anticipation of it.
 
 The repository has a single `.gitignore` at the root rather than one per app, so
@@ -120,6 +119,38 @@ Dependency direction: `api → services → repositories → models`.
 Routers contain no business logic. Services never import routers. All
 provider-specific AI code lives under `ai/` and is reached through an interface.
 
+## Local development topology
+
+`infra/docker-compose.yml` runs the backing services. The web app and the API run
+on the host (ADR-007); host ports avoid the defaults so the stack coexists with
+locally installed Postgres and Redis (ADR-008).
+
+| Service | Image | Host port | In-cluster |
+| --- | --- | --- | --- |
+| PostgreSQL + pgvector | `pgvector/pgvector:pg18` (PG 18.6, vector 0.8.6) | 5433 | `postgres:5432` |
+| Redis | `redis:8-alpine` | 6380 | `redis:6379` |
+| MinIO (S3-compatible) | `quay.io/minio/minio` (ADR-009) | 9000, console 9001 | `minio:9000` |
+| API (optional `api` profile) | built from `infra/api.Dockerfile` | 8000 | `api:8000` |
+
+```
+infra/
+├── docker-compose.yml         backing services + optional api profile
+├── api.Dockerfile             development API image (production image: task 13.1)
+└── postgres/init/
+    └── 01-extensions.sql      enables the vector extension on first init
+```
+
+Named volumes `postgres-data`, `redis-data` and `minio-data` persist across
+`down`/`up`; `scripts/dev-down.sh --volumes` destroys them behind a confirmation.
+
+Two connection contexts exist and must not be conflated: host processes use
+`localhost` with the mapped port, containers use the service name with the internal
+port. Task 0.5 makes this explicit in configuration.
+
+Note on the Postgres image: PG 18 keeps its cluster in
+`/var/lib/postgresql/18/docker`, so the volume mounts `/var/lib/postgresql`. This
+differs from PG 17 and earlier, where it was `/var/lib/postgresql/data`.
+
 ## Toolchain baseline
 
 | Concern | Choice | Pinned | ADR |
@@ -133,6 +164,10 @@ provider-specific AI code lives under `ai/` and is reached through an interface.
 | Python packages | uv + `pyproject.toml` | `apps/api/uv.lock` | ADR-004 |
 | API framework | FastAPI + uvicorn | `apps/api/pyproject.toml` | — |
 | Dependency cooldown | pnpm `minimumReleaseAge` default | `pnpm-workspace.yaml` | ADR-006 |
+| Local services | Docker Compose v5 | `infra/docker-compose.yml` | ADR-007 |
+| Database | PostgreSQL 18.6 + pgvector 0.8.6 | compose | ADR-008 |
+| Cache / queue | Redis 8 | compose | — |
+| Object storage | MinIO, S3-compatible | compose | ADR-009 |
 | Local orchestration | Docker Compose | `infra/` (0.3) | — |
 
 The local system Python (3.9) is not used; uv provisions and pins the interpreter.

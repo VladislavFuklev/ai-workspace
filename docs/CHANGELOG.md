@@ -2,6 +2,39 @@
 
 ## Unreleased
 
+### 0.3 — Development environment and Docker (2026-09-12)
+
+**Added**
+- `infra/docker-compose.yml` — PostgreSQL 18.6 with pgvector 0.8.6, Redis 8 and
+  MinIO, each with a healthcheck and a named volume, plus a one-shot container that
+  creates the application bucket idempotently.
+- `infra/api.Dockerfile` — development API image on `ghcr.io/astral-sh/uv:
+  python3.13-trixie-slim`, dependencies in their own layer, running as a non-root
+  user. Wired to an optional `api` compose profile, not started by default.
+- `infra/postgres/init/01-extensions.sql` — enables the `vector` extension on first
+  initialization.
+- `scripts/dev-up.sh` / `scripts/dev-down.sh` — start with a health wait and an
+  effective-port summary; stop with data preserved, or `--volumes` behind a
+  confirmation prompt.
+- `.env.example` — development-only defaults, committed; `.env` stays ignored.
+- ADR-007 (apps on the host, services in containers), ADR-008 (non-default host
+  ports), ADR-009 (MinIO from quay.io).
+- `docs/tasks/0.4-code-quality-tooling.md`.
+
+**Changed**
+- `README.md` — local development quickstart.
+- `docs/ARCHITECTURE.md` — local topology table, `infra/` layout, the PG 18 volume
+  path caveat, and the toolchain table extended with the services.
+
+**Notes**
+- Host ports are 5433 / 6380 / 9000-9001 because Homebrew `postgresql@16` and
+  `redis` already hold 5432 and 6379 on this machine; verified the stack runs
+  alongside them.
+- `minio/minio` on Docker Hub no longer allows anonymous pulls, so the image comes
+  from quay.io.
+- PostgreSQL 18 moved its cluster to `/var/lib/postgresql/18/docker`; the volume
+  mount accounts for it, and persistence was verified across a full `down`/`up`.
+
 ### Tooling — context economy (2026-09-12, not a roadmap task)
 
 **Added**
