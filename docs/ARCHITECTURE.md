@@ -48,28 +48,36 @@ Legend: **[exists]** created; **[reserved]** planned, created by the task noted.
 ```
 ai-workspace/
 ├── apps/
-│   ├── web/           [reserved: 0.2] Next.js App Router frontend
-│   └── api/           [reserved: 0.2] FastAPI backend + workers
+│   ├── web/           [exists] Next.js App Router frontend
+│   └── api/           [exists] FastAPI backend + workers
 ├── packages/          [reserved: on demand] shared TypeScript packages
 ├── infra/             [reserved: 0.3] Docker Compose, container and deploy config
-├── scripts/           [reserved: 0.2] repo-level developer and CI helper scripts
+├── scripts/           [exists] repo-level developer and CI helper scripts
 ├── docs/              [exists] persistent project memory
 │   └── tasks/         [exists] per-task specifications
 ├── .claude/           [exists] Claude Code skills and commands
-├── .gitignore         [exists]
+├── .gitignore         [exists] single ignore file for the whole repository
+├── .nvmrc             [exists] Node 22
+├── package.json       [exists] private workspace root
+├── pnpm-workspace.yaml[exists]
+├── pnpm-lock.yaml     [exists]
 ├── CLAUDE.md          [exists] agent operating rules
 ├── MASTER_PROMPT.md   [exists] full product specification
 └── README.md          [exists] placeholder until task 14.6
 ```
 
-`packages/` stays empty until a second consumer genuinely exists. Shared code is
-extracted when duplication appears, not in anticipation of it.
+`packages/` and `infra/` stay empty until they have real content; `packages/` waits
+for a second genuine consumer. Shared code is extracted when duplication appears,
+not in anticipation of it.
 
-### Web internals — `apps/web` (layout fixed here, created in 0.2 / 1.1)
+The repository has a single `.gitignore` at the root rather than one per app, so
+there is one place to look when something is unexpectedly ignored.
+
+### Web internals — `apps/web`
 
 ```
 apps/web/
-├── src/app/           App Router routes, layouts, route handlers
+├── src/app/           [exists] App Router routes, layouts, route handlers
 ├── src/features/      feature modules (auth, organizations, documents, chat, usage)
 ├── src/components/    shared presentational components and primitives
 ├── src/lib/           API client, query client, validation, utilities
@@ -78,13 +86,20 @@ apps/web/
 └── e2e/               Playwright specs
 ```
 
+Only `src/app/` exists today. The remaining directories are created when the first
+file that belongs in them is written (phase 1 onwards) rather than as empty
+placeholders — the layering below is the contract, not the directory listing.
+
 Dependency direction: `app → features → components → lib`.
 A feature may not import another feature's internals; shared code moves down a layer.
 
-### API internals — `apps/api` (layout fixed here, created in 0.2 / 2.1)
+### API internals — `apps/api`
 
 ```
 apps/api/
+├── pyproject.toml     [exists] project metadata and dependencies
+├── uv.lock            [exists] fully resolved dependency lock
+├── .python-version    [exists] 3.13
 ├── src/ai_workspace_api/
 │   ├── api/           HTTP routers, versioned (v1), request/response wiring only
 │   ├── services/      business logic and orchestration
@@ -94,9 +109,12 @@ apps/api/
 │   ├── workers/       background jobs
 │   ├── ai/            provider abstraction: embeddings, chat, structured output, tools
 │   └── core/          configuration, logging, error handling, security primitives
-├── migrations/        Alembic revisions
-└── tests/             unit and integration tests
+├── migrations/        [reserved: 2.5] Alembic revisions
+└── tests/             [exists] unit and integration tests
 ```
+
+Every layer package exists and is importable; all are empty apart from a docstring
+stating the layer's responsibility. The FastAPI application itself is task 2.1.
 
 Dependency direction: `api → services → repositories → models`.
 Routers contain no business logic. Services never import routers. All
@@ -107,11 +125,14 @@ provider-specific AI code lives under `ai/` and is reached through an interface.
 | Concern | Choice | Pinned | ADR |
 | --- | --- | --- | --- |
 | Repository topology | monorepo | — | ADR-001 |
-| JS runtime | Node.js 22 LTS | `.nvmrc`, `engines` (0.2) | ADR-003 |
-| JS packages | pnpm workspaces | `packageManager` field (0.2) | ADR-003 |
+| JS runtime | Node.js 22 LTS | `.nvmrc`, root `engines` | ADR-003 |
+| JS packages | pnpm 11 workspaces | root `packageManager`, `pnpm-lock.yaml` | ADR-003 |
 | JS task runner | none yet | — | ADR-003 |
-| Python runtime | Python 3.13 | `.python-version` (0.2) | ADR-004 |
-| Python packages | uv + `pyproject.toml` | `uv.lock` (0.2) | ADR-004 |
+| Web framework | Next.js 16 (App Router), React 19, Tailwind 4 | `apps/web/package.json` | — |
+| Python runtime | Python 3.13 | `apps/api/.python-version` | ADR-004 |
+| Python packages | uv + `pyproject.toml` | `apps/api/uv.lock` | ADR-004 |
+| API framework | FastAPI + uvicorn | `apps/api/pyproject.toml` | — |
+| Dependency cooldown | pnpm `minimumReleaseAge` default | `pnpm-workspace.yaml` | ADR-006 |
 | Local orchestration | Docker Compose | `infra/` (0.3) | — |
 
 The local system Python (3.9) is not used; uv provisions and pins the interpreter.

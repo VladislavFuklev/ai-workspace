@@ -8,12 +8,16 @@ secrets/
 
 # ---- Node / JavaScript ----
 node_modules/
+.pnp
+.pnp.*
 .pnpm-store/
 .pnpm-debug.log*
 npm-debug.log*
 yarn-error.log*
 .next/
+next-env.d.ts
 out/
+.vercel/
 dist/
 build/
 *.tsbuildinfo

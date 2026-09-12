@@ -188,3 +188,43 @@ CI runs web and API as separate jobs.
 
 ### Status
 Accepted — 2026-09-12
+
+---
+
+## ADR-006 — Keep pnpm's dependency-cooldown gate
+
+### Context
+pnpm 11 applies a `minimumReleaseAge` cooldown by default: a package version
+published very recently is not installed silently. This is a supply-chain control —
+most malicious package releases are caught and yanked within hours or days of
+publication, so a short waiting period removes a large share of the risk.
+
+Installing Next.js 16.3.5 hit this gate, and pnpm recorded the affected versions
+under `minimumReleaseAgeExclude` in `pnpm-workspace.yaml`.
+
+### Decision
+Keep the cooldown enabled at pnpm's default. Record deliberate exceptions in
+`minimumReleaseAgeExclude` in `pnpm-workspace.yaml`, committed to git, so every
+bypass is visible in review and in history.
+
+Do not set `minimumReleaseAgeStrict`; the current behaviour (record the exclusion,
+report it) is enough friction to notice without blocking work.
+
+### Alternatives
+- **Disable the cooldown** (`minimumReleaseAge: 0`). Rejected: removes a cheap,
+  real supply-chain control for no gain other than installing brand-new releases a
+  few days sooner.
+- **A long custom cooldown.** Rejected: would routinely block legitimate framework
+  upgrades and push contributors toward disabling it entirely.
+
+### Consequences
+- Easier: brand-new (and therefore least-vetted) package versions cannot enter the
+  lockfile unnoticed; every exception is an auditable line in a committed file.
+- Harder: adopting a just-published release requires an explicit exclusion entry.
+  Contributors will encounter this and should be pointed at this ADR rather than
+  reaching for a global override.
+- The exclusion list grows over time and should be pruned when the listed versions
+  are no longer recent.
+
+### Status
+Accepted — 2026-09-12
