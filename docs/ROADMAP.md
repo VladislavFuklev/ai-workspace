@@ -25,7 +25,7 @@ See `MASTER_PROMPT.md` for the complete product specification.
 - [x] 1.10 Reusable UI surface
 
 ## Phase 2
-- [ ] 2.1 FastAPI application structure
+- [x] 2.1 FastAPI application structure
 - [ ] 2.2 Configuration
 - [ ] 2.3 Database connection
 - [ ] 2.4 SQLAlchemy models

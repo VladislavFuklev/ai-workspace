@@ -18,8 +18,10 @@ module-name = "ai_workspace_api"
 
 [dependency-groups]
 dev = [
+    "httpx==0.28.1",
     "mypy==2.3.1",
     "pytest==9.1.1",
+    "pytest-asyncio==1.4.0",
     "ruff==0.16.7",
 ]
 
@@ -79,3 +81,5 @@ pretty = true
 testpaths = ["tests"]
 pythonpath = ["src"]
 addopts = "-q --strict-markers --strict-config"
+# Every async test is a coroutine; marking each one adds nothing.
+asyncio_mode = "auto"

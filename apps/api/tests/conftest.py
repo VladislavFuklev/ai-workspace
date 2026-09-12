@@ -14,6 +14,8 @@ import pytest
 
 from ai_workspace_api.core.settings import Settings
 
+BuildSettings = Callable[[dict[str, str]], Settings]
+
 VALID_ENVIRONMENT: dict[str, str] = {
     "ENVIRONMENT": "test",
     "DATABASE_URL": "postgresql+psycopg://user:pw@localhost:5433/ai_workspace",
@@ -35,9 +37,7 @@ def valid_env() -> dict[str, str]:
 
 
 @pytest.fixture
-def settings_from(
-    monkeypatch: pytest.MonkeyPatch,
-) -> Callable[[dict[str, str]], Settings]:
+def settings_from(monkeypatch: pytest.MonkeyPatch) -> BuildSettings:
     """Build Settings from a given environment, the way production does."""
 
     def build(env: dict[str, str]) -> Settings:
@@ -50,3 +50,9 @@ def settings_from(
         return Settings(_env_file=None)  # type: ignore[call-arg]
 
     return build
+
+
+@pytest.fixture
+def settings(valid_env: dict[str, str], settings_from: BuildSettings) -> Settings:
+    """A complete Settings object for tests that need one rather than build one."""
+    return settings_from(valid_env)

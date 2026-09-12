@@ -1,7 +1,7 @@
 # Project State
 
 ## Status
-**Phases 0 and 1 complete.** Phase 0 complete: both workspaces, Docker services, quality gate, CI, docs system, design tokens. Both workspaces install cleanly, the local backing services
+Phase 2 in progress. Phases 0 and 1 complete. Phase 0 complete: both workspaces, Docker services, quality gate, CI, docs system, design tokens. Both workspaces install cleanly, the local backing services
 run in Docker, and a quality gate covers both languages. No product features.
 
 ## Current phase
@@ -11,22 +11,16 @@ Phase 2 — Backend foundation
 None in progress.
 
 ## Last completed task
-1.10 — Reusable UI surface (2026-09-13)
+2.1 — FastAPI application structure (2026-09-13)
 
 ## Last session
 
-1.5 through 1.10 in one session, at the user's request — phase 1 complete. See the
-individual task files.
-
-Carried forward: there is still no web test runner, so 1.7, 1.8 and 1.9 were each
-verified once through a throwaway route handler rather than a suite. Task 12.1
-should port those assertions; they are listed in the task outcomes.
+2.1 only. See `docs/tasks/2.1-fastapi-application-structure.md`.
 
 ## Next action
-Phase 2. Execute task **2.1 — FastAPI application structure**; write
-`docs/tasks/2.1-fastapi-application-structure.md` first. The API has
-dependencies, configuration, tooling and a container image but no ASGI app —
-`scripts/dev-api.sh` still reports that.
+Execute task **2.2 — Configuration**. It overlaps 0.5, which already delivered
+typed validated settings — scope it to what 0.5 left out (CORS origins, app
+metadata, per-environment behaviour) rather than redoing it.
 
 ## Known blockers
 None.
@@ -37,8 +31,8 @@ None.
 - API layering is documented and reviewed but not linter-enforced; revisit in
   phase 2 when those packages contain code.
 - Prettier is scoped to `apps/web`; `docs/**` Markdown is deliberately unformatted.
-- The API has dependencies, tooling, configuration and a container image but no
-  ASGI application (task 2.1).
+- The API serves only an identity route; health checks, logging, error handling
+  and versioning are 2.6 to 2.9.
 - `POSTGRES_*` and `DATABASE_URL` in `.env` are separate and must agree (ADR-013).
 - Container Python is 3.13.15 vs 3.13.14 on the host; dependencies are locked.
 - `infra/postgres/init/` runs only on a fresh volume; task 2.5 must also enable the

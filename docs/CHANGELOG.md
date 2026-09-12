@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### 2.1 — FastAPI application structure (2026-09-13)
+
+- `create_app(settings)` factory plus the module-level `app` uvicorn imports; a
+  lifespan for resources that outlive a request; a settings dependency so handlers
+  receive configuration instead of importing a singleton.
+- `/` identifies the service — deliberately not a health check (2.6).
+- Interactive docs only outside production.
+- `scripts/dev-api.sh` runs the server instead of reporting there is none.
+
 ### 1.10 — Reusable UI surface (2026-09-13)
 
 - `(dev)` becomes a navigable reference: Tokens, Components, Forms, with an
