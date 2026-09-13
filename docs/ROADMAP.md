@@ -60,7 +60,7 @@ insecurely, even briefly. The numbering is unchanged.
 - [x] 4.3 Roles
 - [x] 4.4 Permissions
 - [x] 4.5 Organization switching
-- [ ] 4.6 Resource authorization
+- [x] 4.6 Resource authorization
 - [ ] 4.7 Tenant isolation tests
 
 ## Phase 5

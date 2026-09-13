@@ -22,6 +22,7 @@ logger = get_logger(__name__)
 NO_ACCESS = "That workspace does not exist."
 LAST_OWNER = "An organisation must keep at least one owner. Make someone else an owner first."
 OWN_ROLE = "You cannot change your own role. Ask another owner or administrator."
+SELF_REMOVE = "You cannot remove yourself. Leave the organisation instead."
 ABOVE_OWN_LEVEL = "You cannot grant a role above your own."
 
 
@@ -120,6 +121,12 @@ class MembershipService:
         """
         actor.require(Permission.MEMBER_REMOVE)
 
+        if actor.user_id == target_user_id:
+            # Leaving is a different act with different rules; routing it
+            # through here would let an admin "leave" while skipping none of the
+            # permission checks but all of the intent.
+            raise PermissionDeniedError(SELF_REMOVE)
+
         membership = await self._memberships.get(target_user_id, actor.organization_id)
         if membership is None:
             raise NotFoundError("That person is not a member of this workspace.")
@@ -136,6 +143,29 @@ class MembershipService:
             "member removed",
             organization_id=str(actor.organization_id),
             target_user_id=str(target_user_id),
+        )
+
+    async def leave(self, scope: TenantScope) -> None:
+        """Removes the caller from the organisation.
+
+        Leaving is not `remove_member` with yourself as the target: it needs no
+        permission — a viewer may leave — but it keeps the last-owner guard,
+        because an organisation whose last owner walks out is stranded exactly
+        as it would be if someone else removed them.
+        """
+        membership = await self._memberships.get(scope.user_id, scope.organization_id)
+        if membership is None:
+            raise NotFoundError(NO_ACCESS)
+
+        if membership.role is Role.OWNER:
+            await self._require_another_owner(scope.organization_id, scope.user_id)
+
+        await self._session.delete(membership)
+        await self._session.flush()
+        logger.info(
+            "member left",
+            organization_id=str(scope.organization_id),
+            user_id=str(scope.user_id),
         )
 
     async def _require_another_owner(

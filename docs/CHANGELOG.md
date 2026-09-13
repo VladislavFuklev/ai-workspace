@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+### 4.6 — Resource authorization (2026-09-13)
+
+- Renaming and deleting an organisation, changing a member's role, removing a
+  member, and leaving — each authorised through the tenant scope.
+- Renaming never changes the slug, so links people already hold keep working.
+- Leaving is its own act: no permission needed, but the last owner is refused.
+- `OrganizationSummary` now carries the caller's permissions, so the web app
+  hides actions it would be refused instead of keeping its own copy of the
+  permission table.
+- The settings page: name, people with the actions the caller's role allows, and
+  the two ways out.
+
 ### 4.5 — Organization switching (2026-09-13)
 
 - The organisation is part of the URL: `/{locale}/{organization}/{section}`, so

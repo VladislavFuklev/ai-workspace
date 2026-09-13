@@ -7,21 +7,28 @@ resolved by the framework before the handler runs.
 
 from __future__ import annotations
 
+import uuid
 from typing import Annotated
 
 from fastapi import APIRouter, status
 
 from ai_workspace_api.api.auth_dependencies import CurrentPrincipal
 from ai_workspace_api.api.dependencies import SessionDep
-from ai_workspace_api.api.tenant_dependencies import require_permission
+from ai_workspace_api.api.tenant_dependencies import TenantScopeDep, require_permission
 from ai_workspace_api.core.errors import NotFoundError
 from ai_workspace_api.core.permissions import Permission
 from ai_workspace_api.core.tenancy import TenantScope
-from ai_workspace_api.repositories import MembershipRepository, OrganizationRepository
+from ai_workspace_api.repositories import (
+    MembershipRepository,
+    OrganizationRepository,
+    UserRepository,
+)
 from ai_workspace_api.schemas.organization import (
+    ChangeRoleRequest,
     CreateOrganizationRequest,
     MemberSummary,
     OrganizationSummary,
+    UpdateOrganizationRequest,
 )
 from ai_workspace_api.services import MembershipService, OrganizationService
 
@@ -44,12 +51,8 @@ async def create_organization(
     # No permission check: there is no organisation to have a role in yet.
     organization = await OrganizationService(session).create(payload.name, principal.user)
     await session.commit()
-    return OrganizationSummary(
-        id=organization.id,
-        name=organization.name,
-        slug=organization.slug,
-        role=(await MembershipService(session).resolve_scope(principal.user, organization.id)).role,
-    )
+    role = (await MembershipService(session).resolve_scope(principal.user, organization.id)).role
+    return OrganizationSummary.of(organization, role)
 
 
 @router.get(
@@ -64,9 +67,7 @@ async def list_organizations(
 ) -> list[OrganizationSummary]:
     memberships = await MembershipService(session).list_for_user(principal.user)
     return [
-        OrganizationSummary(
-            id=organization.id, name=organization.name, slug=organization.slug, role=membership.role
-        )
+        OrganizationSummary.of(organization, membership.role)
         for membership, organization in memberships
     ]
 
@@ -87,9 +88,7 @@ async def read_organization(
         # Unreachable: the scope was resolved from this organisation. Written as
         # a check rather than an assert, which `python -O` strips.
         raise NotFoundError("That workspace does not exist.")
-    return OrganizationSummary(
-        id=organization.id, name=organization.name, slug=organization.slug, role=scope.role
-    )
+    return OrganizationSummary.of(organization, scope.role)
 
 
 @router.get(
@@ -112,3 +111,93 @@ async def list_members(
         )
         for membership, user in rows
     ]
+
+
+@router.patch(
+    "/{organization_slug}",
+    name="update_organization",
+    response_model=OrganizationSummary,
+    summary="Rename an organisation",
+    description="The address does not change: links people already hold keep working.",
+)
+async def update_organization(
+    payload: UpdateOrganizationRequest,
+    scope: Annotated[TenantScope, require_permission(Permission.ORGANIZATION_UPDATE)],
+    session: SessionDep,
+) -> OrganizationSummary:
+    organization = await OrganizationService(session).rename(scope, payload.name)
+    await session.commit()
+    return OrganizationSummary.of(organization, scope.role)
+
+
+@router.delete(
+    "/{organization_slug}",
+    name="delete_organization",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete an organisation",
+    description="Owners only. Its memberships go with it.",
+)
+async def delete_organization(
+    scope: Annotated[TenantScope, require_permission(Permission.ORGANIZATION_DELETE)],
+    session: SessionDep,
+) -> None:
+    await OrganizationService(session).delete(scope)
+    await session.commit()
+
+
+@router.patch(
+    "/{organization_slug}/members/{user_id}",
+    name="change_member_role",
+    response_model=MemberSummary,
+    summary="Change a member's role",
+    description=(
+        "Refused for your own role, for a role above your own, for someone above "
+        "you, and for the organisation's last owner."
+    ),
+)
+async def change_member_role(
+    user_id: uuid.UUID,
+    payload: ChangeRoleRequest,
+    scope: Annotated[TenantScope, require_permission(Permission.MEMBER_ROLE_CHANGE)],
+    session: SessionDep,
+) -> MemberSummary:
+    memberships = MembershipService(session)
+    membership = await memberships.change_role(scope, user_id, payload.role)
+    await session.commit()
+
+    user = await UserRepository(session).get_by_id(membership.user_id)
+    if user is None:
+        raise NotFoundError("That person is not a member of this workspace.")
+    return MemberSummary(
+        user_id=user.id, email=user.email, display_name=user.display_name, role=membership.role
+    )
+
+
+@router.delete(
+    "/{organization_slug}/members/me",
+    name="leave_organization",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Leave an organisation",
+    description="Any member may leave. The last owner may not, until someone else is one.",
+)
+# Declared before `/members/{user_id}`: routes match in order, and "me" would
+# otherwise be parsed as a UUID and rejected before reaching a handler.
+async def leave_organization(scope: TenantScopeDep, session: SessionDep) -> None:
+    await MembershipService(session).leave(scope)
+    await session.commit()
+
+
+@router.delete(
+    "/{organization_slug}/members/{user_id}",
+    name="remove_member",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Remove a member",
+    description="Not yourself — use the leave endpoint, which needs no permission.",
+)
+async def remove_member(
+    user_id: uuid.UUID,
+    scope: Annotated[TenantScope, require_permission(Permission.MEMBER_REMOVE)],
+    session: SessionDep,
+) -> None:
+    await MembershipService(session).remove_member(scope, user_id)
+    await session.commit()

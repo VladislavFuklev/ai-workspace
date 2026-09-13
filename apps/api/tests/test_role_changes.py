@@ -158,10 +158,17 @@ async def test_the_last_owner_cannot_be_removed(db: AsyncSession) -> None:
     scope = await service.resolve_scope(second_owner, organization.id)
     await service.remove_member(scope, owner.id)
 
-    # The remaining owner cannot remove themselves and strand the organisation.
-    with pytest.raises(ConflictError) as caught:
+    # The remaining owner cannot strand the organisation. Removal refuses them
+    # earlier than the last-owner guard does — removing yourself is not a thing
+    # this method does at all (4.6) — so the guard is reached through `leave`,
+    # which is the only way out that a sole owner would actually take.
+    with pytest.raises(PermissionDeniedError) as refused:
         await service.remove_member(scope, second_owner.id)
 
+    with pytest.raises(ConflictError) as caught:
+        await service.leave(scope)
+
+    assert "leave" in str(refused.value).lower()
     assert "at least one owner" in str(caught.value).lower()
 
 

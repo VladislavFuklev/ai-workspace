@@ -282,6 +282,11 @@ There is no version of such a handler that runs without the check, and a handler
 that needs no permission still cannot reach another tenant's data, because the
 scope it receives is the caller's own.
 
+The web app does not keep a second copy of the permission table. Each
+organisation the API returns carries the caller's permissions, and the interface
+hides what those do not include — a copy would drift, and every drift is a
+control that fails when used. The API checks every request regardless.
+
 ## Configuration
 
 One `.env` at the repository root serves both apps and Docker Compose. It is

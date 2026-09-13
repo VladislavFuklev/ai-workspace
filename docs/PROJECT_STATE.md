@@ -1,7 +1,7 @@
 # Project State
 
 ## Status
-**Phases 0–3 complete; phase 4 in progress (4.1–4.5 done).** Both workspaces,
+**Phases 0–3 complete; phase 4 in progress (4.1–4.6 done).** Both workspaces,
 Docker services, quality gate, CI, design system and i18n (en/uk); authentication
 end to end; organisations, memberships, roles, permission-guarded endpoints and
 organisation switching in the web app.
@@ -13,11 +13,11 @@ Phase 4 — Organizations and RBAC
 None in progress.
 
 ## Last completed task
-4.5 — Organization switching (2026-09-13)
+4.6 — Resource authorization (2026-09-13)
 
 ## Last session
 
-4.1–4.5. Organisations, memberships, the role/permission table and the first
+4.1–4.6. Organisations, memberships, the role/permission table and the first
 tenant-scoped HTTP endpoints. See those task files and ADR-021.
 
 Worth carrying forward: `require_permission(...)` returns the `Depends` itself,
@@ -30,11 +30,16 @@ static route are reserved by the API — otherwise such an organisation would be
 unreachable. `scripts/check-reserved.mjs` guards the three lists that have to
 agree.
 
+The API sends the caller's permissions with each organisation, so the interface
+gates on data rather than on a duplicated permission table. Renaming never
+changes a slug. Over HTTP the last-owner guard is reachable only by leaving:
+nobody may change their own role, and only an owner may act on an owner.
+
 ## Next action
-Execute task **4.6 — Resource authorization**; write
-`docs/tasks/4.6-resource-authorization.md` first. The permissions that only name
-capabilities today (member management, role changes) need endpoints, and every
-one of them has to act through a `TenantScope`.
+Execute task **4.7 — Tenant isolation tests**; write
+`docs/tasks/4.7-tenant-isolation-tests.md` first. Phase 4 has isolation tests
+scattered across four files; 4.7 is the deliberate sweep — one place that tries
+every route as an outsider and fails if a new one is added without an answer.
 
 ## Known blockers
 None.
@@ -59,8 +64,10 @@ None.
 - `(dev)` is reachable in production builds; gating belongs with deployment.
 - No theme switcher yet (1.5); `data-theme` must be set by hand.
 - API layering is documented and reviewed but not linter-enforced.
-- Neither organisation list is paginated, and no endpoint yet changes a role or
-  removes a member over HTTP — that is 4.6.
+- Neither organisation list is paginated.
+- No way to add someone to an organisation yet: invitations are phase 10, so a
+  second member has to be inserted directly for now.
+- No audit trail of role changes, removals or deletions (10.1).
 - The organisation switcher's behaviour is verified by reading it, not by a test:
   it is client-side and browser automation is 12.8.
 - The remembered organisation is one per browser, not per tab.
