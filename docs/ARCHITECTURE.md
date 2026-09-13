@@ -264,6 +264,12 @@ Roles are `owner > admin > member > viewer`, with permissions in one table in
 `core/permissions.py`. A non-member gets 404 (naming the organisation would
 confirm it exists); a member lacking a permission gets 403 naming what they need.
 
+The web app carries the same slug: `/{locale}/{organization}/{section}`. A URL
+therefore identifies what it shows, and two tabs can show two organisations. A
+cookie remembers the last one only so `/enter` knows where to send someone; it
+grants nothing. Slugs that would be shadowed by a static route are reserved in
+`core/slugs.py` and checked against the route tree by `scripts/check-reserved.mjs`.
+
 The tenant is named by a slug in the path — `/api/v1/organizations/{slug}/...` —
 so it is visible in every URL and log line, and the framework resolves the scope
 before a handler runs. Routes state their requirement in the signature:

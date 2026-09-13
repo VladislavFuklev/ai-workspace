@@ -53,6 +53,9 @@ jobs:
       - name: Message catalogues
         working-directory: .
         run: node scripts/check-messages.mjs
+      - name: Reserved slugs
+        working-directory: .
+        run: node scripts/check-reserved.mjs
       - run: pnpm build
 
   api:

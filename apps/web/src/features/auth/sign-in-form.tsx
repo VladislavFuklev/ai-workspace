@@ -15,10 +15,15 @@ import { queryKeys } from "@/lib/query";
 import { signIn } from "./api";
 import { authErrorKey } from "./auth-error-message";
 
-/** Removes the locale prefix: the locale-aware router adds it back. */
+/**
+ * Removes the locale prefix: the locale-aware router adds it back.
+ *
+ * `/enter` is the fallback because no path here names an organisation — that is
+ * the one route whose job is to decide which one to open (task 4.5).
+ */
 function stripLocale(path: string): string {
   const withoutLocale = path.replace(/^\/(en|uk)(?=\/|$)/, "");
-  return withoutLocale || "/workspace";
+  return withoutLocale || "/enter";
 }
 
 export function SignInForm() {
@@ -52,7 +57,7 @@ export function SignInForm() {
       // inside this app. Anything else is an open redirect.
       const next = searchParams.get("next");
       const safe = next && next.startsWith("/") && !next.startsWith("//");
-      router.push(safe ? stripLocale(next) : "/workspace");
+      router.push(safe ? stripLocale(next) : "/enter");
     } catch (error) {
       setFormError(t(authErrorKey(error)));
     }

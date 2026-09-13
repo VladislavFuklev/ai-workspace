@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useSelectedLayoutSegment } from "next/navigation";
+import { useParams, useSelectedLayoutSegment } from "next/navigation";
 
 import { Link } from "@/i18n/navigation";
 
@@ -16,6 +16,9 @@ import { NAVIGATION_ITEMS } from "./navigation-items";
  *
  * The current item is marked with `aria-current="page"`; the colour and the left
  * rule are secondary, because colour alone is not a state.
+ *
+ * Every destination is inside an organisation, so the slug from the route is
+ * prefixed here rather than repeated in `NAVIGATION_ITEMS`.
  */
 export function Navigation({
   label,
@@ -28,6 +31,7 @@ export function Navigation({
 }) {
   const t = useTranslations("navigation");
   const segment = useSelectedLayoutSegment();
+  const { organization } = useParams<{ organization: string }>();
 
   return (
     <nav aria-label={label} className="flex h-full flex-col gap-0.5 p-3">
@@ -36,7 +40,7 @@ export function Navigation({
         return (
           <Link
             key={item.segment}
-            href={item.href}
+            href={`/${organization}${item.href}`}
             aria-current={current ? "page" : undefined}
             onClick={onNavigate}
             className={[

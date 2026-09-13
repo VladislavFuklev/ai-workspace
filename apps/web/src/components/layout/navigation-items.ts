@@ -3,7 +3,8 @@
  * and anything later (a command palette, a mobile tab bar) cannot disagree.
  *
  * `segment` is what `useSelectedLayoutSegment` returns for the route — the first
- * path segment under the (app) group.
+ * path segment under the current organisation. `href` is relative to the
+ * organisation too; the slug is prefixed where the links are rendered.
  */
 export type NavigationItem = {
   segment: string;

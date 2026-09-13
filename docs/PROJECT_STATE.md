@@ -1,9 +1,10 @@
 # Project State
 
 ## Status
-**Phases 0–3 complete; phase 4 in progress (4.1–4.4 done).** Both workspaces,
+**Phases 0–3 complete; phase 4 in progress (4.1–4.5 done).** Both workspaces,
 Docker services, quality gate, CI, design system and i18n (en/uk); authentication
-end to end; organisations, memberships, roles and permission-guarded endpoints.
+end to end; organisations, memberships, roles, permission-guarded endpoints and
+organisation switching in the web app.
 
 ## Current phase
 Phase 4 — Organizations and RBAC
@@ -12,11 +13,11 @@ Phase 4 — Organizations and RBAC
 None in progress.
 
 ## Last completed task
-4.4 — Permissions (2026-09-13)
+4.5 — Organization switching (2026-09-13)
 
 ## Last session
 
-4.1–4.4. Organisations, memberships, the role/permission table and the first
+4.1–4.5. Organisations, memberships, the role/permission table and the first
 tenant-scoped HTTP endpoints. See those task files and ADR-021.
 
 Worth carrying forward: `require_permission(...)` returns the `Depends` itself,
@@ -24,11 +25,16 @@ so a guarded route reads `Annotated[TenantScope, require_permission(X)]` and the
 check lives in the signature. A non-member and a missing organisation return the
 same 404; a member missing a permission gets 403 naming it.
 
+The web app puts the organisation in the URL, which is why slugs matching a
+static route are reserved by the API — otherwise such an organisation would be
+unreachable. `scripts/check-reserved.mjs` guards the three lists that have to
+agree.
+
 ## Next action
-Execute task **4.5 — Organization switching**; write
-`docs/tasks/4.5-organization-switching.md` first. The API identifies the tenant
-by a path slug, so switching is a frontend concern: which organisation the app
-shell is currently showing, and how that survives a reload.
+Execute task **4.6 — Resource authorization**; write
+`docs/tasks/4.6-resource-authorization.md` first. The permissions that only name
+capabilities today (member management, role changes) need endpoints, and every
+one of them has to act through a `TenantScope`.
 
 ## Known blockers
 None.
@@ -55,6 +61,9 @@ None.
 - API layering is documented and reviewed but not linter-enforced.
 - Neither organisation list is paginated, and no endpoint yet changes a role or
   removes a member over HTTP — that is 4.6.
+- The organisation switcher's behaviour is verified by reading it, not by a test:
+  it is client-side and browser automation is 12.8.
+- The remembered organisation is one per browser, not per tab.
 - `ci.yml` duplicates the commands in `scripts/check.sh`; both must be updated
   together.
 

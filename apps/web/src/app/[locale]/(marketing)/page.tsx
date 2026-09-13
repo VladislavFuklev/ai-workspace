@@ -17,7 +17,7 @@ export default async function LandingPage() {
       <p className="mt-3 max-w-prose text-sm text-text-muted">{t("description")}</p>
       <div className="mt-7 flex flex-wrap gap-3">
         <Link
-          href="/workspace"
+          href="/enter"
           className="rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-accent-fg transition-colors duration-fast hover:bg-accent-hover"
         >
           {t("openWorkspace")}

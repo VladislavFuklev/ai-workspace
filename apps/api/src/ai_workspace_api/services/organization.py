@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ai_workspace_api.core.errors import ValidationError
 from ai_workspace_api.core.logging import get_logger
-from ai_workspace_api.core.slugs import slugify, unique_suffix
+from ai_workspace_api.core.slugs import RESERVED, slugify, unique_suffix
 from ai_workspace_api.models import Organization, Role, User
 from ai_workspace_api.repositories.organization import OrganizationRepository
 from ai_workspace_api.services.membership import MembershipService
@@ -57,7 +57,10 @@ class OrganizationService:
                 UNUSABLE_NAME, detail=[{"field": "name", "message": UNUSABLE_NAME}]
             )
 
-        if not await self._organizations.slug_exists(base):
+        # A reserved slug is treated exactly like a taken one: the organisation
+        # is still created, under a suffixed address, rather than the person
+        # being told their company name is not allowed.
+        if base not in RESERVED and not await self._organizations.slug_exists(base):
             return base
 
         for _ in range(SLUG_ATTEMPTS):

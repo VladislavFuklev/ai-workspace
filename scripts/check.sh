@@ -39,6 +39,7 @@ if [ "$target" = "all" ] || [ "$target" = "web" ]; then
   run "web · typecheck" pnpm --filter @ai-workspace/web typecheck
   run "web · contrast"  node scripts/check-contrast.mjs
   run "web · messages"  node scripts/check-messages.mjs
+  run "web · reserved"  node scripts/check-reserved.mjs
 fi
 
 if [ "$target" = "all" ] || [ "$target" = "api" ]; then

@@ -55,6 +55,28 @@ CYRILLIC = {
 }
 
 
+# Slugs that would be shadowed by a static route. The web app puts the
+# organisation slug directly under the locale (`/en/acme/documents`), so a slug
+# equal to a sibling segment produces an organisation nobody can reach. Kept
+# here rather than in the web app because only the API can prevent one existing.
+RESERVED = frozenset(
+    {
+        "api",
+        "assets",
+        "components",
+        "design",
+        "enter",
+        "forms",
+        "new",
+        "organizations",
+        "reset-password",
+        "sign-in",
+        "sign-up",
+        "static",
+    }
+)
+
+
 def slugify(name: str) -> str:
     """A URL-safe slug, or an empty string if nothing survives.
 

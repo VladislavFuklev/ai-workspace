@@ -23,6 +23,28 @@
     "usage": "Usage",
     "settings": "Settings"
   },
+  "organizations": {
+    "title": "Organisations",
+    "subtitle": "Choose where to work, or start another one.",
+    "emptyBody": "You are not in an organisation yet. Create one to start adding documents.",
+    "manage": "All organisations",
+    "switcherLabel": "Current organisation: {name}. Switch organisation",
+    "createTitle": "Create an organisation",
+    "createBody": "You become its owner. The address is made from the name.",
+    "nameLabel": "Name",
+    "nameHint": "Your company or team. You can invite people afterwards.",
+    "nameRequired": "Give the organisation a name.",
+    "nameTooLong": "Use 120 characters or fewer.",
+    "createAction": "Create organisation",
+    "createPending": "Creating…",
+    "createFailed": "That organisation could not be created. Try again.",
+    "roles": {
+      "owner": "Owner",
+      "admin": "Admin",
+      "member": "Member",
+      "viewer": "Viewer"
+    }
+  },
   "landing": {
     "eyebrow": "AI Workspace",
     "title": "Document intelligence for teams",

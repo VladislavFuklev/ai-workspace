@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ai_workspace_api.core.database import create_engine, create_session_factory
 from ai_workspace_api.core.errors import ValidationError
 from ai_workspace_api.core.passwords import hash_password
+from ai_workspace_api.core.slugs import RESERVED
 from ai_workspace_api.models import Organization, User
 from ai_workspace_api.repositories import OrganizationRepository
 from ai_workspace_api.services import OrganizationService
@@ -109,3 +110,25 @@ async def test_the_database_refuses_a_slug_differing_only_by_case(
         await db.flush()
 
     assert "uq_organizations_slug_lower" in str(caught.value)
+
+
+async def test_a_name_matching_a_reserved_route_gets_a_suffixed_slug(db: AsyncSession) -> None:
+    """The web app puts the slug directly under the locale, so `/en/settings`
+    would be a static page rather than an organisation. Suffixing keeps the name
+    usable; refusing it would tell someone their company is not allowed."""
+    organization = await OrganizationService(db).create("Sign In", await owner(db))
+
+    assert organization.name == "Sign In"
+    assert organization.slug != "sign-in"
+    assert organization.slug.startswith("sign-in-")
+
+
+async def test_no_reserved_slug_can_be_created(db: AsyncSession) -> None:
+    """One assertion per reserved word, so adding one to the set without
+    handling it here fails rather than passing quietly."""
+    service = OrganizationService(db)
+    creator = await owner(db)
+
+    for reserved in sorted(RESERVED):
+        organization = await service.create(reserved.replace("-", " "), creator)
+        assert organization.slug != reserved, reserved

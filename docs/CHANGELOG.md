@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+### 4.5 — Organization switching (2026-09-13)
+
+- The organisation is part of the URL: `/{locale}/{organization}/{section}`, so
+  a link identifies what it shows and two tabs can show two organisations.
+- `/enter` decides where signing in lands (last used, else the first, else the
+  picker); `/organizations` lists them and creates one.
+- Slugs matching a static route are refused by the API and suffixed instead;
+  `scripts/check-reserved.mjs` keeps the API list, the web list and the route
+  tree from drifting apart.
+- `serverGet` — one way for a Server Component to read the API — distinguishes
+  "not yours" from "unreachable", so a 404 and an outage no longer look alike.
+
 ### 4.4 — Permissions (2026-09-13)
 
 - The first tenant-scoped endpoints: create an organisation, list your own, read
