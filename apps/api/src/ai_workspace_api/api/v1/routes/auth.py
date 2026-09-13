@@ -4,7 +4,12 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Cookie, Response, status
 
-from ai_workspace_api.api.cookies import REFRESH_COOKIE, set_session_cookies
+from ai_workspace_api.api.auth_dependencies import CurrentPrincipal
+from ai_workspace_api.api.cookies import (
+    REFRESH_COOKIE,
+    clear_session_cookies,
+    set_session_cookies,
+)
 from ai_workspace_api.api.dependencies import SessionDep, SettingsDep
 from ai_workspace_api.core.errors import AuthenticationError
 from ai_workspace_api.schemas.auth import (
@@ -99,3 +104,53 @@ async def refresh(
         settings=settings,
     )
     return UserProfile.model_validate(user)
+
+
+@router.get(
+    "/me",
+    name="me",
+    response_model=UserProfile,
+    summary="The signed-in user",
+    description="401 when there is no valid session. The frontend uses this to decide what to render.",
+)
+async def me(principal: CurrentPrincipal) -> UserProfile:
+    return UserProfile.model_validate(principal.user)
+
+
+@router.post(
+    "/logout",
+    name="logout",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="End this session",
+    description=(
+        "Revokes the current session and clears both cookies. The access token "
+        "remains signature-valid until it expires, which is the cost of not "
+        "reading the database on every request (ADR-019); the refresh token "
+        "stops working immediately."
+    ),
+)
+async def logout(
+    principal: CurrentPrincipal,
+    response: Response,
+    session: SessionDep,
+    settings: SettingsDep,
+) -> None:
+    await SessionService(session, settings).revoke_session(principal.session_id)
+    clear_session_cookies(response, settings)
+
+
+@router.post(
+    "/logout-all",
+    name="logout_all",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="End every session for this account",
+    description="What to use after a suspected compromise, or from another device.",
+)
+async def logout_all(
+    principal: CurrentPrincipal,
+    response: Response,
+    session: SessionDep,
+    settings: SettingsDep,
+) -> None:
+    await SessionService(session, settings).revoke_all(principal.user.id)
+    clear_session_cookies(response, settings)

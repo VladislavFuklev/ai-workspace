@@ -242,7 +242,12 @@ async def test_replaying_a_retired_token_revokes_the_whole_family(
     api: tuple[httpx.AsyncClient, DbSession],
 ) -> None:
     """The point of rotation. A stolen token works once; the moment either party
-    uses the retired one, both are signed out — loudly, on purpose."""
+    uses the retired one, both are signed out — loudly, on purpose.
+
+    The retired token is aged past the grace window added in 3.6, which exists so
+    a second browser tab is not mistaken for a thief. Without that, this test
+    exercises the concurrent-refresh path instead of the one it is about.
+    """
     client, db = api
     await seed(db, "replay@example.com")
     await sign_in(client, "replay@example.com")
@@ -250,6 +255,12 @@ async def test_replaying_a_retired_token_revokes_the_whole_family(
 
     await client.post(REFRESH)  # legitimate rotation retires `stolen`
     assert (await client.post(REFRESH)).status_code == 200  # current token still fine
+
+    retired = (
+        await db.execute(select(Session).where(Session.token_hash == hash_refresh_token(stolen)))
+    ).scalar_one()
+    retired.revoked_at = datetime.now(UTC) - timedelta(minutes=5)
+    await db.flush()
 
     # The thief replays the retired token. Set on the jar rather than passed per
     # request: httpx deprecated per-request cookies because what happens to the

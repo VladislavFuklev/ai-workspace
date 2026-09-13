@@ -138,6 +138,12 @@ class Settings(BaseSettings):
     # Local development has no TLS, so it defaults off and is forced on below.
     cookie_secure: bool = False
 
+    # Two browser tabs refreshing at once both present the same token, and the
+    # second arrival looks exactly like a replay. Within this window a retired
+    # token whose successor is still live is treated as the second tab.
+    # Short on purpose: it is also the window a thief has.
+    refresh_grace_seconds: Annotated[int, Field(ge=0, le=60)] = 10
+
     @field_validator("cors_origins", mode="before")
     @classmethod
     def _split_origins(cls, value: object) -> object:

@@ -11,21 +11,21 @@ Phase 3 — Authentication and identity
 None in progress.
 
 ## Last completed task
-3.5 — Access and refresh token strategy (2026-09-13)
+3.6 — Logout and session revocation (2026-09-13)
 
 ## Last session
 
-3.5 only. See `docs/tasks/3.5-tokens.md` and ADR-019.
+3.6 only. See `docs/tasks/3.6-logout.md`.
 
-Beyond that file: `-W error` caught a real security gap — PyJWT's warning about a
-short HMAC key revealed that `session_secret` had no minimum length. Tests that
-build a production environment must use the `production()` helper in `conftest`,
-or they fail on a guard they did not mean to trip.
+Beyond that file: adding the refresh grace window silently weakened 3.5's replay
+test — it began exercising the benign path instead of the attack. Only the full
+suite caught it. Changing security behaviour means re-reading the tests that
+covered the old behaviour.
 
 ## Next action
-Execute task **3.6 — Logout and session revocation**; write
-`docs/tasks/3.6-logout.md` first. It also needs to address the concurrent-refresh
-race noted in 3.5: two tabs refreshing at once currently look like a replay.
+Execute task **3.7 — Password reset design**; write `docs/tasks/3.7-reset.md`
+first. There is still no email delivery, so the token cannot actually be sent —
+design and endpoints now, delivery when it exists.
 
 ## Known blockers
 None.

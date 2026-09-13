@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+### 3.6 — Logout and session revocation (2026-09-13)
+
+- A `Principal` dependency: access cookie to user and session, or 401. Every
+  protected endpoint from phase 4 will use it.
+- `GET /auth/me`, `POST /auth/logout`, `POST /auth/logout-all`.
+- A disabled account is rejected immediately rather than when its access token
+  expires — one indexed read, and a deliberate departure from ADR-019's
+  no-database-read rule.
+- A refresh grace window so two browser tabs refreshing at once are not mistaken
+  for a stolen token. It requires both a recent retirement and a still-live
+  session in the family, and a replay after the window still revokes everything.
+
 ### 3.5 — Session tokens (2026-09-13)
 
 - A short JWT access token and a long opaque refresh token, both in `HttpOnly`

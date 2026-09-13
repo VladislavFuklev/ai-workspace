@@ -78,16 +78,23 @@ class SessionService:
             raise AuthenticationError(INVALID_SESSION)
 
         if existing.revoked_at is not None:
-            # Already rotated away or explicitly ended, yet someone still has it.
-            revoked = await self._sessions.revoke_family(existing.family_id)
-            await self._db.commit()
-            logger.warning(
-                "refresh token reuse detected; family revoked",
-                family_id=str(existing.family_id),
-                user_id=str(existing.user_id),
-                sessions_revoked=revoked,
-            )
-            raise AuthenticationError(INVALID_SESSION)
+            if await self._is_concurrent_refresh(existing):
+                # A second browser tab, not a thief: the token was retired
+                # moments ago and its successor is still live.
+                logger.info(
+                    "concurrent refresh within the grace window",
+                    family_id=str(existing.family_id),
+                )
+            else:
+                revoked = await self._sessions.revoke_family(existing.family_id)
+                await self._db.commit()
+                logger.warning(
+                    "refresh token reuse detected; family revoked",
+                    family_id=str(existing.family_id),
+                    user_id=str(existing.user_id),
+                    sessions_revoked=revoked,
+                )
+                raise AuthenticationError(INVALID_SESSION)
 
         if existing.expires_at <= datetime.now(UTC):
             logger.info("refresh rejected", reason="expired", user_id=str(existing.user_id))
@@ -103,6 +110,21 @@ class SessionService:
         await self._db.commit()
         logger.info("session rotated", user_id=str(user.id))
         return user, pair
+
+    async def _is_concurrent_refresh(self, retired: Session) -> bool:
+        """Whether a retired token is a second tab rather than a replay.
+
+        Both conditions matter. Recently retired alone is not enough — a thief
+        who moves fast would qualify. The family must also still have a live
+        session, which means the legitimate rotation is the one that retired it
+        and nothing has gone wrong since.
+        """
+        grace = timedelta(seconds=self._settings.refresh_grace_seconds)
+        if grace.total_seconds() == 0 or retired.revoked_at is None:
+            return False
+        if datetime.now(UTC) - retired.revoked_at > grace:
+            return False
+        return await self._sessions.has_live_session_in_family(retired.family_id)
 
     async def revoke_session(self, session_id: uuid.UUID) -> None:
         session = await self._db.get(Session, session_id)

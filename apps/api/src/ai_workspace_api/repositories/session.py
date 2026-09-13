@@ -49,6 +49,19 @@ class SessionRepository:
         )
         return result.rowcount
 
+    async def has_live_session_in_family(self, family_id: uuid.UUID) -> bool:
+        """Whether the family still has an unrevoked, unexpired session."""
+        result = await self._db.execute(
+            select(Session.id)
+            .where(
+                Session.family_id == family_id,
+                Session.revoked_at.is_(None),
+                Session.expires_at > datetime.now(UTC),
+            )
+            .limit(1)
+        )
+        return result.first() is not None
+
     async def count_live_for_user(self, user_id: uuid.UUID) -> int:
         result = await self._db.execute(
             select(Session).where(
