@@ -15,6 +15,7 @@ from ai_workspace_api.models.base import (
     UUIDPrimaryKey,
 )
 from ai_workspace_api.models.identity import Identity, IdentityProvider
+from ai_workspace_api.models.organization import Organization
 from ai_workspace_api.models.password_reset import PasswordResetToken
 from ai_workspace_api.models.session import Session
 from ai_workspace_api.models.user import User
@@ -24,6 +25,7 @@ __all__ = [
     "Base",
     "Identity",
     "IdentityProvider",
+    "Organization",
     "PasswordResetToken",
     "Session",
     "Timestamps",

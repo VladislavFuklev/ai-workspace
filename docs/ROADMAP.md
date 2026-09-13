@@ -55,7 +55,7 @@ insecurely, even briefly. The numbering is unchanged.
 - [x] 3.10 Protected routes
 
 ## Phase 4
-- [ ] 4.1 Organizations
+- [x] 4.1 Organizations
 - [ ] 4.2 Memberships
 - [ ] 4.3 Roles
 - [ ] 4.4 Permissions

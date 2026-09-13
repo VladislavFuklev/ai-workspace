@@ -64,9 +64,16 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 # Tests assert, use fixtures, and hardcode credentials on purpose.
-"tests/**" = ["S101", "S105", "S106", "S311"]
+# RUF001 flags Cyrillic that looks Latin. The product ships in Ukrainian, so
+# Ukrainian strings in test data are the point rather than a homoglyph attack.
+# The rule stays on everywhere it could hide one.
+"tests/**" = ["S101", "S105", "S106", "S311", "RUF001"]
 # Alembic generates its own style and shadows builtins in revision templates.
 "migrations/**" = ["A", "F401", "I001", "INP001"]
+# RUF001 flags characters that look like Latin ones — a homoglyph guard worth
+# keeping everywhere else. This file *is* the Cyrillic transliteration table,
+# so every one of them is deliberate.
+"src/ai_workspace_api/core/slugs.py" = ["RUF001"]
 
 [tool.ruff.lint.flake8-tidy-imports]
 ban-relative-imports = "parents"

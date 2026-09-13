@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### 4.1 — Organizations (2026-09-13)
+
+- The `organizations` table: the tenant boundary. Names are not unique, slugs are,
+  and slug uniqueness is case-insensitive at the database.
+- `slugify` transliterates Cyrillic — without it a Ukrainian name produces an
+  empty slug, and an organisation with no address.
+- A repeated name gets a random suffix rather than a counter, which would need a
+  query per attempt and leak how many organisations share a name.
+
 ### Fix — importing the app required a complete environment (2026-09-13)
 
 - `app = create_app()` at module scope meant importing `api.app` read and

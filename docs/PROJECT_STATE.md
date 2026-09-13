@@ -11,31 +11,21 @@ Phase 4 — Organizations and RBAC
 None in progress.
 
 ## Last completed task
-3.10 — Protected routes (2026-09-13)
+4.1 — Organizations (2026-09-13)
 
 ## Last session
 
-Phase 3 complete — 3.1, then 3.4 brought forward, then 3.2, 3.3, 3.5 to 3.10. See
-the individual task files and ADR-017 through ADR-020.
+4.1 only. See `docs/tasks/4.1-organizations.md`.
 
-Carried forward, in order of how much time each cost:
-- A module-level `app = create_app()` made importing the app module require the
-  whole environment. Anything constructed at import time turns a missing variable
-  into a collection failure across every test file.
-- Integration tests must scope assertions by `user_id`; three counted every row
-  and broke when a manual check left one behind.
-- Changing security behaviour means re-reading the tests that covered the old
-  behaviour — the refresh grace window silently turned a replay test into a
-  concurrent-refresh test.
-- `-W error` earns its place: PyJWT's warning revealed `session_secret` had no
-  minimum length.
+Beyond that file: `unicodedata` normalisation strips accents from Latin letters
+but does nothing for Cyrillic, so anything deriving an ASCII string from a name
+needs an explicit transliteration table or Ukrainian input produces nothing.
 
 ## Next action
-Phase 4. Execute task **4.1 — Organizations**; write
-`docs/tasks/4.1-organizations.md` first. Tenant isolation starts here, and the
-`backend-quality` skill's rule applies from the first query: every tenant-scoped
-query filters on the organisation, through one enforced path rather than a
-`WHERE` clause remembered in forty places.
+Execute task **4.2 — Memberships**; write `docs/tasks/4.2-memberships.md` first.
+It links users to organisations and is where the single enforced path for
+tenant-scoped queries has to be established — a `WHERE` clause remembered in
+forty places is how a cross-tenant leak happens.
 
 ## Known blockers
 None.
