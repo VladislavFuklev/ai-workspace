@@ -93,6 +93,8 @@ jobs:
       S3_BUCKET: ai-workspace-ci
       S3_ACCESS_KEY: ci-access-key
       S3_SECRET_KEY: ci-secret-key
+      # At least 32 bytes; the setting refuses anything shorter (task 3.5).
+      SESSION_SECRET: ci-session-secret-at-least-32-bytes-long
     steps:
       - uses: actions/checkout@v7
 

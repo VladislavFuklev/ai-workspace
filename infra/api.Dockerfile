@@ -35,4 +35,4 @@ EXPOSE 8000
 
 # The ASGI application is created in task 2.1. Until then this image is built and
 # imported as a parity check rather than served.
-CMD ["uvicorn", "ai_workspace_api.api.app:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "--factory", "ai_workspace_api.api.app:create_app", "--host", "0.0.0.0", "--port", "8000"]

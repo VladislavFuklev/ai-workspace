@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Fix — importing the app required a complete environment (2026-09-13)
+
+- `app = create_app()` at module scope meant importing `api.app` read and
+  validated every setting, so a single missing variable failed all twelve test
+  modules at collection. Removed; uvicorn now uses `--factory`.
+- `SESSION_SECRET` added to the CI job, which has no `.env`.
+- Verified with `.env` moved away and every variable unset: the unit suite
+  collects and passes.
+
 ### 3.10 — Protected routes (2026-09-13)
 
 - `getServerUser` asks the API who the caller is, forwarding the `HttpOnly`

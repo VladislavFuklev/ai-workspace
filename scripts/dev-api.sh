@@ -7,4 +7,7 @@ set -euo pipefail
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_root/apps/api"
 
-exec uv run uvicorn ai_workspace_api.api.app:app --reload --host 127.0.0.1 --port "${API_PORT:-8000}"
+# --factory: the module exposes create_app rather than a module-level instance,
+# so importing it does not require a complete environment.
+exec uv run uvicorn --factory ai_workspace_api.api.app:create_app \
+  --reload --host 127.0.0.1 --port "${API_PORT:-8000}"

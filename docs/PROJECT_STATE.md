@@ -19,6 +19,9 @@ Phase 3 complete — 3.1, then 3.4 brought forward, then 3.2, 3.3, 3.5 to 3.10. 
 the individual task files and ADR-017 through ADR-020.
 
 Carried forward, in order of how much time each cost:
+- A module-level `app = create_app()` made importing the app module require the
+  whole environment. Anything constructed at import time turns a missing variable
+  into a collection failure across every test file.
 - Integration tests must scope assertions by `user_id`; three counted every row
   and broke when a manual check left one behind.
 - Changing security behaviour means re-reading the tests that covered the old

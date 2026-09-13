@@ -118,4 +118,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     return app
 
 
-app = create_app()
+# Deliberately no module-level `app = create_app()`.
+#
+# That line made importing this module read and validate the whole environment,
+# so every test module failed at *collection* when one variable was missing —
+# including tests that inject their own settings and never touch the real ones.
+# uvicorn is pointed at the factory instead (`--factory`), which is also how it
+# gets a fresh app per worker.
