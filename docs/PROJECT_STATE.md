@@ -11,21 +11,20 @@ Phase 4 — Organizations and RBAC
 None in progress.
 
 ## Last completed task
-4.1 — Organizations (2026-09-13)
+4.2 — Memberships (2026-09-13)
 
 ## Last session
 
-4.1 only. See `docs/tasks/4.1-organizations.md`.
+4.2 only. See `docs/tasks/4.2-memberships.md` and ADR-021.
 
-Beyond that file: `unicodedata` normalisation strips accents from Latin letters
-but does nothing for Cyrillic, so anything deriving an ASCII string from a name
-needs an explicit transliteration table or Ukrainian input produces nothing.
+Beyond that file: a `TenantScope` may only be produced by
+`MembershipService.resolve_scope`. Anything that constructs one directly defeats
+the point — the value of the type is that holding one means the check happened.
 
 ## Next action
-Execute task **4.2 — Memberships**; write `docs/tasks/4.2-memberships.md` first.
-It links users to organisations and is where the single enforced path for
-tenant-scoped queries has to be established — a `WHERE` clause remembered in
-forty places is how a cross-tenant leak happens.
+Execute task **4.3 — Roles**; write `docs/tasks/4.3-roles.md` first. The enum
+exists but means nothing yet. It also has to stop the last owner leaving, which
+would strand an organisation with no one able to administer it.
 
 ## Known blockers
 None.

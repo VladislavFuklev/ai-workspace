@@ -7,8 +7,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ai_workspace_api.core.errors import ValidationError
 from ai_workspace_api.core.logging import get_logger
 from ai_workspace_api.core.slugs import slugify, unique_suffix
-from ai_workspace_api.models import Organization
+from ai_workspace_api.models import Organization, Role, User
 from ai_workspace_api.repositories.organization import OrganizationRepository
+from ai_workspace_api.services.membership import MembershipService
 
 logger = get_logger(__name__)
 
@@ -23,14 +24,28 @@ class OrganizationService:
     def __init__(self, session: AsyncSession) -> None:
         self._session = session
         self._organizations = OrganizationRepository(session)
+        self._memberships = MembershipService(session)
 
-    async def create(self, name: str) -> Organization:
-        """Creates an organisation with a slug derived from its name."""
+    async def create(self, name: str, owner: User) -> Organization:
+        """Creates an organisation and makes its creator the owner.
+
+        One transaction, because an organisation with no members is unreachable
+        by anyone — including the person who just made it — and nothing in the
+        product could fix it.
+        """
         cleaned = name.strip()
         organization = Organization(name=cleaned, slug=await self._available_slug(cleaned))
         self._organizations.add(organization)
         await self._session.flush()
-        logger.info("organization created", organization_id=str(organization.id))
+
+        self._memberships.add_member(organization, owner, Role.OWNER)
+        await self._session.flush()
+
+        logger.info(
+            "organization created",
+            organization_id=str(organization.id),
+            owner_id=str(owner.id),
+        )
         return organization
 
     async def _available_slug(self, name: str) -> str:

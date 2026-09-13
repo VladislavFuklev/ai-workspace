@@ -707,3 +707,42 @@ with the password to connect them. That is a real friction, and the alternative
 is an account-takeover path.
 
 Accepted — 2026-09-13
+
+---
+
+## ADR-021 — Tenant scope as a type, not a parameter
+
+**Context.** Multi-tenant leaks do not come from someone deciding to skip a
+check. They come from one query out of forty where the
+`WHERE organization_id = ...` was forgotten, in a file nobody reviewed closely,
+months later. Phase 11 has to audit this; the audit is only feasible if there is
+one path to audit.
+
+**Decision.** `TenantScope` is a frozen value produced *only* by
+`MembershipService.resolve_scope`, which verifies a membership row. Tenant-scoped
+repositories take one in their constructor. Forgetting to filter becomes
+impossible rather than unlikely: a repository cannot be built without a scope, so
+the mistake is a type error at the call site instead of a leak in production.
+
+It is deliberately not a bare `uuid`. An id can be passed from anywhere including
+a request body, which is the same leak with extra steps; a `TenantScope` can only
+come from a check.
+
+**Rejected.** *A `WHERE` clause per query, enforced by review* — the status quo
+this exists to avoid. *PostgreSQL row-level security* — genuinely stronger, and
+worth revisiting, but it moves the rule into the database where the application's
+tests cannot see it, and it interacts badly with a connection pool that reuses
+sessions across users. *A session-level filter* — invisible at the call site, so
+the one query that needs to cross tenants (an admin report) becomes a silent
+special case.
+
+**Revisit when** something legitimately needs to read across tenants, or at 11.4
+when the isolation audit runs — that is the point at which "is this actually
+enforced everywhere" gets tested rather than asserted.
+
+**Consequence.** Every tenant-scoped repository gains a constructor argument, and
+a service that forgets it will not compile. A non-member resolving a scope gets
+the same `NotFoundError` as a missing organisation, so a URL cannot be used to
+discover which tenants exist.
+
+Accepted — 2026-09-13

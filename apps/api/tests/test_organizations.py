@@ -10,7 +10,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ai_workspace_api.core.database import create_engine, create_session_factory
 from ai_workspace_api.core.errors import ValidationError
-from ai_workspace_api.models import Organization
+from ai_workspace_api.core.passwords import hash_password
+from ai_workspace_api.models import Organization, User
 from ai_workspace_api.repositories import OrganizationRepository
 from ai_workspace_api.services import OrganizationService
 
@@ -37,15 +38,27 @@ async def db(
         await engine.dispose()
 
 
+async def owner(db: AsyncSession, email: str = "owner@example.com") -> User:
+    """Creating an organisation now needs someone to own it (task 4.2)."""
+    user = User(
+        email=email,
+        password_hash=hash_password("correct horse battery staple"),
+        display_name="Owner",
+    )
+    db.add(user)
+    await db.flush()
+    return user
+
+
 async def test_creating_an_organisation_derives_a_slug(db: AsyncSession) -> None:
-    organization = await OrganizationService(db).create("Acme Legal")
+    organization = await OrganizationService(db).create("Acme Legal", await owner(db))
 
     assert organization.name == "Acme Legal"
     assert organization.slug == "acme-legal"
 
 
 async def test_a_ukrainian_name_gets_an_addressable_slug(db: AsyncSession) -> None:
-    organization = await OrganizationService(db).create("Юридична фірма")
+    organization = await OrganizationService(db).create("Юридична фірма", await owner(db))
 
     assert organization.slug == "iurydychna-firma"
 
@@ -56,8 +69,9 @@ async def test_two_organisations_with_the_same_name_get_different_slugs(
     """Names are not unique — two unrelated companies can both be Acme — but the
     address has to be."""
     service = OrganizationService(db)
-    first = await service.create("Acme")
-    second = await service.create("Acme")
+    creator = await owner(db)
+    first = await service.create("Acme", creator)
+    second = await service.create("Acme", creator)
 
     assert first.name == second.name
     assert first.slug != second.slug
@@ -66,14 +80,14 @@ async def test_two_organisations_with_the_same_name_get_different_slugs(
 
 async def test_a_name_with_nothing_usable_is_refused(db: AsyncSession) -> None:
     with pytest.raises(ValidationError) as caught:
-        await OrganizationService(db).create("!!! ???")
+        await OrganizationService(db).create("!!! ???", await owner(db))
 
     assert caught.value.detail is not None
     assert caught.value.detail[0]["field"] == "name"
 
 
 async def test_lookup_by_slug_is_case_insensitive(db: AsyncSession) -> None:
-    await OrganizationService(db).create("Acme Legal")
+    await OrganizationService(db).create("Acme Legal", await owner(db))
     repository = OrganizationRepository(db)
 
     assert await repository.get_by_slug("ACME-LEGAL") is not None

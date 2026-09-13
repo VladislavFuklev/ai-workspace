@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+### 4.2 — Memberships (2026-09-13)
+
+- The `memberships` table with a role, unique per user and organisation.
+- `TenantScope` (ADR-021): a value only `resolve_scope` can produce, which
+  tenant-scoped repositories will require — so forgetting to filter by
+  organisation becomes a type error rather than a cross-tenant leak.
+- Creating an organisation makes its creator the owner in the same transaction;
+  one with no members would be unreachable by anyone.
+- A non-member gets the same 404 as a missing organisation, so a URL cannot be
+  used to discover which tenants exist.
+
 ### 4.1 — Organizations (2026-09-13)
 
 - The `organizations` table: the tenant boundary. Names are not unique, slugs are,
