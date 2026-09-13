@@ -11,16 +11,16 @@ Phase 3 — Authentication and identity
 None in progress.
 
 ## Last completed task
-3.7 — Password reset (2026-09-13)
+3.8 — OAuth-ready architecture (2026-09-13)
 
 ## Last session
 
-3.7 only. See `docs/tasks/3.7-reset.md`.
+3.8 only. See `docs/tasks/3.8-oauth.md` and ADR-020.
 
 ## Next action
-Execute task **3.8 — OAuth-ready architecture**; write `docs/tasks/3.8-oauth.md`
-first. `password_hash` has been nullable since 3.1 for exactly this; what is
-missing is the table linking a provider identity to a user.
+Execute task **3.9 — Frontend auth flows**; write `docs/tasks/3.9-auth-ui.md`
+first. Sign-in, sign-up and reset screens using the 1.9 form primitives, in both
+locales, against the endpoints that now exist.
 
 ## Known blockers
 None.

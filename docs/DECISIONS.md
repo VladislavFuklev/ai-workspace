@@ -676,3 +676,34 @@ session takes effect within 15 minutes for reads and immediately for refresh.
 token — but any future `GET` that changes state would break that assumption.
 
 Accepted — 2026-09-13
+
+---
+
+## ADR-020 — A provider email matching an existing account does not link automatically
+
+**Context.** Someone signs in with Google using an address that already has a
+password account here. Linking them is convenient and is what many products do.
+
+**Decision.** Refuse, and tell them to sign in with their password and connect
+the provider from settings. Linking on a matching address means anyone who can
+get a provider to assert that address takes over the account behind it —
+through a provider that does not verify emails, a corporate domain where an
+address is reassigned after someone leaves, or a provider account compromise
+that should only have cost the provider account.
+
+`email_verified` from the provider is recorded but is not enough on its own: it
+proves the provider believes the address, not that the person controls *this*
+account.
+
+**Rejected.** *Link when `email_verified` is true* — narrower, but still lets a
+compromised or reassigned provider account inherit an account here. *Link
+silently always* — the same, with no floor at all.
+
+**Revisit when** there is a verified-domain concept (an organisation proving it
+owns `@company.com`), which is a stronger claim than a provider's word.
+
+**Consequence.** A user with both a password and a provider must sign in once
+with the password to connect them. That is a real friction, and the alternative
+is an account-takeover path.
+
+Accepted — 2026-09-13

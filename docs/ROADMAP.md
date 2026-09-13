@@ -50,7 +50,7 @@ insecurely, even briefly. The numbering is unchanged.
 - [x] 3.5 Access/refresh token strategy
 - [x] 3.6 Logout/session revocation
 - [x] 3.7 Password reset design
-- [ ] 3.8 OAuth-ready architecture
+- [x] 3.8 OAuth-ready architecture
 - [ ] 3.9 Frontend auth flows
 - [ ] 3.10 Protected routes
 

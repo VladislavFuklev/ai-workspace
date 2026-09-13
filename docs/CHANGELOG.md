@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### 3.8 — OAuth-ready architecture (2026-09-13)
+
+- An `identities` table keyed on `(provider, subject)` — the provider's opaque id,
+  not the email, which can be reassigned to a different person.
+- A provider email matching an existing account is refused rather than linked
+  (ADR-020): linking on a matching address is an account-takeover path.
+- `IdentityService` finds or creates a user from a verified provider profile, and
+  links deliberately for a user who is already signed in.
+- No provider integrated: credentials and redirect URIs are decisions for later.
+
 ### 3.7 — Password reset (2026-09-13)
 
 - Hashed, single-use, one-hour tokens; requesting a new link invalidates the old.
