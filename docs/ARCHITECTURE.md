@@ -98,7 +98,8 @@ Route groups (no URL segment of their own):
 | Group | Owns | Holds |
 | --- | --- | --- |
 | `(marketing)` | `/` | the public surface; landing page is task 14.1 |
-| `(app)` | `/workspace`, `/documents`, `/assistant`, `/usage`, `/settings` | header, sidebar/drawer, `<main>`, skip link |
+| `(app)` | `/workspace`, `/documents`, `/assistant`, `/usage`, `/settings` | header, sidebar/drawer, `<main>`, skip link — **requires a session** |
+| `(auth)` | `/sign-in`, `/sign-up`, `/reset-password` | the signed-out surface |
 | `(dev)` | `/design`, `/components`, `/forms` | internal reference surfaces, not product |
 
 Top-level `error.tsx`, `global-error.tsx` and `not-found.tsx` cover every route.
@@ -271,6 +272,20 @@ appear in logs or tracebacks; nothing outside those modules reads the environmen
 
 Both settings modules locate the root `.env` by walking up to the `.git` directory,
 because the apps are run from more than one working directory.
+
+## Authentication
+
+Sessions are two cookies (ADR-019): a short JWT access token and a long opaque
+refresh token that rotates and detects replay. Both `HttpOnly`, so no script can
+read them and the web app never holds a token.
+
+The guard is server-side. `getServerUser` forwards the incoming cookies to
+`/auth/me`; the `(app)` layout redirects when that returns nothing. Middleware
+also redirects when no cookie is present, but that is a fast path — a cookie's
+presence proves nothing, and a forged one is rejected by the layout.
+
+The API answers with stable codes and never translated text (ADR-015); the web
+app turns a code into a sentence in the reader's language.
 
 ## Domain boundaries
 

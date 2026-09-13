@@ -52,7 +52,7 @@ insecurely, even briefly. The numbering is unchanged.
 - [x] 3.7 Password reset design
 - [x] 3.8 OAuth-ready architecture
 - [x] 3.9 Frontend auth flows
-- [ ] 3.10 Protected routes
+- [x] 3.10 Protected routes
 
 ## Phase 4
 - [ ] 4.1 Organizations

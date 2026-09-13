@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+### 3.10 — Protected routes (2026-09-13)
+
+- `getServerUser` asks the API who the caller is, forwarding the `HttpOnly`
+  cookie the browser cannot read. The `(app)` layout redirects when it returns
+  nothing — this is the guard.
+- Middleware redirects on a missing cookie as a fast path only; a forged cookie
+  passes it and is still rejected by the layout.
+- The destination is preserved in `?next=` and validated before use, so it cannot
+  redirect off-site.
+- Sign-out in the header clears the query cache and refreshes the route.
+
 ### 3.9 — Frontend auth flows (2026-09-13)
 
 - `features/auth/`: validated schemas, API calls, `useCurrentUser`, and

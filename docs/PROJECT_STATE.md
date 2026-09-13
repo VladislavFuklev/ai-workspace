@@ -5,29 +5,34 @@
 run in Docker, and a quality gate covers both languages. No product features.
 
 ## Current phase
-Phase 3 — Authentication and identity
+Phase 4 — Organizations and RBAC
 
 ## Current task
 None in progress.
 
 ## Last completed task
-3.9 — Frontend auth flows (2026-09-13)
+3.10 — Protected routes (2026-09-13)
 
 ## Last session
 
-3.9 only. See `docs/tasks/3.9-auth-ui.md`.
+Phase 3 complete — 3.1, then 3.4 brought forward, then 3.2, 3.3, 3.5 to 3.10. See
+the individual task files and ADR-017 through ADR-020.
 
-Beyond that file: a Zod schema whose messages come from the catalogue must be
-built inside the component, where `t` exists. A module-level schema produces
-English validation text under Ukrainian labels.
-
-Also: integration tests must scope their assertions by `user_id`. Three counted
-every session row and broke the moment a manual check left one behind.
+Carried forward, in order of how much time each cost:
+- Integration tests must scope assertions by `user_id`; three counted every row
+  and broke when a manual check left one behind.
+- Changing security behaviour means re-reading the tests that covered the old
+  behaviour — the refresh grace window silently turned a replay test into a
+  concurrent-refresh test.
+- `-W error` earns its place: PyJWT's warning revealed `session_secret` had no
+  minimum length.
 
 ## Next action
-Execute task **3.10 — Protected routes**; write `docs/tasks/3.10-protected.md`
-first. Last task of phase 3: a guard on `(app)`, sign-out in the header, and a
-redirect back to where the user was going.
+Phase 4. Execute task **4.1 — Organizations**; write
+`docs/tasks/4.1-organizations.md` first. Tenant isolation starts here, and the
+`backend-quality` skill's rule applies from the first query: every tenant-scoped
+query filters on the organisation, through one enforced path rather than a
+`WHERE` clause remembered in forty places.
 
 ## Known blockers
 None.

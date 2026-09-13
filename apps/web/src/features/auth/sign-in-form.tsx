@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -14,10 +15,17 @@ import { queryKeys } from "@/lib/query";
 import { signIn } from "./api";
 import { authErrorKey } from "./auth-error-message";
 
+/** Removes the locale prefix: the locale-aware router adds it back. */
+function stripLocale(path: string): string {
+  const withoutLocale = path.replace(/^\/(en|uk)(?=\/|$)/, "");
+  return withoutLocale || "/workspace";
+}
+
 export function SignInForm() {
   const t = useTranslations("auth");
   const router = useRouter();
   const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
   const [formError, setFormError] = useState<string | null>(null);
 
   // Messages come from the catalogue, so validation speaks the reader's
@@ -40,7 +48,11 @@ export function SignInForm() {
       // The session cookie changed what `me` returns, so the cached answer is
       // wrong until this is invalidated.
       await queryClient.invalidateQueries({ queryKey: queryKeys.auth.all });
-      router.push("/workspace");
+      // Back to where they were headed before the redirect, if that is a path
+      // inside this app. Anything else is an open redirect.
+      const next = searchParams.get("next");
+      const safe = next && next.startsWith("/") && !next.startsWith("//");
+      router.push(safe ? stripLocale(next) : "/workspace");
     } catch (error) {
       setFormError(t(authErrorKey(error)));
     }
