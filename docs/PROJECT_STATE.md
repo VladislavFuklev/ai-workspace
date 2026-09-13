@@ -1,23 +1,23 @@
 # Project State
 
 ## Status
-**Phases 0–3 complete; phase 4 in progress (4.1–4.6 done).** Both workspaces,
+**Phases 0–4 complete.** Both workspaces,
 Docker services, quality gate, CI, design system and i18n (en/uk); authentication
 end to end; organisations, memberships, roles, permission-guarded endpoints and
 organisation switching in the web app.
 
 ## Current phase
-Phase 4 — Organizations and RBAC
+Phase 5 — Documents and storage
 
 ## Current task
 None in progress.
 
 ## Last completed task
-4.6 — Resource authorization (2026-09-13)
+4.7 — Tenant isolation tests (2026-09-13)
 
 ## Last session
 
-4.1–4.6. Organisations, memberships, the role/permission table and the first
+4.1–4.7 — the whole of phase 4. Organisations, memberships, the role/permission table and the first
 tenant-scoped HTTP endpoints. See those task files and ADR-021.
 
 Worth carrying forward: `require_permission(...)` returns the `Depends` itself,
@@ -35,11 +35,16 @@ gates on data rather than on a duplicated permission table. Renaming never
 changes a slug. Over HTTP the last-owner guard is reachable only by leaving:
 nobody may change their own role, and only an owner may act on an owner.
 
+`test_tenant_isolation.py` discovers tenant routes from the route modules — not
+from `app.routes`, which FastAPI 0.141 populates lazily and would return empty,
+passing every sweep vacuously. Anything added under
+`/organizations/{organization_slug}` is swept automatically.
+
 ## Next action
-Execute task **4.7 — Tenant isolation tests**; write
-`docs/tasks/4.7-tenant-isolation-tests.md` first. Phase 4 has isolation tests
-scattered across four files; 4.7 is the deliberate sweep — one place that tries
-every route as an outsider and fails if a new one is added without an answer.
+Execute task **5.1 — File storage abstraction**; write
+`docs/tasks/5.1-file-storage.md` first. MinIO is already running in Compose and
+configured; 5.1 is the interface the rest of the product uses, with the tenant
+in the object key so isolation survives into storage.
 
 ## Known blockers
 None.

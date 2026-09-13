@@ -282,6 +282,12 @@ There is no version of such a handler that runs without the check, and a handler
 that needs no permission still cannot reach another tenant's data, because the
 scope it receives is the caller's own.
 
+`apps/api/tests/test_tenant_isolation.py` sweeps every route whose path names an
+organisation — discovered from the route modules, not listed by hand — and
+requires each to resolve the scope dependency and to answer a non-member exactly
+as it answers an organisation that does not exist. A tenant route added later is
+covered on the day it is written.
+
 The web app does not keep a second copy of the permission table. Each
 organisation the API returns carries the caller's permissions, and the interface
 hides what those do not include — a copy would drift, and every drift is a

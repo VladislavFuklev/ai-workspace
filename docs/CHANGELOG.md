@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+### 4.7 — Tenant isolation tests (2026-09-13)
+
+- One sweep that tries to cross the tenant boundary on every route that has a
+  tenant, with the route list discovered from the route modules and checked
+  against what the app serves — so a phase-5 endpoint is covered the day it
+  is written.
+- Each route must resolve `get_tenant_scope` (structural) *and* answer a
+  non-member exactly as it answers a missing organisation (behavioural).
+- Proven by sabotage: a route without the scope dependency fails five tests, and
+  a refusal that admits membership fails two.
+
 ### 4.6 — Resource authorization (2026-09-13)
 
 - Renaming and deleting an organisation, changing a member's role, removing a
