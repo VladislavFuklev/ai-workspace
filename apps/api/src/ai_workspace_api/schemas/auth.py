@@ -45,3 +45,19 @@ class LoginRequest(BaseModel):
     # change, and refusing to *check* it would lock people out of their accounts.
     email: EmailStr
     password: Annotated[str, Field(min_length=1, max_length=1024)]
+
+
+class PasswordResetRequest(BaseModel):
+    email: EmailStr
+
+
+class PasswordResetResponse(BaseModel):
+    """Says the same thing whether or not the address has an account."""
+
+    message: str = "If that address has an account, a reset link is on its way."
+
+
+class PasswordResetConfirm(BaseModel):
+    token: Annotated[str, Field(min_length=16, max_length=256)]
+    # The policy applies here: this is a password being *chosen*, unlike sign-in.
+    password: Password

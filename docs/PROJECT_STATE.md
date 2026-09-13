@@ -11,21 +11,16 @@ Phase 3 — Authentication and identity
 None in progress.
 
 ## Last completed task
-3.6 — Logout and session revocation (2026-09-13)
+3.7 — Password reset (2026-09-13)
 
 ## Last session
 
-3.6 only. See `docs/tasks/3.6-logout.md`.
-
-Beyond that file: adding the refresh grace window silently weakened 3.5's replay
-test — it began exercising the benign path instead of the attack. Only the full
-suite caught it. Changing security behaviour means re-reading the tests that
-covered the old behaviour.
+3.7 only. See `docs/tasks/3.7-reset.md`.
 
 ## Next action
-Execute task **3.7 — Password reset design**; write `docs/tasks/3.7-reset.md`
-first. There is still no email delivery, so the token cannot actually be sent —
-design and endpoints now, delivery when it exists.
+Execute task **3.8 — OAuth-ready architecture**; write `docs/tasks/3.8-oauth.md`
+first. `password_hash` has been nullable since 3.1 for exactly this; what is
+missing is the table linking a provider identity to a user.
 
 ## Known blockers
 None.

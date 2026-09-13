@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### 3.7 — Password reset (2026-09-13)
+
+- Hashed, single-use, one-hour tokens; requesting a new link invalidates the old.
+- Both endpoints answer identically for a known and an unknown address, and
+  unknown, used and expired tokens give one message.
+- **Every session is revoked on a successful reset** — a reset is what someone
+  does when they believe they are compromised.
+- No development mode returns or logs the token; delivery is the missing half.
+
 ### 3.6 — Logout and session revocation (2026-09-13)
 
 - A `Principal` dependency: access cookie to user and session, or 401. Every
