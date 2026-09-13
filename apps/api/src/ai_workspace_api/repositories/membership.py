@@ -8,7 +8,7 @@ from collections.abc import Sequence
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ai_workspace_api.models import Membership, Organization
+from ai_workspace_api.models import Membership, Organization, User
 
 
 class MembershipRepository:
@@ -55,6 +55,19 @@ class MembershipRepository:
             .order_by(Membership.created_at)
         )
         return list(result.scalars().all())
+
+    async def list_members_with_users(
+        self, organization_id: uuid.UUID
+    ) -> Sequence[tuple[Membership, User]]:
+        """Members and their people in one query — a list of memberships alone
+        would need a lookup per row to render."""
+        result = await self._session.execute(
+            select(Membership, User)
+            .join(User, User.id == Membership.user_id)
+            .where(Membership.organization_id == organization_id)
+            .order_by(User.display_name)
+        )
+        return [(m, u) for m, u in result.all()]
 
     def add(self, membership: Membership) -> Membership:
         self._session.add(membership)

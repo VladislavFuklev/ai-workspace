@@ -264,6 +264,18 @@ Roles are `owner > admin > member > viewer`, with permissions in one table in
 `core/permissions.py`. A non-member gets 404 (naming the organisation would
 confirm it exists); a member lacking a permission gets 403 naming what they need.
 
+The tenant is named by a slug in the path — `/api/v1/organizations/{slug}/...` —
+so it is visible in every URL and log line, and the framework resolves the scope
+before a handler runs. Routes state their requirement in the signature:
+
+```python
+scope: Annotated[TenantScope, require_permission(Permission.MEMBER_READ)]
+```
+
+There is no version of such a handler that runs without the check, and a handler
+that needs no permission still cannot reach another tenant's data, because the
+scope it receives is the caller's own.
+
 ## Configuration
 
 One `.env` at the repository root serves both apps and Docker Compose. It is

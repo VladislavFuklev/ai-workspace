@@ -58,7 +58,7 @@ insecurely, even briefly. The numbering is unchanged.
 - [x] 4.1 Organizations
 - [x] 4.2 Memberships
 - [x] 4.3 Roles
-- [ ] 4.4 Permissions
+- [x] 4.4 Permissions
 - [ ] 4.5 Organization switching
 - [ ] 4.6 Resource authorization
 - [ ] 4.7 Tenant isolation tests

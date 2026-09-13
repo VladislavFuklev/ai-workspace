@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### 4.4 — Permissions (2026-09-13)
+
+- The first tenant-scoped endpoints: create an organisation, list your own, read
+  one, list its members.
+- The tenant comes from a path slug and is resolved into a `TenantScope` by a
+  dependency; `require_permission(...)` puts the requirement in the handler's
+  signature, where it cannot be forgotten.
+- A malformed slug is rejected by the path type, before any lookup.
+
 ### 4.3 — Roles (2026-09-13)
 
 - A `Permission` enum and one role→permissions table; `TenantScope.can` and

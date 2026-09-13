@@ -9,11 +9,12 @@ change when the API version does.
 
 from fastapi import APIRouter
 
-from ai_workspace_api.api.v1.routes import auth, password_reset
+from ai_workspace_api.api.v1.routes import auth, organizations, password_reset
 
 api_router = APIRouter()
 api_router.include_router(auth.router)
 api_router.include_router(password_reset.router)
+api_router.include_router(organizations.router)
 
 # Routers arrive with their phases:
 #   organizations — phase 4
