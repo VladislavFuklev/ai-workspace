@@ -11,21 +11,20 @@ Phase 3 — Authentication and identity
 None in progress.
 
 ## Last completed task
-1.11 — Internationalisation (2026-09-13)
+3.1 — User model (2026-09-13)
 
 ## Last session
 
-1.11, then a CI fix. See `docs/tasks/1.11-internationalisation.md` and the
-follow-up section in `docs/tasks/2.6-health.md`.
+3.1 only. See `docs/tasks/3.1-user-model.md`.
 
-Beyond those: a test fixture that falls back to a hard-coded URL instead of
-skipping will pass locally and fail in CI. `database_url` and `redis_url` both
-skip; any future one should too.
+Beyond that file: `func.lower("email")` in a SQLAlchemy `Index` compiles to
+`lower('email')` — an index on a constant, which raises nothing and protects
+nothing. Compile the DDL and read it when an index matters.
 
 ## Next action
-Phase 3. Execute task **3.1 — User model**; write `docs/tasks/3.1-user-model.md`
-first. It is the first domain table, so it is also the first real exercise of the
-2.4 base and the 2.5 autogenerate path.
+Execute task **3.4 — Password hashing**, brought forward ahead of 3.2 and 3.3:
+registration cannot be written before hashing exists without handling a plaintext
+password insecurely. Write `docs/tasks/3.4-password-hashing.md` first.
 
 ## Known blockers
 None.

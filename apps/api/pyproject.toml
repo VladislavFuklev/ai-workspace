@@ -5,6 +5,7 @@ description = "AI Workspace API — multi-tenant AI document intelligence backen
 requires-python = ">=3.13"
 dependencies = [
     "alembic==1.20.0",
+    "email-validator==2.3.0",
     "fastapi>=0.141.1",
     "psycopg[binary,pool]==3.3.5",
     "pydantic-settings==2.15.0",

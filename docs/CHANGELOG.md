@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+### 3.1 — User model (2026-09-13)
+
+- The `users` table: email as identity, nullable `password_hash` so an
+  identity-provider account needs no sentinel, separate `is_active` and
+  `is_verified` flags, and the 2.4 base.
+- Uniqueness is a functional index on `lower(email)`: the application normalises,
+  but the database is what makes two accounts differing only by case impossible.
+- `UserRepository` with case-insensitive lookup; it never commits.
+- First real migration, reviewed by hand — which also makes the 2.5 drift check
+  meaningful for the first time.
+
 ### Fix — CI had no Redis (2026-09-13)
 
 - Added a `redis:8-alpine` service to the API job: the readiness check covers both

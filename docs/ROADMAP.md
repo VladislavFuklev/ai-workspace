@@ -38,7 +38,12 @@ See `MASTER_PROMPT.md` for the complete product specification.
 - [x] 2.10 OpenAPI documentation
 
 ## Phase 3
-- [ ] 3.1 User model
+
+Executed in the order 3.1, 3.4, 3.2, 3.3, then 3.5 onwards. Registration cannot
+be written before password hashing exists without handling a plaintext password
+insecurely, even briefly. The numbering is unchanged.
+
+- [x] 3.1 User model
 - [ ] 3.2 Registration
 - [ ] 3.3 Login
 - [ ] 3.4 Password hashing
