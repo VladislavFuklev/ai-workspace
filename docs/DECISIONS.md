@@ -609,3 +609,32 @@ and it means a sign-in endpoint must be rate-limited (10.5) or the hashing itsel
 becomes the denial of service.
 
 Accepted — 2026-09-13
+
+---
+
+## ADR-018 — Registration does not reveal whether an address is taken
+
+**Context.** A registration endpoint that answers "that address is already
+registered" turns any list of addresses into a membership test — for a document
+platform, that is "does this company use this product", answerable at scale by
+anyone.
+
+**Decision.** The same status and body whether or not the address exists. A
+duplicate creates nothing and changes nothing; the caller cannot tell.
+
+**Rejected.** *409 on a duplicate* — the common choice, and the leak itself.
+*A CAPTCHA instead* — raises the cost of enumeration without removing it, and
+the oracle is still there for a determined attacker.
+
+**Revisit when** email delivery exists. The design is only half-built without it:
+a new address should receive a welcome, an existing one a "someone tried to
+register with your address" — which is what tells a legitimate person what
+happened. Until then a duplicate registration is silently inert, and someone who
+forgot they had an account gets no feedback. That is a real usability cost,
+accepted deliberately rather than by omission.
+
+**Consequence.** Registration is now cheap to call repeatedly and does hashing
+work each time, so it needs rate limiting (10.5) more than most endpoints. Sign-in
+(3.3) has to keep the same property, or the pair leaks what neither does alone.
+
+Accepted — 2026-09-13

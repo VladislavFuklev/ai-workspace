@@ -7,7 +7,6 @@ from fastapi import APIRouter
 from pydantic import ValidationError
 
 from ai_workspace_api.api.app import create_app
-from ai_workspace_api.api.v1 import api_router
 from ai_workspace_api.core.settings import Settings
 
 from .conftest import BuildSettings, running_app
@@ -69,6 +68,12 @@ def test_a_malformed_prefix_is_refused(
         settings_from({**valid_env, "API_PREFIX": bad})
 
 
-def test_the_v1_router_exists_and_is_empty_for_now() -> None:
-    """Endpoints arrive with their phases; this asserts the seam, not content."""
-    assert api_router.routes == []
+def test_the_v1_router_carries_the_auth_endpoints(settings: Settings) -> None:
+    """The seam works: a router included there appears under the prefix.
+
+    Read from the OpenAPI document, not `api_router.routes` — FastAPI 0.141 keeps
+    an included router as one opaque entry.
+    """
+    paths = create_app(settings).openapi()["paths"]
+
+    assert f"{settings.api_prefix}/auth/register" in paths

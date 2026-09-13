@@ -11,20 +11,20 @@ Phase 3 — Authentication and identity
 None in progress.
 
 ## Last completed task
-3.4 — Password hashing (2026-09-13)
+3.2 — Registration (2026-09-13)
 
 ## Last session
 
-3.4 only, brought forward ahead of 3.2. See `docs/tasks/3.4-password-hashing.md`.
+3.2 only. See `docs/tasks/3.2-registration.md`.
 
-Beyond that file: an exact-match forbidden-password list catches almost nothing —
-a test found `password1234` passing it. Compare the root after stripping trailing
-digits and punctuation.
+Beyond that file: registration answers identically for a taken address (ADR-018),
+and sign-in must keep the same property — the two together would leak what
+neither does alone.
 
 ## Next action
-Execute task **3.2 — Registration**; write `docs/tasks/3.2-registration.md`
-first. The response must not reveal whether an address is already registered —
-that is account enumeration, and it is why 3.4 built `verify_absent_user`.
+Execute task **3.3 — Login**; write `docs/tasks/3.3-login.md` first. One generic
+failure for a wrong address and a wrong password, `verify_absent_user` on the
+no-user branch, and rehash-on-success. What the endpoint *returns* is 3.5.
 
 ## Known blockers
 None.

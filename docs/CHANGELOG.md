@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### 3.2 — Registration (2026-09-13)
+
+- `POST /api/v1/auth/register` with an `AuthService` that owns the transaction.
+- The same status and body whether or not the address is taken (ADR-018): a
+  duplicate creates nothing, changes nothing, and is indistinguishable from a new
+  account. The handler discards the service's return value on purpose.
+- Passwords are hashed before anything is written, so no path holds a plaintext
+  password and a database handle at once.
+
 ### 3.4 — Password hashing (2026-09-13)
 
 - Argon2id at OWASP's baseline behind one module (ADR-017), with rehash-on-verify

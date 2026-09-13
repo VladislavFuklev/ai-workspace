@@ -44,7 +44,7 @@ be written before password hashing exists without handling a plaintext password
 insecurely, even briefly. The numbering is unchanged.
 
 - [x] 3.1 User model
-- [ ] 3.2 Registration
+- [x] 3.2 Registration
 - [ ] 3.3 Login
 - [x] 3.4 Password hashing
 - [ ] 3.5 Access/refresh token strategy
