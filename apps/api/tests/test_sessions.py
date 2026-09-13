@@ -203,11 +203,13 @@ async def test_the_raw_refresh_token_is_not_stored(
 ) -> None:
     """A database leak must not hand out live sessions."""
     client, db = api
-    await seed(db, "hashed@example.com")
+    user = await seed(db, "hashed@example.com")
     await sign_in(client, "hashed@example.com")
 
     raw = client.cookies[REFRESH_COOKIE]
-    stored = (await db.execute(select(Session))).scalars().all()
+    # Scoped to this user. The database is shared, so counting every row makes
+    # the test depend on whatever else has ever signed in.
+    stored = (await db.execute(select(Session).where(Session.user_id == user.id))).scalars().all()
 
     assert len(stored) == 1
     assert stored[0].token_hash != raw
@@ -249,7 +251,7 @@ async def test_replaying_a_retired_token_revokes_the_whole_family(
     exercises the concurrent-refresh path instead of the one it is about.
     """
     client, db = api
-    await seed(db, "replay@example.com")
+    user = await seed(db, "replay@example.com")
     await sign_in(client, "replay@example.com")
     stolen = client.cookies[REFRESH_COOKIE]
 
@@ -269,7 +271,15 @@ async def test_replaying_a_retired_token_revokes_the_whole_family(
     replay = await client.post(REFRESH)
     assert replay.status_code == 401
 
-    live = (await db.execute(select(Session).where(Session.revoked_at.is_(None)))).scalars().all()
+    live = (
+        (
+            await db.execute(
+                select(Session).where(Session.user_id == user.id, Session.revoked_at.is_(None))
+            )
+        )
+        .scalars()
+        .all()
+    )
     assert live == [], "the family survived a detected replay"
 
 

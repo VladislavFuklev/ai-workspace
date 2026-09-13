@@ -234,7 +234,7 @@ async def test_two_tabs_refreshing_at_once_are_not_treated_as_theft(api: Api) ->
     """Rotation makes a second tab look exactly like a replay. Within the grace
     window it is not, and neither tab gets signed out."""
     client, db = api.client, api.db
-    await seed(db, "tabs@example.com")
+    user = await seed(db, "tabs@example.com")
     await sign_in(client, "tabs@example.com")
     shared = client.cookies[REFRESH_COOKIE]
 
@@ -246,14 +246,22 @@ async def test_two_tabs_refreshing_at_once_are_not_treated_as_theft(api: Api) ->
     second = await client.post(REFRESH)
 
     assert second.status_code == 200, "a second tab was treated as a stolen token"
-    live = (await db.execute(select(Session).where(Session.revoked_at.is_(None)))).scalars().all()
+    live = (
+        (
+            await db.execute(
+                select(Session).where(Session.user_id == user.id, Session.revoked_at.is_(None))
+            )
+        )
+        .scalars()
+        .all()
+    )
     assert live, "the family was revoked by a concurrent refresh"
 
 
 async def test_a_replay_after_the_window_still_revokes_the_family(api: Api) -> None:
     """The grace window must not disarm reuse detection, only delay it."""
     client, db, settings = api.client, api.db, api.settings
-    await seed(db, "late@example.com")
+    user = await seed(db, "late@example.com")
     await sign_in(client, "late@example.com")
     stolen = client.cookies[REFRESH_COOKIE]
     await client.post(REFRESH)
@@ -269,7 +277,15 @@ async def test_a_replay_after_the_window_still_revokes_the_family(api: Api) -> N
     client.cookies.set(REFRESH_COOKIE, stolen)
     assert (await client.post(REFRESH)).status_code == 401
 
-    live = (await db.execute(select(Session).where(Session.revoked_at.is_(None)))).scalars().all()
+    live = (
+        (
+            await db.execute(
+                select(Session).where(Session.user_id == user.id, Session.revoked_at.is_(None))
+            )
+        )
+        .scalars()
+        .all()
+    )
     assert live == []
 
 

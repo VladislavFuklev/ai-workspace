@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### 3.9 — Frontend auth flows (2026-09-13)
+
+- `features/auth/`: validated schemas, API calls, `useCurrentUser`, and
+  `authErrorKey` turning an API code into a translated sentence (ADR-015).
+- Sign-in, sign-up and reset-request screens in an `(auth)` group, both locales,
+  with validation messages from the catalogue rather than English defaults.
+- Sign-up confirms rather than redirecting, so the UI does not leak the
+  difference ADR-018 keeps out of the response.
+
 ### 3.8 — OAuth-ready architecture (2026-09-13)
 
 - An `identities` table keyed on `(provider, subject)` — the provider's opaque id,

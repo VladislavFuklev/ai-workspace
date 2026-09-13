@@ -9,6 +9,10 @@
  * key, so invalidating it invalidates the list and every detail at once.
  */
 export const queryKeys = {
+  auth: {
+    all: ["auth"] as const,
+    currentUser: () => [...queryKeys.auth.all, "current-user"] as const,
+  },
   documents: {
     all: ["documents"] as const,
     list: (filters: { search?: string; page?: number } = {}) =>

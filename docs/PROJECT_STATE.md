@@ -11,16 +11,23 @@ Phase 3 — Authentication and identity
 None in progress.
 
 ## Last completed task
-3.8 — OAuth-ready architecture (2026-09-13)
+3.9 — Frontend auth flows (2026-09-13)
 
 ## Last session
 
-3.8 only. See `docs/tasks/3.8-oauth.md` and ADR-020.
+3.9 only. See `docs/tasks/3.9-auth-ui.md`.
+
+Beyond that file: a Zod schema whose messages come from the catalogue must be
+built inside the component, where `t` exists. A module-level schema produces
+English validation text under Ukrainian labels.
+
+Also: integration tests must scope their assertions by `user_id`. Three counted
+every session row and broke the moment a manual check left one behind.
 
 ## Next action
-Execute task **3.9 — Frontend auth flows**; write `docs/tasks/3.9-auth-ui.md`
-first. Sign-in, sign-up and reset screens using the 1.9 form primitives, in both
-locales, against the endpoints that now exist.
+Execute task **3.10 — Protected routes**; write `docs/tasks/3.10-protected.md`
+first. Last task of phase 3: a guard on `(app)`, sign-out in the header, and a
+redirect back to where the user was going.
 
 ## Known blockers
 None.

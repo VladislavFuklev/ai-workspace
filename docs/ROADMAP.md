@@ -51,7 +51,7 @@ insecurely, even briefly. The numbering is unchanged.
 - [x] 3.6 Logout/session revocation
 - [x] 3.7 Password reset design
 - [x] 3.8 OAuth-ready architecture
-- [ ] 3.9 Frontend auth flows
+- [x] 3.9 Frontend auth flows
 - [ ] 3.10 Protected routes
 
 ## Phase 4
