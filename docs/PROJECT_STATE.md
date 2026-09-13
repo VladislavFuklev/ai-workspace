@@ -11,20 +11,22 @@ Phase 3 — Authentication and identity
 None in progress.
 
 ## Last completed task
-3.2 — Registration (2026-09-13)
+3.3 — Login (2026-09-13)
 
 ## Last session
 
-3.2 only. See `docs/tasks/3.2-registration.md`.
+3.3 only. See `docs/tasks/3.3-login.md`.
 
-Beyond that file: registration answers identically for a taken address (ADR-018),
-and sign-in must keep the same property — the two together would leak what
-neither does alone.
+Beyond that file: `is_active` is verified after the password on purpose — checking
+it first makes a disabled account answer faster and leaks that the address exists.
+Any future check on the user must go after the password comparison for the same
+reason.
 
 ## Next action
-Execute task **3.3 — Login**; write `docs/tasks/3.3-login.md` first. One generic
-failure for a wrong address and a wrong password, `verify_absent_user` on the
-no-user branch, and rehash-on-success. What the endpoint *returns* is 3.5.
+Execute task **3.5 — Access and refresh token strategy**; write
+`docs/tasks/3.5-tokens.md` first. Login currently returns a profile and nothing
+is actually signed in. The web client sends `credentials: "include"` (task 1.7),
+so a cookie session is the shape it already expects.
 
 ## Known blockers
 None.

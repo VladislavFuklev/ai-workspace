@@ -5,7 +5,12 @@ from __future__ import annotations
 from fastapi import APIRouter, status
 
 from ai_workspace_api.api.dependencies import SessionDep
-from ai_workspace_api.schemas.auth import RegisterRequest, RegisterResponse
+from ai_workspace_api.schemas.auth import (
+    LoginRequest,
+    RegisterRequest,
+    RegisterResponse,
+    UserProfile,
+)
 from ai_workspace_api.services.auth import AuthService
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -32,3 +37,20 @@ async def register(payload: RegisterRequest, session: SessionDep) -> RegisterRes
     # The return value is deliberately ignored: branching on it here is exactly
     # the enumeration leak this endpoint exists to avoid.
     return RegisterResponse()
+
+
+@router.post(
+    "/login",
+    name="login",
+    response_model=UserProfile,
+    summary="Sign in",
+    description=(
+        "Returns the signed-in user. Every failure — wrong address, wrong "
+        "password, disabled account — answers identically, so a response cannot "
+        "be used to discover which addresses have accounts.\n\n"
+        "Session tokens arrive in task 3.5; this returns the profile only."
+    ),
+)
+async def login(payload: LoginRequest, session: SessionDep) -> UserProfile:
+    user = await AuthService(session).authenticate(payload.email, payload.password)
+    return UserProfile.model_validate(user)

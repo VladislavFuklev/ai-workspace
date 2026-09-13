@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+### 3.3 — Login (2026-09-13)
+
+- `POST /api/v1/auth/login`. A wrong password, an unknown address, an account with
+  no password, and a disabled account all answer with the same 401, code and
+  message; the distinct reason goes to the log with the request id.
+- `is_active` is checked after the password, so a disabled account does not answer
+  faster and reveal that the address exists.
+- The no-user path spends the same hashing work, so response time does not answer
+  what the body refuses to.
+- A password stored with weaker parameters is upgraded on a successful sign-in.
+
 ### 3.2 — Registration (2026-09-13)
 
 - `POST /api/v1/auth/register` with an `AuthService` that owns the transaction.

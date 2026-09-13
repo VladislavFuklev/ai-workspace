@@ -38,3 +38,10 @@ class UserProfile(BaseModel):
     is_verified: bool
 
     model_config = {"from_attributes": True}
+
+
+class LoginRequest(BaseModel):
+    # Not the `Password` policy type: an existing password predates any policy
+    # change, and refusing to *check* it would lock people out of their accounts.
+    email: EmailStr
+    password: Annotated[str, Field(min_length=1, max_length=1024)]
