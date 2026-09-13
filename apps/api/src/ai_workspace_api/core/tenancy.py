@@ -18,6 +18,8 @@ from __future__ import annotations
 import uuid
 from dataclasses import dataclass
 
+from ai_workspace_api.core.errors import PermissionDeniedError
+from ai_workspace_api.core.permissions import Permission, permissions_for
 from ai_workspace_api.models import Role
 
 
@@ -32,3 +34,18 @@ class TenantScope:
     user_id: uuid.UUID
     organization_id: uuid.UUID
     role: Role
+
+    def can(self, permission: Permission) -> bool:
+        return permission in permissions_for(self.role)
+
+    def require(self, permission: Permission) -> None:
+        """Raises unless the role has the permission.
+
+        403 rather than 404 here, unlike a non-member: the caller has already
+        proved they belong to this organisation, so refusing by name tells them
+        nothing they did not know and tells them what to ask an admin for.
+        """
+        if not self.can(permission):
+            raise PermissionDeniedError(
+                f"Your role does not allow this. Ask an administrator for {permission.value}."
+            )

@@ -11,20 +11,21 @@ Phase 4 — Organizations and RBAC
 None in progress.
 
 ## Last completed task
-4.2 — Memberships (2026-09-13)
+4.3 — Roles (2026-09-13)
 
 ## Last session
 
-4.2 only. See `docs/tasks/4.2-memberships.md` and ADR-021.
+4.1, 4.2 and 4.3. See the task files and ADR-021.
 
-Beyond that file: a `TenantScope` may only be produced by
-`MembershipService.resolve_scope`. Anything that constructs one directly defeats
-the point — the value of the type is that holding one means the check happened.
+Beyond those: permission sets are written out per role rather than derived from
+the rank, so a test — not the construction — asserts that each role has at least
+what the one below it does. Deriving them would make an intentional exception
+impossible to express and hide which role changed.
 
 ## Next action
-Execute task **4.3 — Roles**; write `docs/tasks/4.3-roles.md` first. The enum
-exists but means nothing yet. It also has to stop the last owner leaving, which
-would strand an organisation with no one able to administer it.
+Execute task **4.4 — Permissions**; write `docs/tasks/4.4-permissions.md` first.
+The permission table and `TenantScope.require` exist but no endpoint uses them —
+4.4 is where they become a dependency that HTTP handlers depend on.
 
 ## Known blockers
 None.

@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### 4.3 — Roles (2026-09-13)
+
+- A `Permission` enum and one role→permissions table; `TenantScope.can` and
+  `require`, which raises 403 naming the missing permission.
+- Role changes obey four rules: the actor needs the permission, nobody changes
+  their own role, nobody grants or acts above their own level, and the last owner
+  can be neither demoted nor removed.
+- Mostly negative tests — a permission system with only positive ones is
+  decoration.
+
 ### 4.2 — Memberships (2026-09-13)
 
 - The `memberships` table with a role, unique per user and organisation.

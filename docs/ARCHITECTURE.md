@@ -251,6 +251,19 @@ The layering stated below is enforced by the linter for the web app (ADR-012), n
 only by review. The API's layering is documented and reviewed; enforcing it in
 Python is deferred until there is code in those packages to enforce it against.
 
+## Multi-tenancy
+
+`organizations` is the tenant boundary; `memberships` links a user to one with a
+role. Every tenant-scoped query is meant to go through a `TenantScope`
+(ADR-021) — a value only `MembershipService.resolve_scope` can produce, after
+verifying a membership. Tenant-scoped repositories take one in their
+constructor, so forgetting to filter by organisation is a type error rather than
+a leak.
+
+Roles are `owner > admin > member > viewer`, with permissions in one table in
+`core/permissions.py`. A non-member gets 404 (naming the organisation would
+confirm it exists); a member lacking a permission gets 403 naming what they need.
+
 ## Configuration
 
 One `.env` at the repository root serves both apps and Docker Compose. It is

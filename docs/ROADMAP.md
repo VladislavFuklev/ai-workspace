@@ -57,7 +57,7 @@ insecurely, even briefly. The numbering is unchanged.
 ## Phase 4
 - [x] 4.1 Organizations
 - [x] 4.2 Memberships
-- [ ] 4.3 Roles
+- [x] 4.3 Roles
 - [ ] 4.4 Permissions
 - [ ] 4.5 Organization switching
 - [ ] 4.6 Resource authorization
