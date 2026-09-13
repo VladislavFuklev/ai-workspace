@@ -8,7 +8,7 @@ from ai_workspace_api.api.app import create_app
 from ai_workspace_api.api.openapi import assert_unique_operation_ids
 from ai_workspace_api.core.settings import Settings
 
-from .conftest import BuildSettings, running_app
+from .conftest import BuildSettings, production, running_app
 
 
 def schema_of(settings: Settings) -> dict[str, Any]:
@@ -85,13 +85,13 @@ async def test_docs_are_served_locally_and_closed_elsewhere(
     valid_env: dict[str, str], settings_from: BuildSettings
 ) -> None:
     local = create_app(settings_from({**valid_env, "ENVIRONMENT": "local"}))
-    production = create_app(settings_from({**valid_env, "ENVIRONMENT": "production"}))
+    prod_app = create_app(settings_from(production(valid_env)))
 
     async with running_app(local) as client:
         assert (await client.get("/docs")).status_code == 200
         assert (await client.get("/openapi.json")).status_code == 200
 
-    async with running_app(production) as client:
+    async with running_app(prod_app) as client:
         assert (await client.get("/docs")).status_code == 404
         assert (await client.get("/openapi.json")).status_code == 404
 

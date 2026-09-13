@@ -9,7 +9,7 @@ from pydantic import ValidationError
 from ai_workspace_api.api.app import create_app
 from ai_workspace_api.core.settings import Settings
 
-from .conftest import BuildSettings
+from .conftest import BuildSettings, production
 
 
 @pytest.mark.parametrize(
@@ -31,7 +31,7 @@ def test_wildcard_origin_is_refused_in_production(
     valid_env: dict[str, str], settings_from: BuildSettings
 ) -> None:
     with pytest.raises(ValidationError) as caught:
-        settings_from({**valid_env, "ENVIRONMENT": "production", "CORS_ORIGINS": "*"})
+        settings_from(production(valid_env, CORS_ORIGINS="*"))
 
     assert "cors_origins" in str(caught.value)
 

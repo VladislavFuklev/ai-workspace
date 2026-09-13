@@ -120,6 +120,24 @@ class Settings(BaseSettings):
     s3_secret_key: SecretStr
     s3_region: str = "us-east-1"
 
+    # --- sessions -----------------------------------------------------------
+    # No default. A signing key with a fallback is a signing key someone forgot
+    # to set, and every token in the world would then be forgeable.
+    #
+    # 32 bytes minimum: RFC 7518 requires a key at least as long as the hash for
+    # HMAC-SHA256, and PyJWT warns below that. A short key is brute-forceable,
+    # and forging a signing key means forging any session.
+    session_secret: Annotated[SecretStr, Field(min_length=32)]
+
+    # Short, because an access token cannot be revoked before it expires. Long
+    # enough that a normal page load does not hit the refresh endpoint.
+    access_token_ttl_seconds: Annotated[int, Field(ge=60, le=3600)] = 900
+    refresh_token_ttl_days: Annotated[int, Field(ge=1, le=90)] = 30
+
+    # A cookie without Secure travels in clear text on any plain-HTTP request.
+    # Local development has no TLS, so it defaults off and is forced on below.
+    cookie_secure: bool = False
+
     @field_validator("cors_origins", mode="before")
     @classmethod
     def _split_origins(cls, value: object) -> object:
@@ -131,6 +149,21 @@ class Settings(BaseSettings):
         if isinstance(value, str):
             return [item.strip() for item in value.split(",") if item.strip()]
         return value
+
+    @model_validator(mode="after")
+    def _require_secure_cookies_in_production(self) -> Settings:
+        """Session cookies must be Secure outside development.
+
+        Without it the session travels in clear text on the first plain-HTTP
+        request anyone makes, which is the whole session gone. Refusing to start
+        is better than starting insecurely.
+        """
+        if self.environment is Environment.PRODUCTION and not self.cookie_secure:
+            raise ValueError(
+                "cookie_secure must be true in production: a session cookie "
+                "without Secure is sent over plain HTTP."
+            )
+        return self
 
     @model_validator(mode="after")
     def _reject_unsafe_cors_in_production(self) -> Settings:

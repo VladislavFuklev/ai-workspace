@@ -14,6 +14,7 @@ from ai_workspace_api.models.base import (
     Timestamps,
     UUIDPrimaryKey,
 )
+from ai_workspace_api.models.session import Session
 from ai_workspace_api.models.user import User
 
-__all__ = ["NAMING_CONVENTION", "Base", "Timestamps", "UUIDPrimaryKey", "User"]
+__all__ = ["NAMING_CONVENTION", "Base", "Session", "Timestamps", "UUIDPrimaryKey", "User"]

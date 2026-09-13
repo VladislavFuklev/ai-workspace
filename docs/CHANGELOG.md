@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### 3.5 — Session tokens (2026-09-13)
+
+- A short JWT access token and a long opaque refresh token, both in `HttpOnly`
+  cookies (ADR-019). The refresh cookie is scoped to the refresh endpoint, so it
+  is not attached to every request.
+- Refresh tokens are stored hashed and **rotate**: each use retires the old one,
+  and replaying a retired token revokes every session from that sign-in.
+- `session_secret` is required with a 32-byte minimum; insecure cookies are
+  refused at startup in production.
+
 ### 3.3 — Login (2026-09-13)
 
 - `POST /api/v1/auth/login`. A wrong password, an unknown address, an account with

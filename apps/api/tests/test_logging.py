@@ -21,7 +21,7 @@ from ai_workspace_api.core.logging import (
 )
 from ai_workspace_api.core.settings import Settings
 
-from .conftest import BuildSettings, running_app
+from .conftest import BuildSettings, production, running_app
 
 
 def capture(settings: Settings) -> io.StringIO:
@@ -101,7 +101,7 @@ async def test_a_malformed_inbound_id_is_replaced(settings: Settings, hostile: s
 def test_output_is_json_outside_local(
     valid_env: dict[str, str], settings_from: BuildSettings
 ) -> None:
-    buffer = capture(settings_from({**valid_env, "ENVIRONMENT": "production"}))
+    buffer = capture(settings_from(production(valid_env)))
     get_logger("probe").info("written", document_id="abc", password="hunter2")
 
     payload = json.loads(buffer.getvalue().strip().splitlines()[-1])
@@ -116,7 +116,7 @@ def test_the_request_id_reaches_a_log_line_written_elsewhere(
     valid_env: dict[str, str], settings_from: BuildSettings
 ) -> None:
     """A repository six frames down must not need the id passed to it."""
-    buffer = capture(settings_from({**valid_env, "ENVIRONMENT": "production"}))
+    buffer = capture(settings_from(production(valid_env)))
     known = str(uuid.uuid4())
     token = request_id_var.set(known)
     try:
@@ -134,7 +134,7 @@ async def test_the_request_log_line_carries_the_request_id(
     context variable before writing it drops the id silently."""
     # create_app configures logging itself, which replaces the root handler — so
     # the buffer has to be attached after the app exists, not before.
-    app = create_app(settings_from({**valid_env, "ENVIRONMENT": "production"}))
+    app = create_app(settings_from(production(valid_env)))
     buffer = io.StringIO()
     logging.getLogger().handlers[0].setStream(buffer)  # type: ignore[attr-defined]
 

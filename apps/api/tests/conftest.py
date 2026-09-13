@@ -30,6 +30,8 @@ VALID_ENVIRONMENT: dict[str, str] = {
     "S3_BUCKET": "ai-workspace-documents",
     "S3_ACCESS_KEY": "test-access-key",
     "S3_SECRET_KEY": "test-secret-key",
+    # At least 32 bytes: the setting enforces it, and PyJWT warns below that.
+    "SESSION_SECRET": "test-session-secret-at-least-32-bytes-long",
 }
 
 # Every variable Settings looks at, so a leftover one cannot influence a test.
@@ -41,7 +43,20 @@ MANAGED_KEYS: tuple[str, ...] = (
     "SERVICE_NAME",
     "API_PREFIX",
     "MAX_REQUEST_BODY_BYTES",
+    "ACCESS_TOKEN_TTL_SECONDS",
+    "REFRESH_TOKEN_TTL_DAYS",
+    "COOKIE_SECURE",
 )
+
+
+def production(env: dict[str, str], **overrides: str) -> dict[str, str]:
+    """A valid production environment.
+
+    Production has guards of its own — secure cookies, no wildcard CORS — so
+    flipping only ENVIRONMENT produces a settings object that fails for a reason
+    the test did not intend. This supplies the rest.
+    """
+    return {**env, "ENVIRONMENT": "production", "COOKIE_SECURE": "true", **overrides}
 
 
 @pytest.fixture

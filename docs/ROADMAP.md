@@ -47,7 +47,7 @@ insecurely, even briefly. The numbering is unchanged.
 - [x] 3.2 Registration
 - [x] 3.3 Login
 - [x] 3.4 Password hashing
-- [ ] 3.5 Access/refresh token strategy
+- [x] 3.5 Access/refresh token strategy
 - [ ] 3.6 Logout/session revocation
 - [ ] 3.7 Password reset design
 - [ ] 3.8 OAuth-ready architecture

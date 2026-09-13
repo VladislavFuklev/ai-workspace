@@ -10,6 +10,8 @@ from pydantic import ValidationError
 
 from ai_workspace_api.core.settings import Environment, LogLevel, Settings, get_settings
 
+from .conftest import production
+
 BuildSettings = Callable[[dict[str, str]], Settings]
 
 
@@ -79,8 +81,12 @@ def test_secrets_are_not_exposed_by_repr(
 
 
 def test_environment_predicates(valid_env: dict[str, str], settings_from: BuildSettings) -> None:
-    assert settings_from({**valid_env, "ENVIRONMENT": "production"}).is_production is True
-    assert settings_from({**valid_env, "ENVIRONMENT": "production"}).debug is False
+    # Production has its own guards (secure cookies), so `production` supplies a
+    # complete environment rather than only flipping the name.
+    prod = production(valid_env)
+
+    assert settings_from(prod).is_production is True
+    assert settings_from(prod).debug is False
     assert settings_from({**valid_env, "ENVIRONMENT": "local"}).debug is True
 
 

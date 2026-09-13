@@ -638,3 +638,41 @@ work each time, so it needs rate limiting (10.5) more than most endpoints. Sign-
 (3.3) has to keep the same property, or the pair leaks what neither does alone.
 
 Accepted — 2026-09-13
+
+---
+
+## ADR-019 — Short JWT access token, opaque rotating refresh token, both in cookies
+
+**Context.** A session has to satisfy two things that pull apart: most requests
+should not need a database read, and a session must be revocable.
+
+**Decision.** Two tokens. A 15-minute JWT access token, verified with a signature
+and nothing else. A 30-day opaque refresh token, stored **hashed**, checked
+against a row. Both in `HttpOnly` cookies, `SameSite=Lax`; the refresh cookie's
+`Path` is the refresh endpoint so it is not attached to every request.
+
+Refresh **rotates**: each use issues a new token and retires the old one, within
+a `family_id`. Presenting a retired token revokes the entire family — that is a
+stolen token being replayed, and signing both parties out is the point.
+
+The refresh token is hashed with SHA-256, not Argon2: it is 256 bits of
+randomness, so there is no dictionary to slow down, and a slow hash would add
+50 ms to every refresh for nothing.
+
+**Rejected.** *Stateless JWT only* — cannot be revoked, so a compromised session
+lives until it expires. *Server-side sessions only* — a database read on every
+request, and no way to keep the hot path cheap later. *Tokens in
+`localStorage`* — readable by script, so any XSS is a stolen session; `HttpOnly`
+is the whole reason cookies win here.
+
+**Revisit when** an access token needs to carry authorisation (phase 4). Roles in
+a JWT go stale, so a revoked role would keep working until the token expires —
+15 minutes is the ceiling on how wrong it can be, and that is a decision to make
+consciously then.
+
+**Consequence.** An access token cannot be revoked before it expires; ending a
+session takes effect within 15 minutes for reads and immediately for refresh.
+`SameSite=Lax` covers CSRF for the state-changing endpoints, so no separate CSRF
+token — but any future `GET` that changes state would break that assumption.
+
+Accepted — 2026-09-13

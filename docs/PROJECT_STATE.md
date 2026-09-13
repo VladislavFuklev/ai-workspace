@@ -11,22 +11,21 @@ Phase 3 — Authentication and identity
 None in progress.
 
 ## Last completed task
-3.3 — Login (2026-09-13)
+3.5 — Access and refresh token strategy (2026-09-13)
 
 ## Last session
 
-3.3 only. See `docs/tasks/3.3-login.md`.
+3.5 only. See `docs/tasks/3.5-tokens.md` and ADR-019.
 
-Beyond that file: `is_active` is verified after the password on purpose — checking
-it first makes a disabled account answer faster and leaks that the address exists.
-Any future check on the user must go after the password comparison for the same
-reason.
+Beyond that file: `-W error` caught a real security gap — PyJWT's warning about a
+short HMAC key revealed that `session_secret` had no minimum length. Tests that
+build a production environment must use the `production()` helper in `conftest`,
+or they fail on a guard they did not mean to trip.
 
 ## Next action
-Execute task **3.5 — Access and refresh token strategy**; write
-`docs/tasks/3.5-tokens.md` first. Login currently returns a profile and nothing
-is actually signed in. The web client sends `credentials: "include"` (task 1.7),
-so a cookie session is the shape it already expects.
+Execute task **3.6 — Logout and session revocation**; write
+`docs/tasks/3.6-logout.md` first. It also needs to address the concurrent-refresh
+race noted in 3.5: two tabs refreshing at once currently look like a replay.
 
 ## Known blockers
 None.

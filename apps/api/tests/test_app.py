@@ -9,7 +9,7 @@ from ai_workspace_api import __version__
 from ai_workspace_api.api.app import create_app
 from ai_workspace_api.core.settings import Environment, Settings
 
-from .conftest import BuildSettings, running_app
+from .conftest import BuildSettings, production, running_app
 
 
 @pytest.fixture
@@ -35,7 +35,7 @@ async def test_uses_the_injected_settings_not_the_environment(
     valid_env: dict[str, str], settings_from: BuildSettings
 ) -> None:
     """The factory must not reach for the module-level singleton."""
-    app = create_app(settings_from({**valid_env, "ENVIRONMENT": "production"}))
+    app = create_app(settings_from(production(valid_env)))
 
     assert app.state.settings.environment is Environment.PRODUCTION
 
@@ -52,11 +52,11 @@ async def test_docs_are_closed_outside_local(
 ) -> None:
     """Interactive docs are a development affordance; 2.10 decides production."""
     local = create_app(settings_from({**valid_env, "ENVIRONMENT": "local"}))
-    production = create_app(settings_from({**valid_env, "ENVIRONMENT": "production"}))
+    prod_app = create_app(settings_from(production(valid_env)))
 
     assert local.docs_url == "/docs"
-    assert production.docs_url is None
-    assert production.openapi_url is None
+    assert prod_app.docs_url is None
+    assert prod_app.openapi_url is None
 
 
 async def test_lifespan_puts_the_session_factory_on_app_state(settings: Settings) -> None:
