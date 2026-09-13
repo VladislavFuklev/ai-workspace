@@ -46,7 +46,7 @@ insecurely, even briefly. The numbering is unchanged.
 - [x] 3.1 User model
 - [ ] 3.2 Registration
 - [ ] 3.3 Login
-- [ ] 3.4 Password hashing
+- [x] 3.4 Password hashing
 - [ ] 3.5 Access/refresh token strategy
 - [ ] 3.6 Logout/session revocation
 - [ ] 3.7 Password reset design

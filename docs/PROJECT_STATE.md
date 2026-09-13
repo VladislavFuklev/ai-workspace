@@ -11,20 +11,20 @@ Phase 3 — Authentication and identity
 None in progress.
 
 ## Last completed task
-3.1 — User model (2026-09-13)
+3.4 — Password hashing (2026-09-13)
 
 ## Last session
 
-3.1 only. See `docs/tasks/3.1-user-model.md`.
+3.4 only, brought forward ahead of 3.2. See `docs/tasks/3.4-password-hashing.md`.
 
-Beyond that file: `func.lower("email")` in a SQLAlchemy `Index` compiles to
-`lower('email')` — an index on a constant, which raises nothing and protects
-nothing. Compile the DDL and read it when an index matters.
+Beyond that file: an exact-match forbidden-password list catches almost nothing —
+a test found `password1234` passing it. Compare the root after stripping trailing
+digits and punctuation.
 
 ## Next action
-Execute task **3.4 — Password hashing**, brought forward ahead of 3.2 and 3.3:
-registration cannot be written before hashing exists without handling a plaintext
-password insecurely. Write `docs/tasks/3.4-password-hashing.md` first.
+Execute task **3.2 — Registration**; write `docs/tasks/3.2-registration.md`
+first. The response must not reveal whether an address is already registered —
+that is account enumeration, and it is why 3.4 built `verify_absent_user`.
 
 ## Known blockers
 None.

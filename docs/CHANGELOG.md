@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+### 3.4 — Password hashing (2026-09-13)
+
+- Argon2id at OWASP's baseline behind one module (ADR-017), with rehash-on-verify
+  so cost rises with hardware without asking anyone to reset a password.
+- `verify_password` never raises: an absent, corrupt or foreign hash is a plain
+  false, because a handler that catches an exception to learn "no" will
+  eventually catch the wrong thing.
+- `verify_absent_user` spends the same time when no user matched, so response
+  time does not answer "is this address registered?".
+- A password policy that leads with length and rejects common roots — an
+  exact-match list let `password1234` through, which a test caught.
+
 ### 3.1 — User model (2026-09-13)
 
 - The `users` table: email as identity, nullable `password_hash` so an

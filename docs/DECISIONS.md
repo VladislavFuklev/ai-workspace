@@ -583,3 +583,29 @@ drop prefixes while the public pages keep them for SEO.
 negotiated locale and 404s there rather than 404ing directly.
 
 Accepted — 2026-09-13
+
+---
+
+## ADR-017 — Argon2id for password hashing
+
+**Context.** Passwords need a slow, salted, memory-hard hash. The realistic
+choices are Argon2id, scrypt and bcrypt.
+
+**Decision.** Argon2id via `argon2-cffi`, at OWASP's baseline — 19 MiB memory,
+two iterations, one lane. Memory cost is what makes GPU cracking expensive, so it
+is the parameter to raise first. The hash is self-describing, so parameters can
+change without a migration, and `check_needs_rehash` upgrades a stored hash
+during a successful sign-in — the only moment the plaintext is available.
+
+**Rejected.** *bcrypt* — a 72-byte input limit that silently truncates, and no
+memory hardness. *scrypt* — sound, but Argon2 is the current recommendation and
+the tuning guidance is better documented.
+
+**Revisit when** OWASP's baseline moves, or sign-in latency becomes a complaint.
+Raising `memory_cost` is a one-line change; existing hashes upgrade themselves.
+
+**Consequence.** Each verification costs ~19 MiB and ~50 ms. That is deliberate,
+and it means a sign-in endpoint must be rate-limited (10.5) or the hashing itself
+becomes the denial of service.
+
+Accepted — 2026-09-13
