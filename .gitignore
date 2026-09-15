@@ -45,11 +45,14 @@ venv/
 htmlcov/
 
 # ---- Local data & runtime artifacts ----
+# Anchored to the repository root. Unanchored, `storage/` matched
+# apps/api/src/.../core/storage/ and silently kept a whole package out of a
+# commit — git status does not list ignored files, so nothing said so.
 *.db
 *.sqlite3
 .data/
-storage/
-uploads/
+/storage/
+/uploads/
 logs/
 *.log
 
