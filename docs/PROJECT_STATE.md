@@ -41,6 +41,10 @@ from `app.routes`, which FastAPI 0.141 populates lazily and would return empty,
 passing every sweep vacuously. Anything added under
 `/organizations/{organization_slug}` is swept automatically.
 
+A `.gitignore` pattern (`storage/`, unanchored) kept the whole storage package
+out of its commit — `git status` does not list ignored files, so only CI saw it.
+`scripts/check-tracked.sh` now fails when anything under source is ignored.
+
 Storage keys carry the organisation (ADR-022) and are built inside
 `core/storage`, never from a filename. The interface is an ABC so the rules
 cannot be skipped by a new implementation; `InMemoryStorage` is production code

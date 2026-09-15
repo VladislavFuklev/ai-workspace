@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### Fix — .gitignore was hiding a source package (2026-09-15)
+
+- `storage/` was unanchored, so it matched `core/storage/` and kept the package
+  out of its own commit. Everything passed locally; CI got a tree without it.
+- The runtime-artifact rules are anchored to the repository root now, and
+  `scripts/check-tracked.sh` fails if anything under source is ignored by git.
+
 ### 5.1 — File storage abstraction (2026-09-15)
 
 - `core/storage`: one way to put a file somewhere and get it back, scoped to a

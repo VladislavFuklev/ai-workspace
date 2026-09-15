@@ -30,6 +30,7 @@ run() {
 }
 
 if [ "$target" = "all" ] || [ "$target" = "docs" ]; then
+  run "repo · tracked"    ./scripts/check-tracked.sh
   run "docs · consistency" ./scripts/check-docs.sh
 fi
 

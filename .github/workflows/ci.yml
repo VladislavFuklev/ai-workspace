@@ -56,6 +56,9 @@ jobs:
       - name: Reserved slugs
         working-directory: .
         run: node scripts/check-reserved.mjs
+      - name: Source is tracked
+        working-directory: .
+        run: ./scripts/check-tracked.sh
       - run: pnpm build
 
   api:
