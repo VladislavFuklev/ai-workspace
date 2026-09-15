@@ -17,9 +17,17 @@ Measured across tasks 0.1–0.4, in order of size:
 3. **Bash output: ~13K tokens recoverable per session.** RTK adoption measured
    **2.8%** — the hook cannot rewrite the compound commands used here.
 
-Running checks is *not* on this list. `scripts/check.sh` costs six lines of output
-and is what keeps "done" from being a guess. Never economize by skipping
-verification; economize by not writing the same paragraph four times.
+Measured again at 5.1, the order had changed. The three biggest sinks were
+*mechanical*, not the work:
+
+1. **A single mypy error printing ~250 lines of overload candidates**, fetched
+   three times before it was narrowed. One error, more output than the module.
+2. **The gate printed twice per commit** — once by hand, once by the pre-commit
+   hook — about 90 lines of the word "ok".
+3. **The closing chat summary: ~60 lines.** The user already saw the work happen.
+
+Never economize by skipping verification. Economize by not *printing* it: run the
+check, show nothing unless it fails.
 
 ## 1. Session start — use the digest, not the documents
 
@@ -77,10 +85,32 @@ filter, or output you must quote exactly).
 
 Do not wrap the dedicated Read/Edit/Write tools in rtk — this applies to Bash.
 
-## 3. Habits that cost the most here
+## 3. Silence success
+
+A passing command should cost nothing. Redirect it and print only on failure:
+
+```bash
+./scripts/check.sh >/tmp/gate.log 2>&1 || tail -30 /tmp/gate.log
+git commit -q -F- >/tmp/commit.log 2>&1 <<'MSG' || tail -30 /tmp/commit.log
+...
+MSG
+uv run mypy 2>&1 | grep -E "error:|Success" | head -5    # never raw: overloads
+uv run pytest -q 2>&1 | tail -2
+```
+
+`mypy` in particular must always be filtered. A `call-overload` error against a
+stub-heavy library (botocore, boto3) prints every candidate signature it knows.
+
+The full gate runs at the end of the task, once, and its output is only worth
+reading when it is red.
+
+## 4. Habits that cost the most here
 
 - **Running `scripts/check.sh` and then committing.** The pre-commit hook runs it
-  again. Commit and let the hook be the gate.
+  again — and prints the whole gate a second time. Commit, and let the hook be
+  the gate. If you need the gate before committing, silence it as above.
+- **A closing summary that retells the task.** Eight lines: what shipped, what
+  surprised you, what is next. The user watched the rest happen.
 - **Configuring a library from memory.** The `eslint-plugin-boundaries` config took
   three round trips on deprecated syntax. Its README was in `node_modules` the
   whole time. Read the installed package's docs before writing its config — one
@@ -96,7 +126,7 @@ Do not wrap the dedicated Read/Edit/Write tools in rtk — this applies to Bash.
 - **Committing without `--dry-run` first** and then reading a huge accidental
   diff. `git add -A -n` is cheap insurance in a repo with `node_modules/`.
 
-## 4. Check the return
+## 5. Check the return
 
 ```bash
 rtk gain          # savings so far

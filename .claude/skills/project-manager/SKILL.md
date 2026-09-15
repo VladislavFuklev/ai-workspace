@@ -78,16 +78,20 @@ A task is not complete until every one of these is true:
 
 | File | What goes in |
 | --- | --- |
-| `docs/tasks/<id>-*.md` | An `## Outcome` section: versions chosen, files created/modified, a check→result table, acceptance criteria answered one by one, **deviations from the plan and why**, known limitations, next task |
+| `docs/tasks/<id>-*.md` | An `## Outcome` section, **25 lines**: a check→result table of only the *surprising* checks (six rows, not fifteen — "ruff passed" is not news), **deviations from the plan and why**, and limitations that change what the next session does. Nothing restated from the spec above it |
 | `docs/CHANGELOG.md` | A `### <id> — <title> (date)` entry with Added/Changed/Removed/Notes |
 | `docs/PROJECT_STATE.md` | Status, last completed task, last session summary, next action, blockers, known limitations |
 | `docs/ROADMAP.md` | `- [ ]` → `- [x]` |
 | `docs/ARCHITECTURE.md` | Only if structure or toolchain actually changed |
 | `docs/DECISIONS.md` | A new ADR for any decision that constrains future work |
-| `docs/tasks/<next-id>-*.md` | The next task's spec, so the next session starts with one |
 
 The deviations section is the highest-value thing you write. Any real task departs
 from its plan; a future session that cannot see why will undo the reasoning.
+
+The next task's spec is **not** written here. It is written at the start of that
+task, by the session that will do it — writing it twice is what the budget above
+is trying to stop, and a spec written a session early is written without what
+that session is about to learn.
 
 ### One fact, one place — hard budgets
 
