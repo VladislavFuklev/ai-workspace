@@ -4,6 +4,7 @@ version = "0.0.0"
 description = "AI Workspace API — multi-tenant AI document intelligence backend"
 requires-python = ">=3.13"
 dependencies = [
+    "aioboto3==15.5.0",
     "alembic==1.20.0",
     "argon2-cffi==25.1.0",
     "email-validator==2.3.0",
@@ -31,6 +32,7 @@ dev = [
     "pytest==9.1.1",
     "pytest-asyncio==1.4.0",
     "ruff==0.16.7",
+    "types-aioboto3[s3]==15.5.0",
 ]
 
 [tool.ruff]

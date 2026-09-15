@@ -293,6 +293,20 @@ organisation the API returns carries the caller's permissions, and the interface
 hides what those do not include — a copy would drift, and every drift is a
 control that fails when used. The API checks every request regardless.
 
+## Object storage
+
+`core/storage` is the only way to reach the bucket. Every call takes a
+`TenantScope`, and the key it produces —
+`org/{organization_id}/{kind}/{uuid}{extension}` (ADR-022) — makes each object
+attributable to one organisation without a join. The uploaded filename is not
+part of the key: it is the user's text and belongs in a column, so there is
+nothing in a path for a traversal to work with.
+
+The interface is an abstract base class, not a protocol: the public methods hold
+the size, type and tenant rules, and an implementation supplies only transport.
+`InMemoryStorage` therefore enforces the same rules as `S3Storage`, which is why
+the unit suite needs no network.
+
 ## Configuration
 
 One `.env` at the repository root serves both apps and Docker Compose. It is

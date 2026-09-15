@@ -1,7 +1,7 @@
 # Project State
 
 ## Status
-**Phases 0–4 complete.** Both workspaces,
+**Phases 0–4 complete; phase 5 in progress (5.1 done).** Both workspaces,
 Docker services, quality gate, CI, design system and i18n (en/uk); authentication
 end to end; organisations, memberships, roles, permission-guarded endpoints and
 organisation switching in the web app.
@@ -13,11 +13,12 @@ Phase 5 — Documents and storage
 None in progress.
 
 ## Last completed task
-4.7 — Tenant isolation tests (2026-09-13)
+5.1 — File storage abstraction (2026-09-15)
 
 ## Last session
 
-4.1–4.7 — the whole of phase 4. Organisations, memberships, the role/permission table and the first
+5.1. The storage interface, its rules and two implementations. Nothing calls it
+yet; 5.3 is the upload endpoint. Organisations, memberships, the role/permission table and the first
 tenant-scoped HTTP endpoints. See those task files and ADR-021.
 
 Worth carrying forward: `require_permission(...)` returns the `Depends` itself,
@@ -40,11 +41,17 @@ from `app.routes`, which FastAPI 0.141 populates lazily and would return empty,
 passing every sweep vacuously. Anything added under
 `/organizations/{organization_slug}` is swept automatically.
 
+Storage keys carry the organisation (ADR-022) and are built inside
+`core/storage`, never from a filename. The interface is an ABC so the rules
+cannot be skipped by a new implementation; `InMemoryStorage` is production code
+for that reason.
+
 ## Next action
-Execute task **5.1 — File storage abstraction**; write
-`docs/tasks/5.1-file-storage.md` first. MinIO is already running in Compose and
-configured; 5.1 is the interface the rest of the product uses, with the tenant
-in the object key so isolation survives into storage.
+Execute task **5.2 — Upload UI**; write `docs/tasks/5.2-upload-ui.md` first. The
+storage interface exists but nothing calls it. 5.2 is the drop zone, the
+progress and the error states; 5.3 is the endpoint behind it. Deciding which
+comes first is part of the task — a UI with no endpoint cannot be exercised, so
+consider building 5.3 first and keeping 5.2's number.
 
 ## Known blockers
 None.
@@ -73,6 +80,11 @@ None.
 - No way to add someone to an organisation yet: invitations are phase 10, so a
   second member has to be inserted directly for now.
 - No audit trail of role changes, removals or deletions (10.1).
+- `scripts/check-ci.sh` reports `Migrate` and the integration run as failing
+  locally: the CI environment points at a database no developer machine has.
+  Pre-existing; worth fixing when 13.8 revisits CI.
+- Storage holds whole files in memory (25 MB cap). Streaming is the change if the
+  limit rises.
 - The organisation switcher's behaviour is verified by reading it, not by a test:
   it is client-side and browser automation is 12.8.
 - The remembered organisation is one per browser, not per tab.

@@ -69,6 +69,12 @@ def run_steps() -> None:
             cwd = root / step["working-directory"] if "working-directory" in step else workdir
             step_env = {**env, **{k: str(v) for k, v in (step.get("env") or {}).items()}}
             label = step.get("name") or command.strip().splitlines()[0]
+            # Steps that provision the runner itself. Running them here would
+            # start containers on a machine where the compose stack already
+            # holds those ports, with different credentials.
+            if label.endswith("(CI only)"):
+                print(f"  skip {label}  (provisions the runner)")
+                continue
             result = subprocess.run(
                 command, shell=True, cwd=cwd, env=step_env,
                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,

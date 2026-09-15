@@ -746,3 +746,38 @@ the same `NotFoundError` as a missing organisation, so a URL cannot be used to
 discover which tenants exist.
 
 Accepted — 2026-09-13
+
+## ADR-022 — The tenant is in the object key, and the caller never writes one
+
+**Context.** Storage sits outside the database, so `TenantScope` (ADR-021) stops
+protecting it the moment a key is a string someone can influence. Two things go
+wrong in practice: a key derived from an uploaded filename lets a name like
+`../../other-org/x.pdf` escape a prefix, and a key stored in a row that points
+somewhere else turns a wrong join into a download.
+
+**Decision.** Keys are `org/{organization_id}/{kind}/{uuid}{extension}`, built
+inside the storage layer from a `TenantScope`. The uploaded filename never
+reaches the key — only an extension that matches `^\.[a-z0-9]{1,8}$` survives,
+and the name itself lives in a database column, where it is text rather than a
+path. Every read, delete and signature re-checks that the key starts with the
+caller's own prefix and answers `NotFoundError` when it does not.
+
+The interface is an abstract base class whose public methods hold the rules and
+whose subclasses implement only transport. A `Protocol` would let a second
+implementation satisfy the type while forgetting a rule.
+
+**Rejected.** *A bucket per organisation* — stronger isolation, but bucket limits
+and per-bucket policy make thousands of tenants an operational problem, and
+creating one is a slow, failure-prone step in the signup path. *The filename in
+the key* — readable in a listing, and the source of every traversal bug in this
+class. *Trusting the row* — the row is the thing most likely to be wrong.
+
+**Revisit when** a tenant needs their own bucket or KMS key for compliance
+reasons, or when object counts make a flat per-organisation prefix slow to list.
+
+**Consequence.** An object is attributable to one organisation from its key
+alone, so a mistake is visible in a bucket listing rather than only in a join.
+The original filename must be stored in the document row (task 5.4) or it is
+lost. Changing the layout later means moving objects, so it is settled now.
+
+Accepted — 2026-09-15

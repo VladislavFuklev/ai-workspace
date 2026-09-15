@@ -103,6 +103,23 @@ def redis_url() -> str:
 
 
 @pytest.fixture(scope="session")
+def s3_settings() -> dict[str, str]:
+    """The real MinIO, from the environment the developer already has.
+
+    Skipped rather than defaulted, for the reason the Redis fixture gives: a
+    fallback here passes locally and fails only in CI.
+    """
+    import os
+
+    required = ("S3_ENDPOINT_URL", "S3_BUCKET", "S3_ACCESS_KEY", "S3_SECRET_KEY")
+    values = {key: os.environ.get(key, "") for key in required}
+    missing = [key for key, value in values.items() if not value]
+    if missing:
+        pytest.skip(f"{', '.join(missing)} not set; run scripts/dev-up.sh and copy .env")
+    return values
+
+
+@pytest.fixture(scope="session")
 def database_url() -> str:
     """The real database, from the environment the developer already has.
 

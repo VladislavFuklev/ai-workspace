@@ -64,7 +64,7 @@ insecurely, even briefly. The numbering is unchanged.
 - [x] 4.7 Tenant isolation tests
 
 ## Phase 5
-- [ ] 5.1 File storage abstraction
+- [x] 5.1 File storage abstraction
 - [ ] 5.2 Upload UI
 - [ ] 5.3 Upload API
 - [ ] 5.4 Document metadata

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import time
+
 import pytest
 
 from ai_workspace_api import __version__
@@ -55,8 +57,11 @@ async def test_readiness_is_200_when_everything_is_reachable(
     settings_from: BuildSettings,
     database_url: str,
     redis_url: str,
+    s3_settings: dict[str, str],
 ) -> None:
-    settings = settings_from({**valid_env, "DATABASE_URL": database_url, "REDIS_URL": redis_url})
+    settings = settings_from(
+        {**valid_env, **s3_settings, "DATABASE_URL": database_url, "REDIS_URL": redis_url}
+    )
     app = create_app(settings)
 
     async with running_app(app) as client:
@@ -68,16 +73,25 @@ async def test_readiness_is_200_when_everything_is_reachable(
     assert body["checks"] == {
         "database": {"ok": True, "error": None},
         "redis": {"ok": True, "error": None},
+        "storage": {"ok": True, "error": None},
     }
 
 
 @pytest.mark.integration
 async def test_readiness_degrades_when_only_redis_is_down(
-    valid_env: dict[str, str], settings_from: BuildSettings, database_url: str
+    valid_env: dict[str, str],
+    settings_from: BuildSettings,
+    database_url: str,
+    s3_settings: dict[str, str],
 ) -> None:
-    """Both dependencies are checked, not just the first one that answers."""
+    """Every dependency is checked, not just the first one that answers."""
     settings = settings_from(
-        {**valid_env, "DATABASE_URL": database_url, "REDIS_URL": "redis://127.0.0.1:1/0"}
+        {
+            **valid_env,
+            **s3_settings,
+            "DATABASE_URL": database_url,
+            "REDIS_URL": "redis://127.0.0.1:1/0",
+        }
     )
     app = create_app(settings)
 
@@ -87,7 +101,70 @@ async def test_readiness_degrades_when_only_redis_is_down(
     assert response.status_code == 503
     body = response.json()
     assert body["checks"]["database"]["ok"] is True
+    assert body["checks"]["storage"]["ok"] is True
     assert body["checks"]["redis"]["ok"] is False
+
+
+@pytest.mark.integration
+async def test_readiness_degrades_when_the_bucket_is_not_there(
+    valid_env: dict[str, str],
+    settings_from: BuildSettings,
+    database_url: str,
+    redis_url: str,
+    s3_settings: dict[str, str],
+) -> None:
+    """The most likely storage misconfiguration, and the one that would otherwise
+    surface on a user's first upload rather than on a probe."""
+    settings = settings_from(
+        {
+            **valid_env,
+            **s3_settings,
+            "DATABASE_URL": database_url,
+            "REDIS_URL": redis_url,
+            "S3_BUCKET": "no-such-bucket-here",
+        }
+    )
+    app = create_app(settings)
+
+    async with running_app(app) as client:
+        response = await client.get("/health/ready")
+
+    assert response.status_code == 503
+    body = response.json()
+    assert body["checks"]["database"]["ok"] is True
+    assert body["checks"]["redis"]["ok"] is True
+    assert body["checks"]["storage"]["ok"] is False
+    # The reason is logged in full; the response carries only the class of
+    # failure, since a readiness endpoint is often reachable unauthenticated.
+    assert body["checks"]["storage"]["error"] == "ServiceUnavailableError"
+
+
+@pytest.mark.integration
+async def test_readiness_degrades_within_its_timeout_when_the_store_hangs(
+    valid_env: dict[str, str], settings_from: BuildSettings, database_url: str, redis_url: str
+) -> None:
+    """The class of error is not pinned: an unreachable endpoint is retried by
+    botocore with backoff, so whether the probe reports the connection failure or
+    its own timeout is a race. What must hold is that it answers, and quickly."""
+    settings = settings_from(
+        {
+            **valid_env,
+            "DATABASE_URL": database_url,
+            "REDIS_URL": redis_url,
+            "S3_ENDPOINT_URL": "http://127.0.0.1:1",
+        }
+    )
+    app = create_app(settings)
+
+    async with running_app(app) as client:
+        started = time.monotonic()
+        response = await client.get("/health/ready")
+        elapsed = time.monotonic() - started
+
+    assert response.status_code == 503
+    error = response.json()["checks"]["storage"]["error"]
+    assert error and " " not in error, error
+    assert elapsed < 5, elapsed
 
 
 # A dependency that raises before the handler runs currently propagates out of

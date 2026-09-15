@@ -8,7 +8,7 @@ The module-level `app` is what uvicorn imports.
 from __future__ import annotations
 
 from collections.abc import AsyncIterator
-from contextlib import asynccontextmanager
+from contextlib import AsyncExitStack, asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -26,6 +26,7 @@ from ai_workspace_api.api.v1 import api_router as v1_router
 from ai_workspace_api.core.database import create_engine, create_session_factory
 from ai_workspace_api.core.logging import configure_logging, get_logger
 from ai_workspace_api.core.settings import Settings, get_settings
+from ai_workspace_api.core.storage import open_s3_storage
 
 logger = get_logger(__name__)
 
@@ -44,13 +45,19 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     engine = create_engine(settings)
     app.state.engine = engine
     app.state.session_factory = create_session_factory(engine)
-    try:
-        yield
-    finally:
-        # Dispose even if startup of a later resource failed, or the pool keeps
-        # its connections until the process dies.
-        await engine.dispose()
-        logger.info("stopping api")
+
+    # One S3 client for the process: it owns a connection pool, and opening one
+    # per request means a handshake and a credential lookup per request. The
+    # stack closes it on shutdown even if something after it fails to start.
+    async with AsyncExitStack() as stack:
+        app.state.storage = await open_s3_storage(settings, stack)
+        try:
+            yield
+        finally:
+            # Dispose even if startup of a later resource failed, or the pool
+            # keeps its connections until the process dies.
+            await engine.dispose()
+            logger.info("stopping api")
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:

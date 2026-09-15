@@ -96,10 +96,30 @@ jobs:
       S3_BUCKET: ai-workspace-ci
       S3_ACCESS_KEY: ci-access-key
       S3_SECRET_KEY: ci-secret-key
+      S3_REGION: us-east-1
       # At least 32 bytes; the setting refuses anything shorter (task 3.5).
       SESSION_SECRET: ci-session-secret-at-least-32-bytes-long
     steps:
       - uses: actions/checkout@v7
+
+      # A service container cannot override an image's command, and the MinIO
+      # image needs `server /data`, so this one is started by hand. Marked
+      # "(CI only)" because scripts/check-ci.sh must not start containers on a
+      # developer's machine, where the compose stack already holds port 9000.
+      - name: Start MinIO (CI only)
+        working-directory: .
+        run: |
+          docker run -d --name minio -p 9000:9000 \
+            -e MINIO_ROOT_USER="$S3_ACCESS_KEY" \
+            -e MINIO_ROOT_PASSWORD="$S3_SECRET_KEY" \
+            quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z server /data
+          for _ in $(seq 1 30); do
+            curl -fsS http://localhost:9000/minio/health/live && exit 0
+            sleep 1
+          done
+          echo "MinIO did not become healthy" >&2
+          docker logs minio >&2
+          exit 1
 
       - uses: astral-sh/setup-uv@v10.1.0
         with:
@@ -119,4 +139,20 @@ jobs:
         # Running the migrations here also tests them: a broken revision fails
         # CI rather than a deployment.
         run: uv run alembic upgrade head
+      # The bucket is created rather than assumed: the readiness probe checks it
+      # exists, so assuming it would make that check untested. "(CI only)" for
+      # the same reason as the MinIO step — locally the compose stack made it.
+      - name: Create the bucket (CI only)
+        run: |
+          uv run python - <<'PY'
+          import boto3, os
+          client = boto3.client(
+              "s3",
+              endpoint_url=os.environ["S3_ENDPOINT_URL"],
+              aws_access_key_id=os.environ["S3_ACCESS_KEY"],
+              aws_secret_access_key=os.environ["S3_SECRET_KEY"],
+              region_name=os.environ["S3_REGION"],
+          )
+          client.create_bucket(Bucket=os.environ["S3_BUCKET"])
+          PY
       - run: uv run pytest -m integration

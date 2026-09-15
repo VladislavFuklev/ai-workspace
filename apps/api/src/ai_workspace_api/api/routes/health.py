@@ -24,7 +24,8 @@ from redis.asyncio import Redis
 from sqlalchemy import text
 
 from ai_workspace_api import __version__
-from ai_workspace_api.api.dependencies import SessionDep, SettingsDep
+from ai_workspace_api.api.dependencies import SessionDep, SettingsDep, StorageDep
+from ai_workspace_api.core.storage import Storage
 
 logger = logging.getLogger(__name__)
 router = APIRouter(tags=["health"])
@@ -67,6 +68,16 @@ async def _check_database(session: SessionDep) -> DependencyStatus:
     return DependencyStatus(ok=True)
 
 
+async def _check_storage(storage: Storage) -> DependencyStatus:
+    try:
+        async with asyncio.timeout(CHECK_TIMEOUT_SECONDS):
+            await storage.check()
+    except Exception as error:
+        logger.warning("storage readiness check failed", exc_info=error)
+        return DependencyStatus(ok=False, error=type(error).__name__)
+    return DependencyStatus(ok=True)
+
+
 async def _check_redis(url: str) -> DependencyStatus:
     client: Redis = Redis.from_url(url)
     try:
@@ -87,17 +98,19 @@ async def _check_redis(url: str) -> DependencyStatus:
     responses={503: {"model": ReadinessResponse, "description": "A dependency is unavailable"}},
 )
 async def ready(
-    session: SessionDep, settings: SettingsDep, response: Response
+    session: SessionDep, settings: SettingsDep, storage: StorageDep, response: Response
 ) -> ReadinessResponse:
     """Checks every dependency a request would need, concurrently.
 
     Returns 503 when any of them is down — the status code is what the load
     balancer reads; the body is for a human looking at why.
     """
-    database, redis = await asyncio.gather(
-        _check_database(session), _check_redis(str(settings.redis_url))
+    database, redis, store = await asyncio.gather(
+        _check_database(session),
+        _check_redis(str(settings.redis_url)),
+        _check_storage(storage),
     )
-    checks = {"database": database, "redis": redis}
+    checks = {"database": database, "redis": redis, "storage": store}
     healthy = all(check.ok for check in checks.values())
 
     if not healthy:

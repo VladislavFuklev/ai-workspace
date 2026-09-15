@@ -14,6 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from ai_workspace_api.core.database import session_scope
 from ai_workspace_api.core.settings import Settings
+from ai_workspace_api.core.storage import Storage
 
 
 def get_app_settings(request: Request) -> Settings:
@@ -33,3 +34,17 @@ async def get_session(request: Request) -> AsyncIterator[AsyncSession]:
 
 
 SessionDep = Annotated[AsyncSession, Depends(get_session)]
+
+
+def get_storage(request: Request) -> Storage:
+    """The store opened at startup.
+
+    A dependency rather than an import, so a test swaps in `InMemoryStorage`
+    without a network, and without patching a module that something else may
+    have already imported.
+    """
+    storage: Storage = request.app.state.storage
+    return storage
+
+
+StorageDep = Annotated[Storage, Depends(get_storage)]

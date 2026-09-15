@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### 5.1 — File storage abstraction (2026-09-15)
+
+- `core/storage`: one way to put a file somewhere and get it back, scoped to a
+  tenant on every call. S3/MinIO for real, a dictionary for tests.
+- Keys are `org/{organization_id}/{kind}/{uuid}{extension}` (ADR-022). The
+  uploaded filename never reaches the key; every read, delete and signature
+  re-checks the prefix and answers 404 for another tenant's object.
+- Size and content type are enforced before anything is stored, and a presigned
+  URL is capped at 15 minutes.
+- The readiness probe now reports storage, so a missing bucket is an outage the
+  probe sees rather than one a user finds on their first upload.
+- CI runs MinIO and creates the bucket, so the storage tests run there instead of
+  skipping.
+
 ### 4.7 — Tenant isolation tests (2026-09-13)
 
 - One sweep that tries to cross the tenant boundary on every route that has a
